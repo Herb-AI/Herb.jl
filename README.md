@@ -1,4 +1,4 @@
-# Program-Synthesis-Framework
+# Herb.jl
 
 Core functionality:
 
