@@ -1,0 +1,18 @@
+[submodule "Search.jl"]
+	path = Search.jl
+	url = https://github.com/Herb-AI/Search.jl
+[submodule "Grammar.jl"]
+	path = Grammar.jl
+	url = https://github.com/Herb-AI/Grammar.jl
+[submodule "Data.jl"]
+	path = Data.jl
+	url = https://github.com/Herb-AI/Data.jl
+[submodule "Benchmarks.jl"]
+	path = Benchmarks.jl
+	url = https://github.com/Herb-AI/Benchmarks.jl
+[submodule "Utils.jl"]
+	path = Utils.jl
+	url = https://github.com/Herb-AI/Utils.jl
+[submodule "Evaluation.jl"]
+	path = Evaluation.jl
+	url = https://github.com/Herb-AI/Evaluation.jl
