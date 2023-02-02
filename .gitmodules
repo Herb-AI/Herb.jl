@@ -7,9 +7,6 @@
 [submodule "Data.jl"]
 	path = Data.jl
 	url = https://github.com/Herb-AI/Data.jl
-[submodule "Benchmarks.jl"]
-	path = Benchmarks.jl
-	url = https://github.com/Herb-AI/Benchmarks.jl
 [submodule "Utils.jl"]
 	path = Utils.jl
 	url = https://github.com/Herb-AI/Utils.jl
