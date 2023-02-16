@@ -16,3 +16,6 @@
 [submodule "Evaluation.jl"]
 	path = Evaluation.jl
 	url = https://github.com/Herb-AI/Evaluation.jl
+[submodule "SpecificationExtraction.jl"]
+	path = SpecificationExtraction.jl
+	url = https://github.com/Herb-AI/SpecificationExtraction.jl
