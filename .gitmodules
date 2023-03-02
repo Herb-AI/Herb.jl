@@ -19,3 +19,6 @@
 [submodule "HerbExamples.jl"]
 	path = HerbExamples.jl
 	url = https://github.com/Herb-AI/HerbExamples.jl
+[submodule "Constraints.jl"]
+	path = Constraints.jl
+	url = https://github.com/Herb-AI/Constraints.jl.git
