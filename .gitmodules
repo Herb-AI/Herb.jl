@@ -1,24 +1,24 @@
-[submodule "Search.jl"]
-	path = Search.jl
-	url = https://github.com/Herb-AI/Search.jl
-[submodule "Grammar.jl"]
-	path = Grammar.jl
-	url = https://github.com/Herb-AI/Grammar.jl
-[submodule "Data.jl"]
-	path = Data.jl
-	url = https://github.com/Herb-AI/Data.jl
-[submodule "Benchmarks.jl"]	
-	path = Benchmarks.jl
-	url = https://github.com/Herb-AI/Benchmarks.jl
-[submodule "Utils.jl"]
-	path = Utils.jl
-	url = https://github.com/Herb-AI/Utils.jl
-[submodule "Evaluation.jl"]
-	path = Evaluation.jl
-	url = https://github.com/Herb-AI/Evaluation.jl
+[submodule "HerbSearch.jl"]
+	path = HerbSearch.jl
+	url = https://github.com/Herb-AI/HerbSearch.jl.git
+[submodule "HerbGrammar.jl"]
+	path = HerbGrammar.jl
+	url = https://github.com/Herb-AI/HerbGrammar.jl.git
+[submodule "HerbData.jl"]
+	path = HerbData.jl
+	url = https://github.com/Herb-AI/HerbData.jl.git
+[submodule "HerbBenchmarks.jl"]	
+	path = HerbBenchmarks.jl
+	url = https://github.com/Herb-AI/HerbBenchmarks.jl.git
+[submodule "HerbUtils.jl"]
+	path = HerbUtils.jl
+	url = https://github.com/Herb-AI/HerbUtils.jl.git
+[submodule "HerbEvaluation.jl"]
+	path = HerbEvaluation.jl
+	url = https://github.com/Herb-AI/HerbEvaluation.jl.git
 [submodule "HerbExamples.jl"]
 	path = HerbExamples.jl
 	url = https://github.com/Herb-AI/HerbExamples.jl
-[submodule "Constraints.jl"]
-	path = Constraints.jl
-	url = https://github.com/Herb-AI/Constraints.jl.git
+[submodule "HerbConstraints.jl"]
+	path = HerbConstraints.jl
+	url = https://github.com/Herb-AI/HerbConstraints.jl.git
