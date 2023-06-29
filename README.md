@@ -1,17 +1,8 @@
 # Herb.jl
 
-Core functionality:
+## Introduction
 
-    install all dependencies
-    focus on user interaction, how the user should use the library: init, run, output
-
-Additional functionality:
-
-    benchmarking and basic config for default cases
-    template notebooks
-
-
-### Getting started
+## Getting started
 
 As this project is working with git-submodules, after cloning please run
 
@@ -26,4 +17,5 @@ To update each submodule to their latest master commit, please run
 git submodule update --rebase --remote
 ```
 
+## Conventions
 

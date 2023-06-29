@@ -22,3 +22,6 @@
 [submodule "HerbConstraints.jl"]
 	path = HerbConstraints.jl
 	url = https://github.com/Herb-AI/HerbConstraints.jl.git
+[submodule "HerbCore.jl"]
+	path = HerbCore.jl
+	url = https://github.com/Herb-AI/HerbCore.jl.git
