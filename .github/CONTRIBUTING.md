@@ -2,6 +2,8 @@
 
 Thank you for considering contributing to Herb.jl! We appreciate your interest in helping to improve the capabilities of our program synthesis library. This document provides guidelines for contributing to the project. Please take a moment to review these guidelines before making your contribution.
 
+Be part of our [long list of contributors](./CONTRIBUTORS.md).
+
 ## Table of Contents
 
 - [Reporting Issues](#reporting-issues)
