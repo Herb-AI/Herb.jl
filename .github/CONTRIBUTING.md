@@ -27,7 +27,8 @@ If you encounter any issues or bugs in Herb.jl, please report them using the Git
 We welcome contributions to Herb.jl! If you'd like to contribute code changes, new features, or bug fixes, please follow these steps:
 
 1. Set up the development environment by following the instructions in the README.md file.
-2. Create a new branch for your contribution using a descriptive name for the respective repository.
+2. If you are an external contributor, create a new fork for your contribution using a descriptive name for the respective repository. 
+If you are a student doing a Herb.jl project, you can also create a branch.
 3. Make your changes, ensuring that your code adheres to the code style and guidelines outlined below.
 4. Write tests to cover your changes and ensure existing tests pass.
 5. Update the documentation if necessary.
@@ -37,7 +38,7 @@ We welcome contributions to Herb.jl! If you'd like to contribute code changes, n
 
 ## Branching and Workflow
 
-Herb.jl follows the GitFlow branching model. Please create your feature branches from the `develop` branch and submit your pull requests to the `develop` branch as well. The `master` branch contains the stable, production-ready code.
+Herb.jl follows the GitFlow branching model. Please create your feature branches from the `dev` branch and submit your pull requests to the `dev` branch as well. The `master` branch contains the stable, production-ready code.
 
 ## Code Style and Guidelines
 
@@ -61,13 +62,14 @@ Clear and comprehensive documentation is essential for the usability and maintai
 
 An example can be found below:
 
-```
+```julia
 """
 	rulesoftype(node::RuleNode, grammar::Grammar, ruletype::Symbol)
 
 Returns every rule of nonterminal symbol `ruletype` that is also used in the [`AbstractRuleNode`](@ref) tree.
 """
-function ...
+function rulesoftype(node::RuleNode, grammar::Grammar, ruletype::Symbol)
+	...
 ```
 
 ## Pull Requests
