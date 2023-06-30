@@ -15,7 +15,7 @@ using Test
     include("../HerbGrammar.jl/test/test_cfg.jl")
     include("../HerbGrammar.jl/test/test_csg.jl")
     include("../HerbConstraints.jl/test/test_propagators.jl")
-    # include("../HerbSearch.jl/test/test_algorithms.jl")
+    include("../HerbSearch.jl/test/test_algorithms.jl")
     include("../HerbSearch.jl/test/test_context_free_iterators.jl")
     include("../HerbSearch.jl/test/test_context_sensitive_iterators.jl")
     include("../HerbSearch.jl/test/test_search_procedure.jl")
