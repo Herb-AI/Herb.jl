@@ -6,7 +6,7 @@ We would like to thank the following individuals for their contributions to Herb
 - [Tilman Hinnerichs](https://github.com/thinnerichs)
 - [Sebastijan Dumancic](https://github.com/sebdumancic)
 
-2023:
+### 2023:
 - [Alexander Freeman](https://github.com/flammified)
 - [Issa Hanou](https://github.com/IssaHanou)
 - [Pepijn Klop](https://github.com/Pepijnk12)
