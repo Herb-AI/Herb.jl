@@ -19,3 +19,6 @@
 [submodule "HerbCore.jl"]
 	path = HerbCore.jl
 	url = https://github.com/Herb-AI/HerbCore.jl.git
+[submodule "HerbLearn.jl"]
+	path = HerbLearn.jl
+	url = https://github.com/Herb-AI/HerbLearn.jl
