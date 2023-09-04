@@ -11,7 +11,8 @@ using Test
 import Pkg
 
 @testset verbose=false "Herb" begin
-   @test 1==1 # dummy test
+   # @test 1==1 # dummy test
+
    println("\n--- HerbConstraints tests ---")
    Pkg.test("HerbConstraints")
    println("\n--- HerbCore tests ---")
