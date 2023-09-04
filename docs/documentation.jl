@@ -4,11 +4,11 @@ include("../src/Herb.jl")
 
 using .Herb
 
-using .Herb.HerbConstraints
-using .Herb.HerbSearch
-using .Herb.HerbGrammar 
-using .Herb.HerbData
-using .Herb.HerbEvaluation
+using HerbConstraints
+using HerbSearch
+using HerbGrammar 
+using HerbData
+using HerbEvaluation
 
 makedocs(
     sitename="Herb.jl",
