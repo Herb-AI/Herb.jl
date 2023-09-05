@@ -32,5 +32,6 @@ makedocs(;
 deploydocs(;
     repo="github.com/Herb-AI/Herb.jl.git",
     devbranch="documentation",
+    devurl="dev",
 )
 
