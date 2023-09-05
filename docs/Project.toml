@@ -7,3 +7,6 @@ HerbData = "495a3ad3-8034-41b3-a087-aacf2fd71098"
 HerbEvaluation = "eb1bf938-813d-4942-ac0f-b4657a683e76"
 HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
 HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
+
+[compat]
+Documenter = "0.27"
