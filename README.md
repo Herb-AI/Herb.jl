@@ -1,5 +1,5 @@
 [![Build Status](https://github.com/Herb-AI/Herb.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/Herb-AI/Herb.jl/actions/workflows/CI.yml?query=branch%3Amaster)
-<> ([![Docs](https://img.shields.io/badge/docs-stable-blue.svg)](tbd))
+[![Dev-Docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://Herb-AI.github.io/Herb.jl/dev)
 
 
 # Herb.jl
