@@ -1,11 +1,11 @@
-# HerbConstraints.jl Documentation
+# [HerbCore.jl Documentation](@id HerbCore_docs)
 
 ```@meta
-CurrentModule=HerbConstraints
+CurrentModule=HerbCore
 ```
 
 ```@autodocs
-Modules = [HerbConstraints]
+Modules = [HerbCore]
 Order   = [:type, :const, :macro, :function]
 ```
 
