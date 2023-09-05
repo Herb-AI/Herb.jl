@@ -1,16 +1,29 @@
 name = "Herb"
 uuid = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
-authors = ["Jaap de Jong <jaapdejong15@gmail.com>"]
+authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Tilman Hinnerichs <t.r.hinnerichs@tudelft.nl>", "Sebastijan Dumancic <s.dumancic@tudelft.nl>"]
 version = "0.1.0"
 
 [deps]
-AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
-DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-TreeView = "39424ebd-4cf3-5550-a685-96706a953f40"
-Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+HerbConstraints = "1fa96474-3206-4513-b4fa-23913f296dfc"
+HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
+HerbData = "495a3ad3-8034-41b3-a087-aacf2fd71098"
+HerbEvaluation = "eb1bf938-813d-4942-ac0f-b4657a683e76"
+HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
+HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [compat]
-AbstractTrees = "0.4"
-DataStructures = "0.17,0.18"
-TreeView = "0.5"
-julia = "1"
+HerbConstraints = "0.1.0"
+HerbCore = "0.1.1"
+HerbData = "0.1.1"
+HerbEvaluation = "0.1.0"
+HerbGrammar = "0.1.0"
+HerbSearch = "0.1.0"
+julia = "1.8"
+
+[extras]
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
