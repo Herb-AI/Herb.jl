@@ -1,4 +1,4 @@
-# HerbConstraints.jl Documentation
+# [HerbConstraints.jl Documentation](@id HerbConstraints_docs)
 
 ```@meta
 CurrentModule=HerbConstraints

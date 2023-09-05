@@ -17,14 +17,19 @@ makedocs(;
     sitename="Herb.jl",
     repo="https://github.com/Herb-AI/Herb.jl",
     pages = [
-        "Home" => "index.md",
+        "Basics" => [
+            "index.md",
+            "install.md",
+            "get_started.md",
+            "concepts.md"
+           ],
         "Sub-Modules" => [
-        "HerbGrammar.jl" => "HerbGrammar.md",
-        "HerbSearch.jl" => "HerbSearch.md",
-        "HerbConstraints.jl" => "HerbConstraints.md",
-        "HerbCore.jl" => "HerbData.md",
-        "HerbEvaluation.jl" => "HerbEvaluation.md",
-        "HerbData.jl" => "HerbData.md",
+            "HerbGrammar.jl" => "HerbGrammar/index.md",
+            "HerbSearch.jl" => "HerbSearch/index.md",
+            "HerbConstraints.jl" => "HerbConstraints/index.md",
+            "HerbCore.jl" => "HerbData/index.md",
+            "HerbEvaluation.jl" => "HerbEvaluation/index.md",
+            "HerbData.jl" => "HerbData/index.md",
        ],
     ],
 )

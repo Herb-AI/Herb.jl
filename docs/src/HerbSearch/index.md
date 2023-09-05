@@ -1,11 +1,11 @@
-# HerbGrammar.jl Documentation
+# [HerbSearch.jl Documentation](@id HerbSearch_docs)
 
 ```@meta
-CurrentModule=HerbGrammar
+CurrentModule=HerbSearch
 ```
 
 ```@autodocs
-Modules = [HerbGrammar]
+Modules = [HerbSearch]
 Order   = [:type, :const, :macro, :function]
 ```
 
