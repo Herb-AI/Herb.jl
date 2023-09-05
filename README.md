@@ -3,21 +3,31 @@
 
 
 # Herb.jl
-Welcome to `Herb.jl`, a program synthesis library using the Julia programming language. 
+*A library for defining and efficiently solving program synthesis tasks in Julia.*
 
 ## Introduction
-The task of program synthesis considers automatic generation of programs with respect to a higher-order specification. 
-This involves searching through a space of possible programs, that are usually described by a domain specific language (DSL), determining possible derivations and expansions and expressed by a grammar (See [HerbGrammar.jl](https://github.com/Herb-AI/HerbGrammar.jl)). Specifications may be expressed in a variety of forms such as input-output examples, logical formulas, or natural language descriptions (See [HerbData.jl](https://github.com/Herb-AI/HerbData.jl)). 
+When writing research software we almost always investigate highly specific properties or algorithms of our domain, leading to us building the tools from scratch over and over again. The very same holds for the field of program synthesis: Tools are hard to run, benchmarks are hard to get and prepare, and its hard to adapt our existing code to a novel idea.
 
-There are two ways of narrowing down this enormous search space: First, one may use constraints to assist the search itself by pruning the exploration rendundant, useless or impossible sub-programs (See [HerbConstraints.jl](https://github.com/Herb-AI/HerbConstraints.jl)). 
-Second, one may use guiding heuristics and different search strategies to suitable programs (See [HerbSearch](https://github.com/Herb-AI/HerbSearch.jl)) or learn to guide the search itself (See [HerbLearn](yet_to_be_published)).
+Herb.jl will take care of this for you and helps you defining, solving and extending your program synthesis problems.
+
+Herb.jl provides...
+- a unified and universal framework for program synthesis
+- Herb.jl allows you to describe all sorts of program synthesis problems using context-free grammars
+- a number of state-of-the-art benchmarks and solvers already implemented and usable out-of-the-box
+
+Herb.jl's sub-packages provide fast and easily extendable implementations of
+- various static and dynamic search strategies,
+- learning search strategies, sampling techniques and more,
+- constraint formulation and propagation,
+- easy grammar formulation and usage,
+- wide-range of usable program interpreters and languages + the possibility to use your own, and
+- efficient data formulation.
 
 ## Getting started
-To get started with our library, please have a look at our introductory examples in [HerbExamples](https://github.com/Herb-AI/HerbExamples.jl). 
-
-## Library structure and compartments
+Please check out our [tutorial](https://herb-ai.github.io/Herb.jl/dev/install/)
 
 ## Conventions
 
 ## Documentation
+The entire documentation is available at [https://herb-ai.github.io/Herb.jl/dev/install/](https://herb-ai.github.io/Herb.jl/dev/install/).
 
