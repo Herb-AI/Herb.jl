@@ -38,23 +38,13 @@ Herb's functionality is distributed among several sub-packages:
 - [HerbConstraints.jl](@ref HerbConstraints_docs):
 
 
-## Basics:
+## Basics
 
 ```@contents
-Pages = [ "def_pomdp.md", "interfaces.md"]
-Depth = 3
+Pages = ["install.md", "get_started.md", "concepts.md"]
 ```
 
-
+## Advanced content
 
 ```@contents
 ```
-
-## Index
-
-This is the index.
-
-```@index
-```
-
-
