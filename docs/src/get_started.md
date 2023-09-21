@@ -35,7 +35,7 @@ solution = search(g, problem, :Number, max_depth=3)
 println(solution)
 ```
 
-There are various ways to adapt the search technique to your needs. Please have a look at the [`search`][@ref] documentation.
+There are various ways to adapt the search technique to your needs. Please have a look at the [`search`](@ref) documentation.
 
 Eventually, we want to test our solution on some other inputs using `HerbInterpret`. We transform our grammar `g` to a Julia expression with `Symboltable(g)`, add our solution and the input, assigning the value `6` to the variable `x`.
 
