@@ -9,7 +9,7 @@ using HerbSearch
 
 export 
     HerbCore,
-    HerbGrammars,
+    HerbGrammar,
     HerbConstraints,
     HerbData,
     HerbEvaluation,

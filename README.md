@@ -24,7 +24,8 @@ Herb.jl's sub-packages provide fast and easily extendable implementations of
 - efficient data formulation.
 
 ## Getting started
-Please check out our [tutorial](https://herb-ai.github.io/Herb.jl/dev/install/)
+Please check out our [tutorial](https://herb-ai.github.io/Herb.jl/dev/install/).
+Also check out recent projects and events on our [website](https://herb-ai.github.io).
 
 ## Conventions
 
