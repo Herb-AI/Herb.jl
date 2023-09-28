@@ -1,18 +1,16 @@
 using Documenter
 
-include("../src/Herb.jl")
-
-using .Herb
+using Herb
 
 using HerbConstraints
 using HerbSearch
 using HerbGrammar 
 using HerbData
-using HerbEvaluation
+using HerbInterpret
 using HerbCore
 
 makedocs(;
-    modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbData, HerbEvaluation, HerbCore],
+    modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbData, HerbInterpret, HerbCore],
     authors="SEBs",
     sitename="Herb.jl",
     repo="https://github.com/Herb-AI/Herb.jl",
@@ -28,7 +26,7 @@ makedocs(;
             "HerbSearch.jl" => "HerbSearch/index.md",
             "HerbConstraints.jl" => "HerbConstraints/index.md",
             "HerbCore.jl" => "HerbData/index.md",
-            "HerbEvaluation.jl" => "HerbEvaluation/index.md",
+            "HerbInterpret.jl" => "HerbInterpret/index.md",
             "HerbData.jl" => "HerbData/index.md",
        ],
     ],

@@ -33,7 +33,7 @@ Herb's functionality is distributed among several sub-packages:
 - [HerbCore.jl](@ref HerbCore_docs): The core of Herb.jl defining core concepts to avoid circular dependencies.
 - [HerbGrammar.jl](@ref HerbGrammar_docs):
 - [HerbData.jl](@ref HerbData_docs):
-- [HerbEvaluation.jl](@ref HerbEvaluation_docs):
+- [HerbInterpret.jl](@ref HerbInterpret_docs):
 - [HerbSearch.jl](@ref HerbSearch_docs):
 - [HerbConstraints.jl](@ref HerbConstraints_docs):
 
