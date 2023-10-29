@@ -4,15 +4,15 @@ using HerbCore
 using HerbGrammar
 using HerbConstraints
 using HerbData
-using HerbEvaluation
+using HerbInterpret
 using HerbSearch
 
 export 
     HerbCore,
-    HerbGrammars,
+    HerbGrammar,
     HerbConstraints,
     HerbData,
-    HerbEvaluation,
+    HerbInterpret,
     HerbSearch
     
 end # module
