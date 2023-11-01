@@ -24,7 +24,7 @@ makedocs(;
         "Tutorials" => [
             "An more verbose getting started with Herb.jl" => "tutorials/getting_started_with_herb.md",
             "Defining Grammars in Herb.jl" => "tutorials/defining_grammars.md"
-        ]
+        ],
         "Sub-Modules" => [
             "HerbGrammar.jl" => "HerbGrammar/index.md",
             "HerbSearch.jl" => "HerbSearch/index.md",
