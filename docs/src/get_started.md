@@ -53,7 +53,7 @@ See our other tutorials!
 ## The full code example
 
 ```julia
-using HerbSearch, HerbData, HerbInterpret
+using HerbSearch, HerbData, HerbInterpret, HerbGrammar
 
 # define our very simple context-free grammar
 # Can add and multiply an input variable x or the integers 1,2.
