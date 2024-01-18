@@ -22,8 +22,9 @@ makedocs(;
             "concepts.md"
            ],
         "Tutorials" => [
-            "An more verbose getting started with Herb.jl" => "tutorials/getting_started_with_herb.md",
+            "A more verbose getting started with Herb.jl" => "tutorials/getting_started_with_herb.md",
             "Defining Grammars in Herb.jl" => "tutorials/defining_grammars.md"
+            "Advanced Search Procedures" => "tutorials/advanced_search.md"
         ],
         "Sub-Modules" => [
             "HerbGrammar.jl" => "HerbGrammar/index.md",
