@@ -11,7 +11,6 @@ using HerbCore
 
 makedocs(
     modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbData, HerbInterpret, HerbCore],
-    format
     authors="PONYs",
     sitename="Herb.jl",
     pages = [
