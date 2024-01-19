@@ -22,8 +22,8 @@ jobs:
           using Pkg;
           Pkg.develop(PackageSpec(path=pwd()));
           Pkg.develop("HerbCore");
-          Pkg.develop("HerbGrammar");
           Pkg.develop("HerbData");
+          Pkg.develop("HerbGrammar");
           Pkg.develop("HerbInterpret");
           Pkg.develop("HerbConstraints");
           Pkg.develop("HerbSearch");
