@@ -9,11 +9,11 @@ using HerbData
 using HerbInterpret
 using HerbCore
 
-makedocs(;
+makedocs(
     modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbData, HerbInterpret, HerbCore],
-    authors="SEBs",
+    format
+    authors="PONYs",
     sitename="Herb.jl",
-    repo="https://github.com/Herb-AI/Herb.jl",
     pages = [
         "Basics" => [
             "index.md",
@@ -35,6 +35,7 @@ makedocs(;
             "HerbData.jl" => "HerbData/index.md",
        ],
     ],
+    warnonly = [:missing_docs]
 )
 
 deploydocs(;

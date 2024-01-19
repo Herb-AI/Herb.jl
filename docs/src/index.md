@@ -26,6 +26,7 @@ Herb.jl's sub-packages provide fast and easily extendable implementations of
 
 ## Why Julia?
 
+Julia is a perfect fit for program synthesis due to numerous reasons. Starting from scientific reasons like speed of execution and composability over to practical reasons like speed of writing Julia code. For a full ode on why to use Julia, please see [the WhyJulia manifesto](https://github.com/pitmonticone/whyjulia-manifesto/tree/main).
 
 ## Sub-Modules
 
