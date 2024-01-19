@@ -1,6 +1,6 @@
 # Getting started
 
-You can either paste this code into the Julia REPL or into a seperate file, e.g. `get_started.jl` followed by running `julia get_started.jl`.
+You can either paste this code into the Julia REPL or run it using the `advanced_search.ipynb` notebook. Alternatively you can copy the code into a file like `get_started.jl`, followed by running `julia get_started.jl`.
 
 To start, we import the necessary packages.
 
@@ -60,7 +60,7 @@ end
 >>> ...
 ```
 
-We see that only when `i >= 24`, there is a result, after that, increasing `i` does not have any effect on the number of allocations. 
+We see that only when `i >= 24`, there is a result. After that, increasing `i` does not have any effect on the number of allocations. 
 
 A final parameter we consider here is `allow_evaluation_errors`, which is `false` by default. When this is set to `true`, the program will still run even when an exception is thrown during evaluation. To see the effect of this, we create a new grammar. We can also retrieve the error together with the solution from the search method.
 
@@ -77,7 +77,7 @@ println(solution)
 >>> nothing
 ```
 
-There is also another search method called `search_best` which return both the solution and the possible error. The method returns the best program found so far. In this case, we can also see the error:
+There is also another search method called `search_best` which returns both the solution and the possible error. The method returns the best program found so far. In this case, we can also see the error:
 
 ```julia
 solution, error = search_best(g, problem, :Index, max_depth=2, allow_evaluation_errors=true)
@@ -93,7 +93,7 @@ We now show examples of using different search procedures.
 
 ### Breadth-First Search
 
-The breadth-first search will first enumerate all possible programs at the same depth before considering a program with a depth of one more. A tree of the grammar is returned with programs ordered in increasing sizes. We can first `collect` the programs that have a `max-depth` of 2 and a `max_size` of infinite (integer maximum value), where the starting symbol is of type `Real`. This function uses a default heuristic 'left-most first', such that the left-most child in the tree is always explored first. 
+The breadth-first search will first enumerate all possible programs at the same depth before considering programs with a depth of one more. A tree of the grammar is returned with programs ordered in increasing sizes. We can first `collect` the programs that have a `max-depth` of 2 and a `max_size` of infinite (integer maximum value), where the starting symbol is of type `Real`. This function uses a default heuristic 'left-most first', such that the left-most child in the tree is always explored first. 
 
 ```julia
 g1 = @cfgrammar begin
@@ -103,7 +103,7 @@ end
 programs = collect(get_bfs_enumerator(g1, 2, typemax(Int), :Real))
 ```
 
-We can test that this function returns the correct functions and all functions. 
+We can test that this function returns all and only the correct functions. 
 
 ```julia
 answer_programs = [
@@ -145,11 +145,9 @@ println(programs)
 >>> RuleNode[1,, 3{1,1}, 3{2,1}, 3{1,2}, 3{2,2}, 2,]
 ```
 
-### Metropolis-Hastings
+## Stochastic search 
 
-One of the stochastic search methods that is implemented is Metropolis-Hastings (MH), which samples from a distribution of programs based on the grammar. For more information on MH, see for example [this webpage](https://stephens999.github.io/fiveMinuteStats/MH_intro.html).
-
-For the example below, we use this grammar and helper function.
+For the examples below, we use this grammar and helper function.
 ```julia
 grammar = @csgrammar begin
     X = |(1:5)
@@ -163,6 +161,12 @@ function create_problem(f, range=20)
     return Problem(examples), examples
 end
 ```
+
+### Metropolis-Hastings
+
+One of the stochastic search methods that is implemented is Metropolis-Hastings (MH), which samples from a distribution of programs based on the grammar. For more information on MH, see for example [this webpage](https://stephens999.github.io/fiveMinuteStats/MH_intro.html).
+
+
 
 The below example uses a simple arithmetic example. As the search method is stochastic, different programs may be returned, as shown below.
 
@@ -203,7 +207,7 @@ program, cost = search_best(grammar, problem, :X, enumerator=enumerator, error_f
 
 ### Simulated Annealing
 
-The third stochastic search method is called simulated annealing, is another hill-climbing method to find local optima. For more information, see [this page](https://www.cs.cmu.edu/afs/cs.cmu.edu/project/learn-43/lib/photoz/.g/web/glossary/anneal.html).
+The third stochastic search method is called simulated annealing. This is another hill-climbing method to find local optima. For more information, see [this page](https://www.cs.cmu.edu/afs/cs.cmu.edu/project/learn-43/lib/photoz/.g/web/glossary/anneal.html).
 
 We try the example from earlier, but now we can additionally define the `initial_temperature` of the algorithm, which is 1 by default. Two possible answers to the program are given as well.
 
@@ -224,8 +228,8 @@ Genetic search is a type of evolutionary algorithm, which will simulate the proc
 We show the example of finding a lambda function.
 
 ```julia
-e = Meta.parse("x -> 3 * x * x + (x + 2)")
-problem, examples = create_problem(eval(e))
+e = x -> 3 * x * x + (x + 2)
+problem, examples = create_problem(e)
 enumerator = get_genetic_enumerator(examples, 
     initial_population_size = 10,
     mutation_probability = 0.8,

@@ -10,7 +10,9 @@ using HerbGrammar, HerbData, HerbSearch, HerbInterpret
 
 To define a program synthesis problem, we need a grammar and specification. 
 
-First, the grammar can be constructed using the `@cfgrammar` macro included in `HerbGrammar`. Here we describe a simple integer arithmetic example, that can add and multiply an input variable `x` or the integers `1,2`, using
+First, a grammar can be constructed using the `@cfgrammar` macro included in `HerbGrammar`. Alternatively, we can use the `@csgrammar` macro, which will be shown later on in the tutorial when we use constraints. 
+
+Here, we describe a simple integer arithmetic example, that can add and multiply an input variable `x` or the integers `1,2`, using
 
 
 ```julia
