@@ -18,7 +18,16 @@ jobs:
         with:
           version: '1.8'
       - name: Install dependencies
-        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        run: julia --project=docs/ -e '
+          using Pkg
+          Pkg.develop(PackageSpec(path=pwd()))
+          Pkg.develop("HerbCore")
+          Pkg.develop("HerbGrammar")
+          Pkg.develop("HerbData")
+          Pkg.develop("HerbInterpret")
+          Pkg.develop("HerbConstraints")
+          Pkg.develop("HerbSearch")
+          Pkg.instantiate()'
       - name: Build and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If authenticating with GitHub Actions token
