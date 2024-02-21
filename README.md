@@ -27,6 +27,9 @@ Herb.jl's sub-packages provide fast and easily extendable implementations of
 Please check out our [tutorial](https://herb-ai.github.io/Herb.jl/dev/install/).
 Also check out recent projects and events on our [website](https://herb-ai.github.io).
 
+### Read about Julia specifics
+- [How to optimise Julia code](https://viralinstruction.com/posts/optimise/)
+
 ## Conventions
 
 ## Documentation
