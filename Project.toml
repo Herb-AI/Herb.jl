@@ -14,7 +14,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [compat]
 HerbConstraints = "0.1.0"
-HerbCore = "0.1.1"
+HerbCore = "0.1.1, 0.2"
 HerbData = "0.1.1"
 HerbGrammar = "0.1.0"
 HerbInterpret = "0.1.0"
