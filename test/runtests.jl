@@ -2,10 +2,10 @@ module HerbTest
 
 using HerbConstraints
 using HerbCore
-using HerbData
 using HerbInterpret
 using HerbGrammar
 using HerbSearch
+using HerbSpecification
 
 using Test
 import Pkg
@@ -16,14 +16,14 @@ import Pkg
    Pkg.test("HerbConstraints")
    println("\n--- HerbCore tests ---")
    Pkg.test("HerbCore")
-   println("\n--- HerbData tests ---")
-   Pkg.test("HerbData")
    println("\n--- HerbInterpret tests ---")
    Pkg.test("HerbInterpret")
    println("\n--- HerbGrammar tests ---")
    Pkg.test("HerbGrammar")
    println("\n--- HerbSearch tests ---")
    Pkg.test("HerbSearch")
+   println("\n--- HerbSpecification tests ---")
+   Pkg.test("HerbSpecification")
 end
 
 end # module

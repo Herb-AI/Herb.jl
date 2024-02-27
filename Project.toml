@@ -1,25 +1,25 @@
 name = "Herb"
 uuid = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
 authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Tilman Hinnerichs <t.r.hinnerichs@tudelft.nl>", "Sebastijan Dumancic <s.dumancic@tudelft.nl>"]
-version = "0.1.1"
+version = "0.2.0"
 
 [deps]
 HerbConstraints = "1fa96474-3206-4513-b4fa-23913f296dfc"
 HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
-HerbData = "495a3ad3-8034-41b3-a087-aacf2fd71098"
 HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
 HerbInterpret = "5bbddadd-02c5-4713-84b8-97364418cca7"
 HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
+HerbSpecification = "6d54aada-062f-46d8-85cf-a1ceaf058a06"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [compat]
-HerbConstraints = "0.1.0"
-HerbCore = "0.1.1"
-HerbData = "0.1.1"
-HerbGrammar = "0.1.0"
-HerbInterpret = "0.1.0"
-HerbSearch = "0.1.1"
-julia = "1.8"
+HerbConstraints = "^0.1.1"
+HerbCore = "^0.2.0"
+HerbInterpret = "^0.1.2"
+HerbGrammar = "^0.2.1"
+HerbSearch = "^0.2.0"
+HerbSpecification = "^0.1.0"
+julia = "^1.8"
 
 [extras]
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
