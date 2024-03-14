@@ -5,7 +5,7 @@ You can either paste this code into the Julia REPL or into a seperate file, e.g.
 To begin, we need to import all needed packages using
 
 ```julia
-using HerbGrammar, HerbData, HerbSearch, HerbInterpret
+using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret
 ```
 
 To define a program synthesis problem, we need a grammar and specification. 
@@ -33,7 +33,8 @@ problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 The problem is given now, let us search for a solution with `HerbSearch`. For now we will just use the default parameters searching for a satisfying program over the grammar, given the problem and a starting symbol using
 
 ```julia
-solution = search(g, problem, :Number, max_depth=3)
+iterator = BFSIterator(g₁, :Number, max_depth=5)
+solution, flag = synth(problem, iterator)
 println(solution)
 ```
 
@@ -42,7 +43,9 @@ There are various ways to adapt the search technique to your needs. Please have 
 Eventually, we want to test our solution on some other inputs using `HerbInterpret`. We transform our grammar `g` to a Julia expression with `Symboltable(g)`, add our solution and the input, assigning the value `6` to the variable `x`.
 
 ```julia
-output = test_with_input(SymbolTable(g), solution, Dict(:x => 6))
+program = rulenode2expr(solution, g) # should yield 2*6+1
+
+output = execute_on_input(SymbolTable(g), program, Dict(:x => 6)) 
 println(output)
 ```
 
@@ -67,9 +70,14 @@ g = @cfgrammar begin
 end
 
 problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
-solution = search(g, problem, :Number, max_depth=3)
+iterator = BFSIterator(g₁, :Number, max_depth=5)
 
-test_with_input(SymbolTable(g), solution, Dict(:x => 6))
+solution, flag = synth(problem, iterator)
+program = rulenode2expr(solution, g) # should yield 2*6 +1 
+
+output = execute_on_input(SymbolTable(g), program, Dict(:x => 6)) 
+println(output)
+
 ```
 
 
