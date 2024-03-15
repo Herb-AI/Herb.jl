@@ -18,7 +18,7 @@ HerbCore = "0.1.1"
 HerbData = "0.1.1"
 HerbGrammar = "0.1.0"
 HerbInterpret = "0.1.0"
-HerbSearch = "0.1.1"
+HerbSearch = "0.1.1, 0.2"
 julia = "1.8"
 
 [extras]
