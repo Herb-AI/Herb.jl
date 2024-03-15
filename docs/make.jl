@@ -34,6 +34,9 @@ makedocs(
             "HerbData.jl" => "HerbData/index.md",
        ],
     ],
+    format = Documenter.HTML(        
+        sidebar_sitename = false
+    ),
     warnonly = [:missing_docs]
 )
 
