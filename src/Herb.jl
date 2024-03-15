@@ -1,18 +1,18 @@
 module Herb
 
 using HerbCore
-using HerbGrammar
 using HerbConstraints
-using HerbData
+using HerbGrammar
 using HerbInterpret
 using HerbSearch
+using HerbSpecification
 
 export 
     HerbCore,
-    HerbGrammar,
     HerbConstraints,
-    HerbData,
+    HerbGrammars,
     HerbInterpret,
-    HerbSearch
+    HerbSearch,
+    HerbSpecification
     
 end # module
