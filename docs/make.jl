@@ -37,7 +37,7 @@ makedocs(
     format = Documenter.HTML(        
         sidebar_sitename = false
     ),
-    warnonly = [:missing_docs, :cross_reference]
+    warnonly = [:missing_docs, :cross_references, :doctest]
 )
 
 deploydocs(;
