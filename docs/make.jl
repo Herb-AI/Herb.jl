@@ -5,12 +5,12 @@ using Herb
 using HerbConstraints
 using HerbSearch
 using HerbGrammar 
-using HerbData
 using HerbInterpret
 using HerbCore
+using HerbSpecification
 
 makedocs(
-    modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbData, HerbInterpret, HerbCore],
+    modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbSpecification, HerbInterpret, HerbCore],
     authors="PONYs",
     sitename="Herb.jl",
     pages = [
@@ -26,12 +26,12 @@ makedocs(
             "Advanced Search Procedures" => "tutorials/advanced_search.md"
         ],
         "Sub-Modules" => [
-            "HerbGrammar.jl" => "HerbGrammar/index.md",
-            "HerbSearch.jl" => "HerbSearch/index.md",
-            "HerbConstraints.jl" => "HerbConstraints/index.md",
             "HerbCore.jl" => "HerbData/index.md",
+            "HerbGrammar.jl" => "HerbGrammar/index.md",
+            "HerbSpecification.jl" => "HerbSpecification/index.md",
             "HerbInterpret.jl" => "HerbInterpret/index.md",
-            "HerbData.jl" => "HerbData/index.md",
+            "HerbConstraints.jl" => "HerbConstraints/index.md",
+            "HerbSearch.jl" => "HerbSearch/index.md",
        ],
     ],
     format = Documenter.HTML(        
@@ -43,6 +43,7 @@ makedocs(
 deploydocs(;
     repo="github.com/Herb-AI/Herb.jl.git",
     devbranch="documentation",
-    devurl="dev",
+    # devurl="dev",
+    push_preview=true
 )
 

@@ -71,16 +71,16 @@ In the cell below we automatically generate some examples for `x` assigning valu
 
 ```julia
 # Create input-output examples
-examples = [Herb.HerbData.IOExample(Dict(:x => x), 3x+5) for x ∈ 1:5]
+examples = [Herb.HerbSpecification.IOExample(Dict(:x => x), 3x+5) for x ∈ 1:5]
 ```
 
 
-    5-element Vector{Main.Herb.HerbData.IOExample}:
-     Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 1), 8)
-     Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 2), 11)
-     Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 3), 14)
-     Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 4), 17)
-     Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 5), 20)
+    5-element Vector{Main.Herb.HerbSpecification.IOExample}:
+     Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 1), 8)
+     Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 2), 11)
+     Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 3), 14)
+     Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 4), 17)
+     Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 5), 20)
 
 
 Now that we have some input-output examples, we can define the problem. 
@@ -89,11 +89,11 @@ For now, this is irrelevant, and you can give the program any name you like.
 
 
 ```julia
-problem = Herb.HerbData.Problem(examples, "example")
+problem = Herb.HerbSpecification.Problem(examples, "example")
 ```
 
 
-    Main.Herb.HerbData.Problem(Main.Herb.HerbData.Example[Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 1), 8), Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 2), 11), Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 3), 14), Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 4), 17), Main.Herb.HerbData.IOExample(Dict{Symbol, Any}(:x => 5), 20)], "example")
+    Main.Herb.HerbSpecification.Problem(Main.Herb.HerbSpecification.Example[Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 1), 8), Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 2), 11), Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 3), 14), Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 4), 17), Main.Herb.HerbSpecification.IOExample(Dict{Symbol, Any}(:x => 5), 20)], "example")
 
 
 ### Searching
@@ -135,7 +135,7 @@ Search is done by passing the grammar, the problem and the starting point like b
 
 
 ```julia
-problem = Herb.HerbData.Problem([Herb.HerbData.IOExample(Dict(:x => x), 168) for x ∈ 1:5], "example2")
+problem = Herb.HerbSpecification.Problem([Herb.HerbSpecification.IOExample(Dict(:x => x), 168) for x ∈ 1:5], "example2")
 expr = Herb.HerbSearch.search(g, problem, :Real, enumerator=Herb.HerbSearch.get_dfs_enumerator, max_depth=4, max_size=30, max_time=180)
 print(expr)
 ```
@@ -148,7 +148,7 @@ In any case, this concludes our first introduction to the `Herb.jl` program synt
 
 
 ```julia
-problem = Herb.HerbData.Problem([Herb.HerbData.IOExample(Dict(:x => x), 167) for x ∈ 1:5], "example2")
+problem = Herb.HerbSpecification.Problem([Herb.HerbSpecification.IOExample(Dict(:x => x), 167) for x ∈ 1:5], "example2")
 expr = Herb.HerbSearch.search(g, problem, :Real)
 println(expr)
 ```

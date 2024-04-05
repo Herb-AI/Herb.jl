@@ -5,7 +5,7 @@ You can either paste this code into the Julia REPL or run it using the `advanced
 To start, we import the necessary packages.
 
 ```julia
-using HerbGrammar, HerbData, HerbSearch, HerbInterpret
+using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret
 ```
 
 We start with the same simple grammar from the main file [get_started.md](../get_started.md).

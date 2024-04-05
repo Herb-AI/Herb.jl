@@ -32,7 +32,7 @@ which will both install all dependencies automatically.
 
 For later convenience we can also add the respective dependencies to our project, so that we do not have to write `Herb.HerbGrammar` every time.
 ```julia
-] add HerbConstraints HerbCore HerbData HerbInterpret HerbGrammar HerbSearch
+] add HerbConstraints HerbCore HerbSpecification HerbInterpret HerbGrammar HerbSearch
 ```
 
 And just like this you are done! Welcome to Herb.jl!

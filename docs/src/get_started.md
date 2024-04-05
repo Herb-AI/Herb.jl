@@ -24,7 +24,7 @@ g = @cfgrammar begin
 end
 ```
 
-Second, the problem specification can be provided using e.g. input/output examples using `HerbData`. Inputs are provided as a `Dict` assigning values to variables, and outputs as arbitrary values. The problem itself is then a list of `IOExample`s using
+Second, the problem specification can be provided using e.g. input/output examples using `HerbSpecification`. Inputs are provided as a `Dict` assigning values to variables, and outputs as arbitrary values. The problem itself is then a list of `IOExample`s using
 
 ```julia
 problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
@@ -58,7 +58,7 @@ See our other tutorials!
 ## The full code example
 
 ```julia
-using HerbSearch, HerbData, HerbInterpret, HerbGrammar
+using HerbSearch, HerbSpecification, HerbInterpret, HerbGrammar
 
 # define our very simple context-free grammar
 # Can add and multiply an input variable x or the integers 1,2.
