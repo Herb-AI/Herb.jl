@@ -26,7 +26,7 @@ makedocs(
             "Advanced Search Procedures" => "tutorials/advanced_search.md"
         ],
         "Sub-Modules" => [
-            "HerbCore.jl" => "HerbData/index.md",
+            "HerbCore.jl" => "HerbCore/index.md",
             "HerbGrammar.jl" => "HerbGrammar/index.md",
             "HerbSpecification.jl" => "HerbSpecification/index.md",
             "HerbInterpret.jl" => "HerbInterpret/index.md",
