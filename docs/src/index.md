@@ -31,12 +31,12 @@ Julia is a perfect fit for program synthesis due to numerous reasons. Starting f
 ## Sub-Modules
 
 Herb's functionality is distributed among several sub-packages:
-- [HerbCore.jl](@ref HerbCore_docs): The core of Herb.jl defining core concepts to avoid circular dependencies.
-- [HerbGrammar.jl](@ref HerbGrammar_docs):
-- [HerbSpecification.jl](@ref HerbSpecification_docs):
-- [HerbInterpret.jl](@ref HerbInterpret_docs):
-- [HerbSearch.jl](@ref HerbSearch_docs):
-- [HerbConstraints.jl](@ref HerbConstraints_docs):
+- [HerbCore.jl](@ref HerbCore_docs): The core of Herb.jl defining abstract concepts,
+- [HerbGrammar.jl](@ref HerbGrammar_docs): Functionality for declaring grammars,
+- [HerbSpecification.jl](@ref HerbSpecification_docs): For describing user intent as specifications,
+- [HerbInterpret.jl](@ref HerbInterpret_docs): For running programs in different languages and environments,
+- [HerbConstraints.jl](@ref HerbConstraints_docs): For defining and effectively propagating and managing constraints during search, and
+- [HerbSearch.jl](@ref HerbSearch_docs): For actually searching for solutions.
 
 
 ## Basics
