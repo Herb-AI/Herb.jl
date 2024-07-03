@@ -18,6 +18,7 @@ jobs:
       - name: Get start and end dates
         shell: bash
         run: |
+          # Some date before the start of the Herb.jl project
           start_date=2023-01-01
   
           # Calculate the last day of the previous month
