@@ -15,7 +15,7 @@ jobs:
       issues: write
 
     steps:
-      - name: Get dates for last month
+      - name: Get start and end dates
         shell: bash
         run: |
           start_date=2023-01-01
