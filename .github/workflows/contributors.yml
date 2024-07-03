@@ -14,11 +14,26 @@ jobs:
     permissions:
       issues: write
 
-    steps:  
+    steps:
+      - name: Get start and end dates
+        shell: bash
+        run: |
+          # Some date before the start of the Herb.jl project
+          start_date=2023-01-01
+  
+          # Calculate the last day of the previous month
+          end_date=$(date -d "$start_date +1 month -1 day" +%Y-%m-%d)
+  
+          #Set an environment variable with the date range
+          echo "START_DATE=$start_date" >> "$GITHUB_ENV"
+          echo "END_DATE=$end_date" >> "$GITHUB_ENV"
+          
       - name: Run contributor action
         uses: github/contributors@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          START_DATE: ${{ env.START_DATE }}
+          END_DATE: ${{ env.END_DATE }}          
           ORGANIZATION: Herb-AI
           SPONSOR_INFO: "true"
           LINK_TO_PROFILE: "true"
