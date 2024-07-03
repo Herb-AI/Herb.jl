@@ -19,6 +19,8 @@ jobs:
         uses: github/contributors@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          START_DATE: ${{ env.START_DATE }}
+          END_DATE: ${{ env.END_DATE }}          
           ORGANIZATION: Herb-AI
           SPONSOR_INFO: "true"
           LINK_TO_PROFILE: "true"
