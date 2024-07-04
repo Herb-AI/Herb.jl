@@ -32,7 +32,7 @@ end
     3: Int = -Int
     4: Int = Int + Int
     5: Int = Int * Int
-    
+
 
 
 ### Working with constraints
@@ -66,7 +66,7 @@ end
     x + x
     1 + x
     1 + 1
-    
+
 
 Upon inspection, we can already see some redundant programs, like `1 * 1` and `-(-1)`. To eliminate these redundant programs, we will set up some constraints that prevent these patterns from appearing. Then we will create another iteratator to enumerate all programs that satisfy the defined grammar constraints.
 
@@ -106,7 +106,7 @@ end
     x + 1
     1 + 1
     1 + x
-    
+
 
 ### Forbidden Constraint
 
@@ -135,7 +135,7 @@ println(length(iter))
 
     154
     106
-    
+
 
 ### Contains Constraint
 
@@ -163,7 +163,7 @@ end
     x + 1
     x + x
     1 + x
-    
+
 
 ### Contains Subtree Constraint
 
@@ -182,7 +182,7 @@ end
 
     x * x
     -(x * x)
-    
+
 
 ### Ordered Constraint
 
@@ -224,7 +224,7 @@ end
     x + x
     1 + x
     1 + 1
-    
+
 
 ### Forbidden Sequence Constraint
 
@@ -269,7 +269,7 @@ end
     -(-x)
     x * x
     x + x
-    
+
 
 ### Custom Constraint
 
@@ -735,4 +735,4 @@ end
     -((1 + x * x))
     -((1 + 1x))
     -((1 + 1 * 1))
-    
+

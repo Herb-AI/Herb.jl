@@ -176,3 +176,5 @@ problem = HerbSpecification.Problem("example3", [HerbSpecification.IOExample(Dic
 expr = HerbSearch.synth(problem, iterator)
 print(expr)
 ```
+
+    (12{14{7,14{10,4}}6}, optimal_program)
