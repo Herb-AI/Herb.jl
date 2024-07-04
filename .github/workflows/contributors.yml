@@ -15,6 +15,9 @@ jobs:
       issues: write
 
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        
       - name: Get start and end dates
         shell: bash
         run: |
@@ -38,8 +41,9 @@ jobs:
           SPONSOR_INFO: "true"
           LINK_TO_PROFILE: "true"
 
-      - name: Check out repository code
-        uses: actions/checkout@v4
+      - name: Move contributors file to repo directory
+        shell: bash
+        run: mv contibutors.md ${{ github.repository }}/CONTRIBUTORS.md
           
       - name: Add and commit CONTRIBUTORS.md
         uses: EndBug/add-and-commit@v9 
