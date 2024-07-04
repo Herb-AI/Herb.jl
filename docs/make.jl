@@ -24,7 +24,7 @@ makedocs(
             "A more verbose getting started with Herb.jl" => "tutorials/getting_started_with_herb.md",
             "Defining Grammars in Herb.jl" => "tutorials/defining_grammars.md",
             "Advanced Search Procedures" => "tutorials/advanced_search.md"
-            "Top Down Iterator" => "tutorials/TopDown"
+            "Top Down Iterator" => "tutorials/TopDown.md"
         ],
         "Sub-Modules" => [
             "HerbCore.jl" => "HerbCore/index.md",
