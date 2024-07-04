@@ -33,14 +33,9 @@ jobs:
         run: |
           rm contributors.json
           mv contributors.md CONTRIBUTORS.md
-          
-      - name: Add and commit CONTRIBUTORS.md
-        uses: EndBug/add-and-commit@v9 
-        with:
-          message: "Monthly contributors report"
-          default_author: github_actions
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: Update org-level contributors
+          branch: update-contributors
