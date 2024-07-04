@@ -9,6 +9,18 @@ using HerbInterpret
 using HerbCore
 using HerbSpecification
 
+# Use jupyter.nbconver to convert notebooks to markdown
+using PyCall
+jupyter = pyimport("jupyterlab")
+nbconvert = pyimport("nbconvert")
+all_notebooks = readdir("src/tutorials/")
+for file in all_notebooks
+    if occursin("ipynb", file)
+        path = pwd() * "/src/tutorials/" *  file
+        run(`jupyter nbconvert --to markdown $path`)
+    end
+end
+
 makedocs(
     modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbSpecification, HerbInterpret, HerbCore],
     authors="PONYs",

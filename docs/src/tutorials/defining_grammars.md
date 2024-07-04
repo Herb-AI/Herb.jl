@@ -1,10 +1,12 @@
-# Defining Grammars in Herb.jl using `HerbGrammar`
+# Defining Grammars in Herb.jl using HerbGrammar
 
 The program space in Herb.jl is defined using a grammar. 
 This notebook demonstrates how such a grammar can be created. 
 There are multiple kinds of grammars, but they can all be defined in a very similar way.
 
 ### Setup
+First, we import the necessary Herb packages.
+
 
 ```julia
 using HerbGrammar, HerbConstraints
@@ -435,8 +437,8 @@ HerbGrammar.addconstraint!(g₈, HerbConstraints.ComesAfter(1, [9]))
 ```
 
 
-    1-element Vector{Main.HerbCore.Constraint}:
-     Main.HerbConstraints.ComesAfter(1, [9])
+    1-element Vector{HerbCore.Constraint}:
+     ComesAfter(1, [9])
 
 
 ### Probabilistic grammars
@@ -472,25 +474,25 @@ end
 
     ┌ Warning: Requesting probability in a non-probabilistic grammar.
     │ Uniform distribution is assumed.
-    └ @ Main.HerbGrammar d:\GitHub\HerbGrammar.jl\src\grammar_base.jl:155
+    └ @ HerbGrammar /Users/issahanou/.julia/packages/HerbGrammar/x0E9w/src/grammar_base.jl:155
     ┌ Warning: Requesting probability in a non-probabilistic grammar.
     │ Uniform distribution is assumed.
-    └ @ Main.HerbGrammar d:\GitHub\HerbGrammar.jl\src\grammar_base.jl:155
+    └ @ HerbGrammar /Users/issahanou/.julia/packages/HerbGrammar/x0E9w/src/grammar_base.jl:155
     ┌ Warning: Requesting probability in a non-probabilistic grammar.
     │ Uniform distribution is assumed.
-    └ @ Main.HerbGrammar d:\GitHub\HerbGrammar.jl\src\grammar_base.jl:155
+    └ @ HerbGrammar /Users/issahanou/.julia/packages/HerbGrammar/x0E9w/src/grammar_base.jl:155
     ┌ Warning: Requesting probability in a non-probabilistic grammar.
     │ Uniform distribution is assumed.
-    └ @ Main.HerbGrammar d:\GitHub\HerbGrammar.jl\src\grammar_base.jl:155
+    └ @ HerbGrammar /Users/issahanou/.julia/packages/HerbGrammar/x0E9w/src/grammar_base.jl:155
     ┌ Warning: Requesting probability in a non-probabilistic grammar.
     │ Uniform distribution is assumed.
-    └ @ Main.HerbGrammar d:\GitHub\HerbGrammar.jl\src\grammar_base.jl:155
+    └ @ HerbGrammar /Users/issahanou/.julia/packages/HerbGrammar/x0E9w/src/grammar_base.jl:155
     ┌ Warning: Requesting probability in a non-probabilistic grammar.
     │ Uniform distribution is assumed.
-    └ @ Main.HerbGrammar d:\GitHub\HerbGrammar.jl\src\grammar_base.jl:155
+    └ @ HerbGrammar /Users/issahanou/.julia/packages/HerbGrammar/x0E9w/src/grammar_base.jl:155
     ┌ Warning: Requesting probability in a non-probabilistic grammar.
     │ Uniform distribution is assumed.
-    └ @ Main.HerbGrammar d:\GitHub\HerbGrammar.jl\src\grammar_base.jl:155
+    └ @ HerbGrammar /Users/issahanou/.julia/packages/HerbGrammar/x0E9w/src/grammar_base.jl:155
 
 
 The numbers before each rule represent the probability assigned to that rule.
@@ -561,7 +563,7 @@ g₈, g₈.constraints
     11: Int = Int + Int
     12: Int = Int * Int
     13: Int = x
-    , Main.HerbCore.Constraint[Main.HerbConstraints.ComesAfter(1, [9])])
+    , HerbCore.Constraint[ComesAfter(1, [9])])
 
 
 
@@ -584,5 +586,5 @@ g₉, g₉.constraints
     11: Int = Int + Int
     12: Int = Int * Int
     13: Int = x
-    , Main.HerbCore.Constraint[Main.HerbConstraints.ComesAfter(1, [9])])
+    , HerbCore.Constraint[ComesAfter(1, [9])])
 
