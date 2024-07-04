@@ -37,12 +37,12 @@ jobs:
           ORGANIZATION: Herb-AI
           SPONSOR_INFO: "true"
           LINK_TO_PROFILE: "true"
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
           
       - name: Add and commit CONTRIBUTORS.md
         uses: EndBug/add-and-commit@v9 
         with:
-          author_name: IssaHanou
-          author_email: i.k.hanou@tudelft.nl
           message: "Monthly contributors report"
           default_author: github_actor
-          fetch: false  
