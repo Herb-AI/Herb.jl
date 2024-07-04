@@ -43,7 +43,7 @@ jobs:
 
       - name: Move contributors file to repo directory
         shell: bash
-        run: mv ./contibutors.md ${{ github.repository }}/CONTRIBUTORS.md
+        run: mv contributors.md ${{ github.repository }}/CONTRIBUTORS.md
           
       - name: Add and commit CONTRIBUTORS.md
         uses: EndBug/add-and-commit@v9 
