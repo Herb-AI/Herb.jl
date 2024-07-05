@@ -1,9 +1,56 @@
-# Top Down Iterator
+# Building Herb Iterators
 
-## Base Iterator
+The core building block in Herb is a program iterator.
+A program iterator represents a walk through the program space; different iterators provide different ways of iterating through program space. 
+From the program synthesis point of view, program iterators actaully represent program spaces.
 
-This function describes the iteration for a Top Down Iterator. A priority queue is created to determine the order. The solver is checked for the constraints, if it violates the constraints, it is considered infeasible, and if it is feasible, it is added to the queue. This function then returns the next complete tree, that is a tree without holes.
-This function creates a priority queue, and is therefore called once during the initialisation.
+
+### Iterator hierarchy
+
+Program iterators are organised in a hierarchy.
+The top-level abstract type is `ProgramIterator`. 
+At the next level of the hierarchy lie commonly used search families:
+ - `TopDownIterator` for top-down traversals
+ - `StochasticSearachIterator` for traversals with stochastic search
+ - `BottomUpIterator` for bottom-up search
+
+
+Stochastic search further provides specific iterators:
+ - `MHSearchIterator` for program traversal with Metropolis-Hastings algorithm
+ - `VLNSearchIterator` for traversals with Very Large Neighbourhood Search
+ - `SASearchIterator` for Simulated Annealing
+
+ We provide generic and customiseable implementations of each of these iterators, so that users can easily tweak them by through multiple dispatch. Keep reading!
+
+
+### Iterator design
+
+Program iterators follow the standard Julia `Iterator` interface.
+That is, every iterator should implement two functions:
+ - `iterate(<:ProgramIterator)::(RuleNode,Any)` to get the first program. The function takes a program iterator as an input, returning the first program and a state (which can be anything)
+ - `iterate(<:ProgramIterator,Any)::(RuleNode,Any)` to get the consequtive programs. The function takes the progrma iterator and the state from the previous iteration, and return the next program and the next state.
+
+
+
+
+
+
+
+## Top Down iterator
+
+We illustarate how to build iterators with a Top Down iterator.
+The top Down iterator is build as a best-first iterator: it maintains a priority queue of programs and always pops the first element of the queue. 
+The iterator is customiseable through the following functions:
+- priority_function: dictating the order of programs in the priority queue
+- derivation_heuristic: dictating in which order to explore the derivations rules within a single hole
+- hole_heuristic: dictating which hole to expand next
+
+
+
+
+
+
+The first call to `iterate(iter::TopDownIterator)`:
 
 ``` julia
 function Base.iterate(iter::TopDownIterator)
@@ -19,10 +66,11 @@ function Base.iterate(iter::TopDownIterator)
 end
 ```
 
-## Base Iterator With a Given Priority Queue
+The first call steps everything up: it initiates the priority queue, the constraint solver (more on that later), and return the first program.
+The function `_find_next_complete_tree(iter.solver, pq, iter)` does a lot of heavy lifting here; we will cover it later, but the only important thing is that it finds the next complete program in the priority queue (because, in case of top down enumeration, the queue also contains partial programs which we only want to expand, but not return to the user).
 
-This function describes the iteration for a Top Down Iterator, and a priority queue is given as an argument. This function then returns the next complete tree, that is a tree without holes.
-After a priority queue is created, this is the function that will be called.
+
+The subsequent call to `iterate(iter::TopDownIterator, pq::DataStructures.PriorityQueue)` are quite simple: all that is needed is to find the next complete program in the priority queue:
 
 ``` julia
 function Base.iterate(iter::TopDownIterator, pq::DataStructures.PriorityQueue)
@@ -30,7 +78,45 @@ function Base.iterate(iter::TopDownIterator, pq::DataStructures.PriorityQueue)
 end
 ```
 
-# Find Next Complete Tree / Program
+# Modifying the provided iterator
+
+If you would like to, for example, modify the priority function, you don't have to implement the iterator from scratch.
+You simply need to create a new type and inherit from the `TopDownIterator`:
+
+`abstract type MyTopDown <: TopDownIterator end`.
+
+What is left is to implement the priority function, multiple-dispatching it over the new type. 
+For example, to do a random order:
+
+```julia
+function priority_function(
+    ::MyTopDown, 
+    ::AbstractGrammar, 
+    ::AbstractRuleNode, 
+    ::Union{Real, Tuple{Vararg{Real}}},
+    ::Bool
+)
+    Random.rand();
+end
+```
+
+
+# A note on data structures
+
+As you have probably noticed, the priority queue some strange data structures: `SolverState` and `UniformIterator`; the top down iterator never puts `RuleNode`s into the queue.
+In fact, the iterator never directly manipulates `RuleNode`s itself, but that is rather delegated to the constraint solver.
+The constraint solver will do a lot of work to reduce the number of programs we have to consider.
+The `SolverState` and `UniformIterator` are specialised data structure to improve the efficiency and memory usage. 
+
+Herb uses a data structure of `UniformTrees` to represent all programs with an AST of the same shape, where each node has the same type. the `UniformIterator` is an iterator efficiently iterating over that structure.
+
+The `SolverState` represents non-uniform trees -- ASTs whose shape we haven't compeltely determined yet. `SolverState` is used as an intermediate representation betfore we reach `UniformTree`s on which partial constraint propagation is done.
+
+In principle, you should never construct ASTs yourself directly; you should leave that to the constraint solver.
+
+
+
+# Extra: Find Next Complete Tree / Program
 
 This function pops an element from the priority queue whilst it is not empty, and then checks what kind of iterator it is.
 
