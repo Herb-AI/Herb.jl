@@ -13,7 +13,7 @@ using HerbSpecification
 using PyCall
 jupyter = pyimport("jupyterlab")
 nbconvert = pyimport("nbconvert")
-all_notebooks = readdir("src/tutorials/")
+all_notebooks = readdir(pwd()*"src/tutorials/")
 for file in all_notebooks
     if occursin("ipynb", file)
         path = pwd() * "/src/tutorials/" *  file
