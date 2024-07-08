@@ -13,10 +13,10 @@ using HerbSpecification
 using PyCall
 jupyter = pyimport("jupyterlab")
 nbconvert = pyimport("nbconvert")
-all_notebooks = readdir(pwd()*"src/tutorials/")
+all_notebooks = readdir("docs/src/tutorials/")
 for file in all_notebooks
     if occursin("ipynb", file)
-        path = pwd() * "/src/tutorials/" *  file
+        path = "docs/src/tutorials/" *  file
         run(`jupyter nbconvert --to markdown $path`)
     end
 end
