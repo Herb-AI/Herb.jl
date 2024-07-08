@@ -1,10 +1,20 @@
 # Contributor Guide
 
-Thank you for considering contributing to Herb. Below are some guidelines how you can do so.
+Thank you for contributing to Herb.jl. Below are some guidelines on how you can do so.
+
+## Overview Herb repositories
+
+The Herb.jl framework for program synthesis comprises multiple sub-packages with the following functionality:
+- HerbCore.jl: Core functionality of the program synthesis library, including the representation and manipulation of expression trees, and abstract types for constraints and grammars.
+- HerbGrammar.jl: Declaring grammars.
+- HerbSpecification.jl: Specifying the program synthesis problem as input-output examples. 
+- HerbSearch.jl: Search procedures for finding solution programs to a program synthesis problem.
+- HerbInterpret.jl: Handling the interpretation of (candidate) programs, supporting arbitrary Julia expressions or other interpretors with provided evaluation functions.
+- HerbConstraints.jl: Formulating, representing and using contraints.
 
 ## Reporting Bugs
 
-If you find a bug, open a new issue. Please provide some details about the bug, including 
+If you find a bug, open a new issue in the appropriate repo. Please provide some details about the bug, including 
 - a description of the problem.
 - a minimal example to reproduce the problem (by copy + paste).
 - relevant error messages and logs. 
@@ -26,7 +36,7 @@ To contribute code, please follow these steps:
 6. Push your changes to your fork of the repo.
 7. Open a PR from the appropriate branch of your fork to the `dev` branch of the original repo.
 
-### Code and coding style
+### Code quality guidelines
 
 - **Testing:** Make sure your code is well-tested, i.e., that you add new tests for your code changes and that all existing tests still pass.
 - **Documentation:** Please update or add documentation as necessary. Follow the Julia guidelines for [writing documentation](https://docs.julialang.org/en/v1/manual/documentation/#Writing-Documentation).
