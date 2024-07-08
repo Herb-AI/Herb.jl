@@ -37,7 +37,7 @@ makedocs(
             "Defining Grammars in Herb.jl" => "tutorials/defining_grammars.md",
             "Advanced Search Procedures" => "tutorials/advanced_search.md",
             "Getting started with Constraints" => "tutorials/getting_started_with_constraints.md",
-            "Working with custom interpreters" => "tutorials/working_with_interpreters.html"
+            "Working with custom interpreters" => "tutorials/working_with_interpreters.md"
         ],
         "Sub-Modules" => [
             "HerbCore.jl" => "HerbCore/index.md",
