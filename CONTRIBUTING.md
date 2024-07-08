@@ -1,17 +1,34 @@
-# Herb development guidelines
-Below are some guidelines for working on the Herb Program Synthesis framework. These rules are flexible, they can be updated when necessary.
+# Contributor Guide
 
-## Git
-- Don't push directly to the main branch
-- To add new functionality, create a new branch from the main branch and give it a meaningful name. Once everything works, create a merge request for moving the code back to the main branch and ideally have it reviewed by someone else.
-- Make sure that the code in the main branch works and is compatible with the main branches from other repositories
-- Create issues and keep them up-to-date
+Thank you for considering contributing to Herb. Below are some guidelines how you can do so.
 
-## Code
-- Add *useful* comments to your code
-- Document functions using [docstrings](https://docs.julialang.org/en/v1/manual/documentation/#Writing-Documentation) 
-- Give clear names to functions, variables and structures 
-- Have a quick look at the [Julia style guide](https://docs.julialang.org/en/v1/manual/style-guide/). Some important things to highlight:
-	- Append `!` to names of functions that modify their arguments
-	- Module names are `CamelCase` 
-	- Function names are generally `lowercase`
+## Reporting Bugs
+
+If you find a bug, open a new issue. Please provide some details about the bug, including 
+- a description of the problem.
+- a minimal example to reproduce the problem (by copy + paste).
+- relevant error messages and logs. 
+
+## Suggesting Features
+
+We encourage and welcome suggestions for new features. Please open a new issue and describe the desired feature in as much detail as you can, including an example of how you would like to use it. 
+
+## Contributing Code
+
+### Workflow
+
+To contribute code, please follow these steps:
+1. Fork the repository.
+2. Clone your fork to your local machine.
+3. Create a new branch (with a descriptive name) for your bug fix or feature. 
+4. Make changes in the new branch.
+5. Test and document your code. 
+6. Push your changes to your fork of the repo.
+7. Open a PR from the appropriate branch of your fork to the `dev` branch of the original repo.
+
+### Code and coding style
+
+- **Testing:** Make sure your code is well-tested, i.e., that you add new tests for your code changes and that all existing tests still pass.
+- **Documentation:** Please update or add documentation as necessary. Follow the Julia guidelines for [writing documentation](https://docs.julialang.org/en/v1/manual/documentation/#Writing-Documentation).
+- Please follow the [Julia style guide](https://docs.julialang.org/en/v1/manual/style-guide/).
+
