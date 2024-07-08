@@ -42,3 +42,6 @@ To contribute code, please follow these steps:
 - **Documentation:** Please update or add documentation as necessary. Follow the Julia guidelines for [writing documentation](https://docs.julialang.org/en/v1/manual/documentation/#Writing-Documentation).
 - Please follow the [Julia style guide](https://docs.julialang.org/en/v1/manual/style-guide/).
 
+### Code changes to multiple sub-packages
+
+If the code you're developing requires changes to more than one Herb.jl sub-package, see [this description](https://github.com/Herb-AI/) on how to locally change to a specific version (branch) of a package. 
