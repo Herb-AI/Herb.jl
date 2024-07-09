@@ -1,0 +1,52 @@
+name: Monthly contributor report
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '3 2 1 * *'
+
+permissions:
+  contents: read
+
+jobs:
+  contributor_report:
+    name: contributor report
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        
+      - name: Get start and end dates
+        shell: bash
+        run: |
+          # Some date before the start of the Herb.jl project
+          start_date=2023-01-01
+  
+          # Calculate the last day of the previous month
+          end_date=$(date -d "$start_date +1 month -1 day" +%Y-%m-%d)
+  
+          #Set an environment variable with the date range
+          echo "START_DATE=$start_date" >> "$GITHUB_ENV"
+          echo "END_DATE=$end_date" >> "$GITHUB_ENV"
+          
+      - name: Run contributor action
+        uses: github/contributors@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          START_DATE: ${{ env.START_DATE }}
+          END_DATE: ${{ env.END_DATE }}          
+          ORGANIZATION: Herb-AI
+          SPONSOR_INFO: "true"
+          LINK_TO_PROFILE: "true"
+
+      - name: Move contributors file to repo directory
+        shell: bash
+        run: mv contibutors.md ${{ github.repository }}/CONTRIBUTORS.md
+          
+      - name: Add and commit CONTRIBUTORS.md
+        uses: EndBug/add-and-commit@v9 
+        with:
+          message: "Monthly contributors report"
+          default_author: github_actor
