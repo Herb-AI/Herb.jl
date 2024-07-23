@@ -1,7 +1,7 @@
 name = "Herb"
 uuid = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
 authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Tilman Hinnerichs <t.r.hinnerichs@tudelft.nl>", "Sebastijan Dumancic <s.dumancic@tudelft.nl>"]
-version = "0.3.0"
+version = "0.4.0"
 
 [deps]
 HerbConstraints = "1fa96474-3206-4513-b4fa-23913f296dfc"
@@ -15,7 +15,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 [compat]
 HerbConstraints = "^0.2.0"
 HerbCore = "^0.3.0"
-HerbGrammar = "^0.3.0"
+HerbGrammar = "^0.4.0"
 HerbInterpret = "^0.1.2"
 HerbSearch = "^0.3.0"
 HerbSpecification = "^0.1.0"
