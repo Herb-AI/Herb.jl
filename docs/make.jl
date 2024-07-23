@@ -1,5 +1,7 @@
 using Documenter
 
+using Pluto, PlutoSliderServer
+
 using Herb
 
 using HerbConstraints
@@ -9,17 +11,27 @@ using HerbInterpret
 using HerbCore
 using HerbSpecification
 
-# Use jupyter.nbconver to convert notebooks to markdown
-using PyCall
-jupyter = pyimport("jupyterlab")
-nbconvert = pyimport("nbconvert")
-all_notebooks = readdir("docs/src/tutorials/")
-for file in all_notebooks
-    if occursin("ipynb", file)
-        path = "docs/src/tutorials/" *  file
-        run(`jupyter nbconvert --to markdown $path`)
+# Create md file for tutorial that embeds html file
+basedir = joinpath(@__DIR__, "src", "tutorials")
+html_files = filter!(f -> occursin(r"\.html$", f), readdir(basedir)) # assumes all html file in directory are tutorials
+
+for f in html_files
+    html_path = joinpath(basedir, f)
+    filename = replace(f, ".html" => "")
+    md_path = joinpath(basedir, "$filename.md")
+    content = """
+    # Tutorial $filename
+
+    <iframe src="$html_path" width="100%" height="600px"></iframe> 
+    """
+    open(md_path, "w") do file
+        write(
+            file,
+            content
+        )
     end
 end
+
 
 makedocs(
     modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbSpecification, HerbInterpret, HerbCore],
@@ -38,7 +50,8 @@ makedocs(
             "Advanced Search Procedures" => "tutorials/advanced_search.md",
             "Top Down Iterator" => "tutorials/TopDown.md",
             "Getting started with Constraints" => "tutorials/getting_started_with_constraints.md",
-            "Working with custom interpreters" => "tutorials/working_with_interpreters.md"
+            "Working with custom interpreters" => "tutorials/working_with_interpreters.md",
+            "Abstract Syntax Trees" => "tutorials/abstract_syntax_trees.md",
         ],
         "Sub-Modules" => [
             "HerbCore.jl" => "HerbCore/index.md",
