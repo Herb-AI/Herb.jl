@@ -15,7 +15,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 [compat]
 HerbConstraints = "^0.2.0"
 HerbCore = "^0.3.0"
-HerbGrammar = "^0.3.0"
+HerbGrammar = "^0.3.0, 0.4"
 HerbInterpret = "^0.1.2"
 HerbSearch = "^0.3.0"
 HerbSpecification = "^0.1.0"
