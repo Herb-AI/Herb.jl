@@ -29,7 +29,7 @@ We will also redefine the simple arithmetic grammar from the previous tutorial.
 """
 
 # ╔═╡ aacedef3-08d6-4bc0-a2c3-dd9a9aac340d
-grammar = @cfgrammar begin
+grammar = @csgrammar begin
     Int = 1
     Int = x
     Int = - Int
