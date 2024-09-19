@@ -25,11 +25,11 @@ First, we start with the setup. We need to access to all the function in the Her
 md"""
 ### Defining the program space
 
-Next, we start by creating a grammar. We define a context-free grammar (cfg) as a [`HerbGrammar.ContextSpecificGrammar`](@ref) without any constraints. A cfg is just a simple set of production rules for defining combinations of terminal symbols (in our case real numbers). 
+Next, we start by creating a grammar. We define a context-free grammar as a [`HerbGrammar.ContextSpecificGrammar`](@ref) without any constraints. A context-free grammar is just a simple set of production rules for defining combinations of terminal symbols (in our case real numbers). 
 
 Contrary, we could define a context-sensitive grammar, when the production rules only hold in a certain context. However, for more information on this, please see our tutorial on [defining grammars](defining_grammars.md).
 
-For now, we specify a simple grammar for dealing with integers and explain all the rules individually:
+For now, we specify a simple grammar (using the `@csgrammar` macro) for dealing with integers and explain all the rules individually:
 
 1. First, we specify our interval `[0:9]` on real numbers and also constrain them to be integer.
 2. Then, we can also use the variable `x` to hold an integer.
@@ -41,7 +41,7 @@ If you run this cell, you can see all the rules rolled out.
 """
 
 # ╔═╡ 763b378b-66f9-481e-a3da-ca37825eb255
-g = HerbGrammar.@cfgrammar begin
+g = HerbGrammar.@csgrammar begin
     Real = |(0:9)
     Real = x
     Real = Real + Real
