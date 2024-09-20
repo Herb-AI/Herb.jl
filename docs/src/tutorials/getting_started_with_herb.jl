@@ -69,7 +69,7 @@ In the cell below we automatically generate some examples for `x` assigning valu
 
 # ╔═╡ 8bf48b7a-0ff5-4015-81d3-ed2eeeceff1c
 # Create input-output examples
-examples = [HerbSpecification.IOExample(Dict(:x => x), 3x+5) for x ∈ 1:5]
+examples = [HerbSpecification.IOExample(Dict(:x => x), 3x + 5) for x ∈ 1:5]
 
 # ╔═╡ 2baa7f33-c86d-40e2-9253-720ec19e4c43
 md"""
@@ -126,10 +126,10 @@ Search is done by passing the grammar, the problem and the starting point like b
 
 # ╔═╡ cdab3f55-37e4-4aee-bae1-14d3475cbdcd
 begin
-	problem_2 = HerbSpecification.Problem("example2", [HerbSpecification.IOExample(Dict(:x => x), 168) for x ∈ 1:5])
-	iterator_2 = HerbSearch.BFSIterator(g, :Real, max_depth=4, max_size=30)
-	expr_2 = HerbSearch.synth(problem_2, iterator_2)
-	print(expr_2)
+    problem_2 = HerbSpecification.Problem("example2", [HerbSpecification.IOExample(Dict(:x => x), 168) for x ∈ 1:5])
+    iterator_2 = HerbSearch.BFSIterator(g, :Real, max_depth=4, max_size=30)
+    expr_2 = HerbSearch.synth(problem_2, iterator_2)
+    print(expr_2)
 end
 
 # ╔═╡ 5ad86beb-eb25-4bae-b0c2-a33d1a38581a
@@ -141,9 +141,9 @@ In any case, this concludes our first introduction to the `Herb.jl` program synt
 
 # ╔═╡ c06d09a5-138a-4821-8a60-074fa7ec026d
 begin
-	problem_3 = HerbSpecification.Problem("example3", [HerbSpecification.IOExample(Dict(:x => x), 167) for x ∈ 1:5])
-	expr_3 = HerbSearch.synth(problem_3, iterator_2)
-	print(expr_3)
+    problem_3 = HerbSpecification.Problem("example3", [HerbSpecification.IOExample(Dict(:x => x), 167) for x ∈ 1:5])
+    expr_3 = HerbSearch.synth(problem_3, iterator_2)
+    print(expr_3)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
