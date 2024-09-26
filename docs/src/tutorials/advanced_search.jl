@@ -11,23 +11,30 @@ using PlutoUI
 using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret, HerbConstraints
 
 
+# ╔═╡ aa45e602-6219-44ea-82a0-b97639f6a450
+using HerbCore
+
 # ╔═╡ dddca175-3d88-45ce-90da-575c0ba38175
 md"""
 # Advanced Search Procedures in Herb.jl
 
-[A more verbose getting started with Herb.jl]() described the concept of a program space and showed how to search it with Herb.jl, using a simple search with a BFS iterator. 
-This tutorial takes a closer look at advanced search procedures. 
+[A more verbose getting started with Herb.jl]() described the concept of a program space and showed how to search it with Herb.jl, using a simple breadth-first-search (BFS) iterator for the search. 
+This tutorial takes a closer look at advanced search procedures hat can be employed to find a solution program to a program synthesis problem. 
 
 More specifically, you will learn about
 
 - **Parameters** that can be specified and their effect on the search procedure.  
-- **Search methods** that can be employed to find a solution program to a program synthesis problem, including basic search (BFS and DFS), stochastic search and genetic search methods.
-- **Other functionality** of the module `HerbSearch.jl` 
-   (TODO: why are they in this tutorial?)
+- **Deterministic search methods** BFS and DFS.
+- **Stochastic search methods**, which introduce randomness to search the program space. We will look at Metropolis-Hastings, Very Large Scale Neighbourhood Search, Simulated Annealing and Genetic Search.
 """
 
 # ╔═╡ 6ab37bbc-73e2-4d9a-a8b2-e715a0b61c8f
 TableOfContents()
+
+# ╔═╡ 61cee94c-2481-4268-823b-ca596592b63c
+md"""
+Let's import all the Herb modules that we will use throughout the tutorial.
+"""
 
 # ╔═╡ 67931820-0f43-41e1-898e-5b5bd55e30d1
 md"""
@@ -54,13 +61,13 @@ problem_1 = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 md"""
 ## Parameters
 
-Search procedures typically have some hyperparameters that can be cofigured by the user. 
+Search procedures typically have some hyperparameters that you can configure.
 
 ### `max_depth`
 
-`max_depth` controls the maximum depth of the program trees we want to explore.
+`max_depth` controls the maximum depth of the program trees that are explored during the search, effectively limiting the size and complexity of the synthesized program. The parameter is configured as part of the iterator.
 
-In the following example, we can see the effect of `max_depth` on the number of allocations considered. 
+In the following example, we consider two different values for `max_depth`.
 """
 
 # ╔═╡ 338f19f1-3a62-4462-b8dc-24424d7644f2
@@ -68,6 +75,11 @@ iterator_1 = BFSIterator(g_1, :Number, max_depth=3)
 
 # ╔═╡ 542cd47e-74cd-4b6f-acc9-bf524222e583
 iterator_2 = BFSIterator(g_1, :Number, max_depth=6)
+
+# ╔═╡ 63e97576-1c34-464d-a106-d59d5fb1ee38
+md"""
+To see the effect `max_depth` has on the number of memory allocations made during the program synthesis process, we use the `@time` macro.  
+"""
 
 # ╔═╡ a6fb2e91-b73a-4032-930f-d884abd539e2
 begin
@@ -80,16 +92,17 @@ begin
 	println(solution_2)
 end
 
-# ╔═╡ 4b49f206-970e-47d2-af65-336ba65b1019
+# ╔═╡ 58c1a904-4d87-43f7-bcc3-884a8663c1da
 md"""
-TODO: Explain @time
+While increasing `max_depth` allows us to explore more complex and deeper program trees, which may lead to a better solution, it also requires more memory allocation and can increase the execution time. 
 """
 
 # ╔═╡ 35405357-179b-4e77-9bdc-edf5a550b36d
 md"""
 ### `max_enumerations`
-Another parameter to use is `max_enumerations`, which describes the maximum number of programs that can be tested at evaluation. 
-Let's see how many enumerations are necessary to solve our simple problem.
+`max_enumerations` defines the maximum number of candidate programs that can be evaluated before the search is terminated. 
+
+Let's explore how many enumerations are necessary to solve our simple problem.
 """
 
 # ╔═╡ 3954dd49-07a2-4ec2-91b4-9c9596d5c264
@@ -104,26 +117,17 @@ end
 
 # ╔═╡ 9892e91b-9115-4520-9637-f8d7c8905825
 md"""
-TODO: numbers seem to have changed. Not 24 anymore. How reproducible is this anyway?
-What does allocations mean?
-
-We see that only when `i >= 24`, there is a result, after that, increasing `i` does not have any effect on the number of allocations. 
-
-A final parameter we consider here is `allow_evaluation_errors`, which is `false` by default. When this is set to `true`, the program will still run even when an exception is thrown during evaluation. To see the effect of this, we create a new grammar. We can also retrieve the error together with the solution from the search method.
+At `i = 3`, we observe that an optimal program is found. Increasing the number of enumerations beyond that does not affect the solution or the number of memory allocations. 
 """
 
 # ╔═╡ a4e58bbc-7c14-4fce-b35d-688b56e0eb61
 md"""
 ### `allow_evaluation_errors`
 
-TODO: What do we mean with 'program will still run'?
-
-A final parameter we consider here is `allow_evaluation_errors`, which is `false` by default. When set to `true`, the program will still run even when an exception is thrown during evaluation. 
-
-We will use a new example to see the effect of `allow_evaluation_errors`. After defining a new grammar and problem, ...
+A final parameter we consider here is `allow_evaluation_errors`, which is `false` by default. When `true`, the search continues even if an exception occurs during the evaluation of a candidate program. This allows the search process to handle faulty candidate programs and explore other ones, instead of throwing an error and terminating prematurely.
 
 
-We can also retrieve the error together with the solution from the search method.
+We will use a new example to see the effect of `allow_evaluation_errors`. We begin defining a new simple grammar. We then create some input-output examples to specify the problem we want to solve. This time, we choose a problem that we cannot solve with the provided grammar. 
 """
 
 # ╔═╡ 9fb40ceb-8d41-491b-8941-20a8b240eb82
@@ -139,51 +143,77 @@ end
 problem_2 = Problem([IOExample(Dict(), x) for x ∈ 1:5])
 
 # ╔═╡ a4a7daed-f89b-44ad-8787-9199c05bf046
-iterator_3 = BFSIterator(g_2, :Number, max_depth=2)
+iterator_3 = BFSIterator(g_2, :Index, max_depth=2)
 
 # ╔═╡ 4821fd3a-ff2d-4991-99ad-76608d11b1da
-solution_3 = @time synth(problem_2, iterator_3, allow_evaluation_errors=true)
+solution_3 = synth(problem_2, iterator_3)
 
-# ╔═╡ 8d91b2e3-30b5-4ea2-bd3f-3055bb6d1d5a
-# solution = search(g_2, problem_2, :Index, max_depth=2, allow_evaluation_errors=true)
-
-# ╔═╡ 52332fa2-7ea7-4226-9460-e0bbc905c619
-println("solution: ", solution_3)
-
-# ╔═╡ c26fea48-f812-4f24-bb8c-680e14a55df7
+# ╔═╡ b2eb08d7-3e53-46c5-84b1-e1fa0e07e291
 md"""
-There is another search method called `search_best` which returns both the solution and the possible error. The method returns the best program found so far. In this case, we can also see the error (`typemax(Int)`):
+As expected, an exception occurs during the synthesis process. Now we try the same again, with `allow_evaluation_errors=true`.
 """
 
-# ╔═╡ 57f5face-d9d5-441a-8e0e-6ef6319fc178
-solution, error = search_best(g, problem, :Index, max_depth=2, allow_evaluation_errors=true)
-println("solution: ", solution)
-println("error: ", error)
+# ╔═╡ 606070e1-83a7-4cca-a716-4fa459f78772
+solution_4 = synth(problem_2, iterator_3, allow_evaluation_errors=true)
+
+# ╔═╡ 52332fa2-7ea7-4226-9460-e0bbc905c619
+println("solution: ", solution_4)
+
+# ╔═╡ c262116e-138e-4133-a032-d2f50bfbf5bd
+md""""This time we find a solution, although a suboptimal one."""
 
 # ╔═╡ 9b4b21e0-dc6a-43ae-a511-79988ee99001
 md"""
 ## Search methods
 
-We now show examples of using different search procedures, which are initialized by passing different enumerators to the search function.
+Herb.jl provides already implemented, ready-to-use search methods. The core building block of the search is the program iterator, which represents a walk through the program space. All program iterators share the top-level abstract type `ProgramIterator`. For more information on iterators and how to customize them, see [this tutorial](https://herb-ai.github.io/Herb.jl/dev/tutorials/TopDown/).
+"""
 
-### Breadth-First Search
+# ╔═╡ 115c02c9-ae0c-4623-a61d-831fc6ad55a2
+md"""
+### Deterministic search: BFS and DFS
 
-The breadth-first search will first enumerate all possible programs at the same depth before considering programs with a depth of one more. A tree of the grammar is returned with programs ordered in increasing sizes. We can first `collect` the programs that have a `max-depth` of 2 and a `max_size` of infinite (integer maximum value), where the starting symbol is of type `Real`. This function uses a default heuristic 'left-most first', such that the left-most child in the tree is always explored first.
+First, we explore two fundamental deterministic top-down search algorithms: **breadth-first search (BFS)** and **depth-first search (DFS)**. Both algorithms are implemented using the abstract type `TopDownIterator`, which can be customized through the functions priority_function, derivation_heuristic, and hole_heuristic.
+
+#### Breadth-First Search
+
+The `BFSIterator` enumerates all possible programs at a given depth before progressing to the next level, ensuring that trees are explored in increasing order of size. This guarantees that smaller programs are evaluated first, and larger, more complex ones are considered only after all smaller ones have been processed.
+
+To explore `BFSIterator`, we define another very simple grammar.
 """
 
 # ╔═╡ 3af650d9-19c6-4351-920d-d2361091f628
-g1 = @cfgrammar begin
-    Real = 1 | 2
-    Real = Real * Real
+begin g3 = @cfgrammar begin
+	    Real = 1 | 2
+	    Real = Real * Real
+	end
 end
-programs = collect(get_bfs_enumerator(g1, 2, typemax(Int), :Real))
+
+# ╔═╡ 4cb08dba-aea5-4c31-998c-844d1fce8c81
+md"""
+Next, we define a `BFSIterator` with a `max_depth` of 2 and a `max_size` of infinite (which we approximate with the maximum value of `Int`), and a starting symbol of type `Real`. By default, `BFSIterator` uses the heuristic 'left-most first', i.e., the left-most child in the tree is always explored first.
+"""
+
+# ╔═╡ f2521a57-267e-4b49-9179-4e9c2e6bdec7
+iteratorbfs = BFSIterator(g3, :Real, max_depth=2, max_size=typemax(Int))
+
+# ╔═╡ bf038215-1ecf-4e1c-a9be-e133e4497293
+md"""
+To see all possible solution programs the iterator explores, we use `collect`. It returs a list of the programs, ordered by increasing size and depth. 
+"""
+
+# ╔═╡ 6aec7358-225a-4764-9a36-da86234b6cf8
+programsbfs = collect(iteratorbfs)
+
+# ╔═╡ 54ecf6b9-3341-49e0-92e9-71190e06d61b
+println(programsbfs)
 
 # ╔═╡ d3ff497e-d2c2-4df6-8e4c-cdca70fd0677
 md"""
-We can test that this function returns all and only the correct functions. 
+Let's verify that the iterator returns the programs we expect (keep in mind we use a leftmost-first heuristic).
 """
 
-# ╔═╡ da7f326c-f0d5-4837-ac9a-5bcad604566e
+# ╔═╡ 07b54acf-0c0d-40ac-ae18-fb26094b4aca
 answer_programs = [
     RuleNode(1),
     RuleNode(2),
@@ -193,40 +223,101 @@ answer_programs = [
     RuleNode(3, [RuleNode(2), RuleNode(2)])
 ]
 
-println(all(p ∈ programs for p ∈ answer_programs))
+# ╔═╡ 9efb01cf-b190-4e3e-aa19-11499ba46489
+println(all(p ∈ programsbfs for p ∈ answer_programs))
 
 # ╔═╡ 0020b79a-6352-4e2d-93f6-2a1d7b03ae2c
 md"""
-### Depth-First Search
+#### Depth-First Search
 
-In depth-first search, we first explore a certain branch of the search tree till the `max_depth` or a correct program is reached before we consider the next branch. 
+The `DFSIterator` looks at one branch of the search tree at a time, exploring it unitl a correct program is found or the specified `max_depth` is reached. Only then, the next branch is considered.
+
+Let's `collect` the the trees/programs (TODO), using the same grammar but this time `DFSIterator`. 
 """
 
 # ╔═╡ 789150a8-862c-48c3-88b8-710b81ab34cf
-g1 = @cfgrammar begin
-Real = 1 | 2
-Real = Real * Real
+begin
+	g1 = @cfgrammar begin
+	Real = 1 | 2
+	Real = Real * Real
+	end
+	
 end
-programs = collect(get_dfs_enumerator(g1, 2, typemax(Int), :Real))
-println(programs)
+
+# ╔═╡ db5be2c3-0b36-40b4-bf14-20e2c7063ad7
+iteratordfs = DFSIterator(g3, :Real, max_depth=2, max_size=typemax(Int))
+
+# ╔═╡ 4048ff37-e7d1-44ee-bfa3-aa058b6f53b6
+programsdfs = collect(iteratordfs)
+
+# ╔═╡ 658c55ac-88c8-4657-a8eb-c9c9b91d0ded
+println(programsdfs)
 
 # ╔═╡ 243165be-a9d2-484d-8046-811a2b0ba139
 md"""
-`get_dfs_enumerator` also has a default left-most heuristic and we consider what the difference is in output. 
+`DFSIterator` also uses by default a **leftmost-first** heuristic. If we want to use a **rightmost-first** heuristic instead, we can create our own iterator `DFSIteratorRightmost`. Also see the tutorial [Top Down Iterator](https://herb-ai.github.io/Herb.jl/dev/tutorials/TopDown/) for how to build iterators is Herb.jl. 
+
+
+
+
+TODO: How to use rightmost heuristic?
 """
 
-# ╔═╡ 3d01c6f1-80a6-4904-97e2-775170e97bbf
-g1 = @cfgrammar begin
-    Real = 1 | 2
-    Real = Real * Real
+# ╔═╡ 3f18989a-ae25-4a66-9930-4459407af695
+# to modify the heuristics, we create a new type
+# abstract type DFSIteratorRightmost <: TopDownIterator end
+
+# ╔═╡ 4b97602a-5226-429f-86ea-8ecac3c807fa
+@programiterator DFSIteratorRightmost() <: TopDownIterator
+
+# ╔═╡ ed198b79-1b95-4531-b148-c1037cfdacf4
+md"""
+By default, `priority_function` for a `TopDownIterator` is that of a BFS iterator. Hence, we need to overwrite it:
+"""
+
+# ╔═╡ 3c7f6e75-ea70-4ccd-8ad6-5876d50a587d
+function priority_function(
+    ::DFSIteratorRightmost, 
+    ::AbstractGrammar, 
+    ::AbstractRuleNode, 
+    parent_value::Union{Real, Tuple{Vararg{Real}}},
+    isrequeued::Bool
+)
+    if isrequeued
+        return parent_value;
+    end
+    return parent_value - 1;
 end
-programs = collect(get_dfs_enumerator(g1, 2, typemax(Int), :Real, heuristic_rightmost))
-println(programs)
+
+# ╔═╡ d62918e4-4113-45bd-81ea-d17d007b83f5
+# Alternative
+priority_function(::DFSIteratorRightmost) = priority_function(DFSIterator())
+
+# ╔═╡ 7480d1e4-e417-4d87-80b7-513a098da70e
+md"""
+Next, we need to overwrite the `hole_heuristic` to rightmost-first.
+"""
+
+# ╔═╡ 7e2af72d-b71c-4234-9bca-cb9a90732a91
+function hole_heuristic(::DFSIteratorRightmost, node::AbstractRuleNode, max_depth::Int)::Union{ExpandFailureReason, HoleReference}
+    return heuristic_rightmost(node, max_depth);
+end
+
+# ╔═╡ 00d05a7e-ca79-4d6b-828d-b24ef1cb80a2
+iteratordfs_rightmost = DFSIteratorRightmost(g3, :Real, max_depth=2, max_size=typemax(Int))
+
+# ╔═╡ c70eb1a1-7d6b-413f-bd85-77e1b8c30b94
+println(collect(iteratordfs_rightmost))
 
 # ╔═╡ 168c71bf-ce5b-4ab3-b29a-5996981c42a5
 md"""
 ## Stochastic search
-We now introduce a few stochastic search algorithms, for which we first create a simple grammar and a helper function for problems.
+
+Whereas deterministic search methods explore the search space in a predictable way, stochastic ones use randomness.
+
+We will look at several stochastic search algorithms, usinga a new example.
+
+We start with a simple grammar and a helper function to create the input-output examples for the problem we want to solve.
 """
 
 # ╔═╡ a4b522cf-78f0-4d44-88c8-82dd0cdbf952
@@ -248,259 +339,154 @@ end
 md"""
 ### Metropolis-Hastings
 
-One of the stochastic search methods that is implemented is Metropolis-Hastings (MH), which samples from a distribution of programs based on the grammar. For more information on MH, see for example [this webpage](https://stephens999.github.io/fiveMinuteStats/MH_intro.html).
+Metropolis-Hastings (MH) is a method to produce samples from a distribution that may otherwise be difficult to sample. In the context of program synthesis, we want samples from a distribution of programs, based on the grammar. 
+For more information on MH, see for example [this webpage](https://stephens999.github.io/fiveMinuteStats/MH_intro.html).
 
-The example below uses a simple arithmetic example. You can try running this code block multiple times, which will give different programs, as the search is stochastic. 
+The example below uses a simple arithmetic example. Try run the code block (TODO) multiple times. You will get different programs every time, as the search is stochastic.
 """
 
+# ╔═╡ 4df84c71-99b5-487f-9db5-c048c0c74151
+e_mh = x -> x * x + 4
+
+# ╔═╡ afe1872c-6641-4fa0-a53e-50c6b4a712ee
+problem_mh, examples_mh = create_problem(e_mh)
+
+# ╔═╡ 969db94c-d583-40d1-a058-097f8117c2e9
+cost_function = mean_squared_error
+
+
 # ╔═╡ 0a30fb40-cd45-4661-a501-ae8e45f1e07e
-e = x -> x * x + 4
-problem, examples = create_problem(e)
-enumerator = get_mh_enumerator(examples, mean_squared_error)
-program, cost = search_best(grammar, problem, :X, enumerator=enumerator, error_function=mse_error_function, max_depth=3)
+begin
+	iteratormh = MHSearchIterator(grammar, :X, examples_mh, cost_function, max_depth=3) #TODO: What should max_depth be?
+	programmh = synth(problem_mh, iteratormh)
+end
+
+# ╔═╡ 82f7ffa5-2bdc-4153-85fa-d7aca063da12
+programmh
 
 # ╔═╡ 700270ea-90bd-474b-91d9-0e5ed329776a
 md"""
 ### Very Large Scale Neighbourhood Search 
 
-The second implemented stochastic search method is VLSN, which searches for a local optimum in the neighbourhood. For more information, see [this article](https://backend.orbit.dtu.dk/ws/portalfiles/portal/5293785/Pisinger.pdf).
+The second stochastic search method we consider is Very Large Scale Neighbourhood Search (VLSN). In each iteration, the neighbourhood of the current candidate program is searched for the local optimum to find a better candidate. 
+
+TODO: more?
+
+
+For more information, see [this article](https://backend.orbit.dtu.dk/ws/portalfiles/portal/5293785/Pisinger.pdf).
 
 Given the same grammar as before, we can try it with some simple examples.
+
+
+
+Using
+large neighborhoods makes it possible to find better candidate solutions in each it-
+eration and hence traverse a more promising search path
+
+#### Example I
 """
 
-# ╔═╡ 8731f312-bfcf-4f6c-86fa-60014dc146d6
-e = x -> 10
-max_depth = 2
-problem, examples = create_problem(e)
-enumerator = get_vlsn_enumerator(examples, mean_squared_error, max_depth)
-program, cost = search_best(grammar, problem, :X, enumerator=enumerator, error_function=mse_error_function, max_depth=max_depth)
+# ╔═╡ e6e5c63b-34e8-40d6-bc12-bd31f40b4b16
+e_vlsn = x -> 10
 
+# ╔═╡ 2397f65f-e6b4-4f11-bf66-83440c58b688
+problem_vlsn, examples_vlsn = create_problem(e_vlsn)
 
-# ╔═╡ 46ca65d1-d876-4abc-a562-8d266bad195f
-e = x -> x
-max_depth = 1
-problem, examples = create_problem(e)
-enumerator = get_vlsn_enumerator(examples, mean_squared_error, max_depth)
-program, cost = search_best(grammar, problem, :X, enumerator=enumerator, error_function=mse_error_function, max_depth=max_depth)
+# ╔═╡ 7c738d7b-bf05-40c7-b3b7-1512fbae7299
+iteratorvlsn = VLSNSearchIterator(grammar, :X, examples_vlsn, cost_function, max_depth=2) 
+
+# ╔═╡ 33af905e-e8ca-425d-9805-eb02bec7c26b
+programvlsn = synth(problem_vlsn, iteratorvlsn)
+# program, cost = search_best(grammar, problem, :X, enumerator=enumerator, error_function=mse_error_function, max_depth=max_depth)
+
+# ╔═╡ 4208cd17-6c2a-4480-a535-5a7358e0ab25
+md"""
+#### Example 2
+
+TODO: What do we want to show with this example?
+"""
+
+# ╔═╡ bea28b36-6613-4895-98f9-27dfd9e57b09
+e_vlsn2 = x -> x
+
+# ╔═╡ aa95cb5e-926d-4119-8d08-353f37a59039
+problem_vlsn2, examples_vlsn2 = create_problem(e_vlsn2)
+
+# ╔═╡ 285043ef-c295-400f-91c5-f3c6c69ac2bf
+iterator_vlsn2 = VLSNSearchIterator(grammar, :X, examples_vlsn2, cost_function, max_depth=1) 
+
+# ╔═╡ 36f0e0cf-c871-42c9-956e-054767cbf693
+program_vlsn2 = synth(problem_vlsn2, iterator_vlsn2)
 
 # ╔═╡ 599194a8-3f47-4917-9143-a5fe0d43029f
 md"""
 ### Simulated Annealing
 
-The third stochastic search method is called simulated annealing. This is another hill-climbing method to find local optima. For more information, see [this page](https://www.cs.cmu.edu/afs/cs.cmu.edu/project/learn-43/lib/photoz/.g/web/glossary/anneal.html).
+Simualted Annealing (SA) explores smaller, incremental changes in the candidate program per iteration and refines the solution over time. It is a modified hill-climbing algorithm that, instead of picking the best move (program modification?), picks a random move. If the move improves the solution (candidate program), it is always accepted. Ocassionally, a move towards a worse solution is accepted to escape loca optima. However, this strategy follows a cooling (annealing) schedule, i.e., it starts exploring widely (at high temperature) and gradually becomes more selective (at low temperture), accepting worse solutions less often.
 
-We try the example from earlier, but now we can additionally define the `initial_temperature` of the algorithm, which is 1 by default. Change the value below to see the effect.
+For more information, see [this page](https://www.cs.cmu.edu/afs/cs.cmu.edu/project/learn-43/lib/photoz/.g/web/glossary/anneal.html).
 """
 
-# ╔═╡ cb5935ed-d89b-4e25-9243-d201daf18e78
-e = x -> x * x + 4
-initial_temperature = 1
-problem, examples = create_problem(e)
-enumerator = get_sa_enumerator(examples, mean_squared_error, initial_temperature)
-program, cost = search_best(grammar, problem, :X, enumerator=enumerator, error_function=mse_error_function, max_depth=3)        
+# ╔═╡ dd6aee87-cd96-4be1-b8fb-03fffee5ea43
+md"""
+We use the same example as for MH. SA additionally has the option to specify the `initial_temperature` for the annealing (default `initial_temperature=1`). Let's see what effect changing the temperature from 1 to 2 has on the solution program.   
+"""
 
-# ╔═╡ d0c3742e-23e5-4ca1-9e83-b6d1e8a7cded
-e = x -> x * x + 4
-initial_temperature = 2
-problem, examples = create_problem(e)
-enumerator = get_sa_enumerator(examples, mean_squared_error, initial_temperature)
-program, cost = @time search_best(grammar, problem, :X, enumerator=enumerator, error_function=mse_error_function, max_depth=3)
+# ╔═╡ f6a3ed3f-bcf9-4f22-a86e-33255d88e0b2
+e_sa = x -> x * x + 4
+
+# ╔═╡ e25d115f-7549-4606-b96c-9ef700810f7b
+problem_sa, examples_sa = create_problem(e_sa)
+
+# ╔═╡ 94f2bd5e-e11e-42e7-9a3e-3c9d5ae43cd4
+initial_temperature1 = 1
+
+# ╔═╡ eb851d7b-803e-45f6-ad10-fa0bde78826a
+iterator_sa1 = SASearchIterator(grammar, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature1) 
+
+# ╔═╡ 73304e3f-05bf-4f0c-9acd-fc8afa87b460
+program_sa1 = synth(problem_sa, iterator_sa1)
+
+# ╔═╡ 07f11eb1-6b45-441a-a481-57628bad23ae
+initial_temperature2 = 2
+
+# ╔═╡ 4ff69f0a-6626-4593-b361-a2387eecc731
+iterator_sa2 = SASearchIterator(grammar, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature2) 
+
+# ╔═╡ 0f7f228c-4f95-4f1a-9ca2-2d03384a00c0
+
 
 # ╔═╡ 5df0ba53-b528-4baf-9980-cafe5d73f9dd
 md"""
 ### Genetic Search
 
-Genetic search is a type of evolutionary algorithm, which will simulate the process of natural selection and return the 'fittest' program of the population. For more information, see [here](https://www.geeksforgeeks.org/genetic-algorithms/).
+Genetic search is a type of evolutionary algorithm, which simulates the process of natural selection. It evolves a population of candidate programs through operations like mutation, crossover (recombination), and selection. Then, the fitness of each program is assessed (i.e., how well it satisfies the given specifications). Only the 'fittest' programs are selected for the next generation, thus gradually refining the population of candidate programs.
+
+For more information, see [here](https://www.geeksforgeeks.org/genetic-algorithms/).
 
 We show the example of finding a lambda function. Try varying the parameters of the genetic search to see what happens.
 """
 
-# ╔═╡ a434645b-d592-4162-a8b4-b4b04cea30a9
-e = x -> 3 * x * x + (x + 2)
-problem, examples = create_problem(e)
-enumerator = get_genetic_enumerator(examples, 
-    initial_population_size = 10,
-    mutation_probability = 0.8,
-    maximum_initial_population_depth = 3,
-)
-program, cost = search_best(grammar, problem, :X, enumerator=enumerator, error_function=mse_error_function, max_depth=nothing, max_time=20)    
+# ╔═╡ 99ea1c20-ca2c-4d77-bc3b-06814db1d666
+e_gs = x -> 3 * x * x + (x + 2)
 
-# ╔═╡ 38cd9032-27c0-4179-a536-ce59a42ff16a
-md"""
-## Other functionality
+# ╔═╡ d991edb9-2291-42a7-97ff-58c456515505
+problem_gs, examples_gs = create_problem(e_gs)
 
-Finally, we showcase two other functionalities of HerbSearch, sampling and heuristics.
+# ╔═╡ d17c2a79-3c14-4c50-a4aa-465f3da011a2
 
-### Sampling
-Sampling is implemented for the different stochastic search methods.
 
-We consider here a simple grammar, which gives different programs for different search depths.
-"""
+# ╔═╡ 069591a3-b89b-4fc6-afba-2145e32852b7
+iterator_gs = GeneticSearchIterator(grammar, :X, examples_gs, population_size = 10, mutation_probability = 0.8, maximum_initial_population_depth = 3) 
 
-# ╔═╡ f8415d48-a51d-4845-8425-fd61ed79c06e
-grammar = @cfgrammar begin 
-    A = B | C | F
-    F = G
-    C = D
-    D = E
-end
-
-# A->B (depth 1) or A->F->G (depth 2) or A->C->D->E (depth 3)
-
-# For depth ≤ 1 the only option is A->B
-expression = rand(RuleNode, grammar, :A, 1)
-@assert rulenode2expr(expression, grammar) in [:B,:C,:F]
-
-# For depth ≤ 2 the two options are A->B (depth 1) and A->B->G| A->C->G | A->F->G (depth 2)
-expression = rand(RuleNode, grammar, :A, 2)
-@assert rulenode2expr(expression,grammar) in [:B,:C,:F,:G]
-
-# ╔═╡ 7f88bf4f-d82c-4e5a-a9eb-93870954c79e
-md"""
-### Heuristics
-"""
-
-# ╔═╡ 53598f8f-9973-4cad-af0c-280f5531bb21
-md"""
-# More interesting domains & Use of constraints
-In the following examples, we introduce some larger grammars and show that Herb can still efficiently find the correct program.
-"""
-
-# ╔═╡ bc971069-08c4-493c-a917-8092493d3233
-#Expects to return a program equivalent to 1 + (1 - x) = 2 - x
-
-g₁ = @csgrammar begin
-    Element = |(1 : 3)          # 1 - 3
-    Element = Element + Element # 4
-    Element = 1 - Element       # 5
-    Element = x                 # 6
-end
-
-addconstraint!(g₁, ComesAfter(6, [5]))
-
-examples = [
-    IOExample(Dict(:x => 0), 2),
-    IOExample(Dict(:x => 1), 1),
-    IOExample(Dict(:x => 2), 0)
-]
-problem = Problem(examples)
-solution = search(g₁, problem, :Element, max_depth=3)
-
-@assert test_with_input(SymbolTable(g₁), solution, Dict(:x => -2)) == 4
-
-# ╔═╡ 61a60c9c-36cf-4e86-b697-748b3524d3b4
-# Expects to return a program equivalent to 4 + x * (x + 3 + 3) = x^2 + 6x + 4
-
-g₂ = @csgrammar begin
-    Element = Element + Element + Element # 1
-    Element = Element + Element * Element # 2
-    Element = x                           # 3
-    Element = |(3 : 5)                    # 4
-end
-
-# Restrict .. + x * x
-addconstraint!(g₂, Forbidden(MatchNode(2, [MatchVar(:x), MatchNode(3), MatchNode(3)])))
-# Restrict 4 and 5 in lower level
-addconstraint!(g₂, ForbiddenPath([2, 1, 5]))
-addconstraint!(g₂, ForbiddenPath([2, 1, 6]))
-
-examples = [
-    IOExample(Dict(:x => 1), 11)
-    IOExample(Dict(:x => 2), 20)
-    IOExample(Dict(:x => -1), -1)
-]
-problem = Problem(examples)
-solution = search(g₂, problem, :Element)
-
-@assert test_with_input(SymbolTable(g₂), solution, Dict(:x => 0)) == 4
-
-# ╔═╡ a5b17c81-b667-4b1c-ab15-ddf1a162683b
-# Expects to return a program equivalent to (1 - (((1 - x) - 1) - 1)) - 1 = x + 1
-
-g₃ = @csgrammar begin
-    Element = |(1 : 20)   # 1 - 20
-    Element = Element - 1 # 21
-    Element = 1 - Element # 22
-    Element = x           # 23
-end
-
-addconstraint!(g₃, ComesAfter(23, [22, 21]))
-addconstraint!(g₃, ComesAfter(22, [21]))
-
-examples = [
-    IOExample(Dict(:x => 1), 2)
-    IOExample(Dict(:x => 10), 11)
-]
-problem = Problem(examples)
-solution = search(g₃, problem, :Element)
-
-@assert test_with_input(SymbolTable(g₃), solution, Dict(:x => 0)) == 1
-@assert test_with_input(SymbolTable(g₃), solution, Dict(:x => 100)) == 101
-
-# ╔═╡ e41feac7-6de6-4223-8a21-341b85da52c0
-# Expects to return a program equivalent to 18 + 4x
-
-g₄ = @csgrammar begin
-    Element = |(0 : 20)                   # 1 - 20
-    Element = Element + Element + Element # 21
-    Element = Element + Element * Element # 22
-    Element = x                           # 23
-end
-
-# Enforce ordering on + +
-addconstraint!(g₄, Ordered(
-    MatchNode(21, [MatchVar(:x), MatchVar(:y), MatchVar(:z)]),
-    [:x, :y, :z]
-))
-
-examples = [
-    IOExample(Dict(:x => 1), 22),
-    IOExample(Dict(:x => 0), 18),
-    IOExample(Dict(:x => -1), 14)
-]
-problem = Problem(examples)
-solution = search(g₄, problem, :Element)
-
-@assert test_with_input(SymbolTable(g₄), solution, Dict(:x => 100)) == 418
-
-# ╔═╡ 1c4db74a-4caa-4ce5-815f-b631365c5129
-# Expects to return a program equivalent to (x == 2) ? 1 : (x + 2)
-
-g₅ = @csgrammar begin
-    Element = Number # 1
-    Element = Bool # 2
-
-    Number = |(1 : 3) # 3-5
-    
-    Number = Number + Number # 6
-    Bool = Number ≡ Number # 7
-    Number = x # 8
-    
-    Number = Bool ? Number : Number # 9
-    Bool = Bool ? Bool : Bool # 10
-end
-
-# Forbid ? = ?
-addconstraint!(g₅, Forbidden(MatchNode(7, [MatchVar(:x), MatchVar(:x)])))
-# Order =
-addconstraint!(g₅, Ordered(MatchNode(7, [MatchVar(:x), MatchVar(:y)]), [:x, :y]))
-# Order +
-addconstraint!(g₅, Ordered(MatchNode(6, [MatchVar(:x), MatchVar(:y)]), [:x, :y]))
-
-examples = [
-    IOExample(Dict(:x => 0), 2)
-    IOExample(Dict(:x => 1), 3)
-    IOExample(Dict(:x => 2), 1)
-]
-problem = Problem(examples)
-solution = search(g₅, problem, :Element)
-
-@assert test_with_input(SymbolTable(g₅), solution, Dict(:x => 3)) == 5
+# ╔═╡ 5bef5754-d81b-4160-8ed6-396d02853d9a
+program_gs, error_gs = synth(problem_gs, iterator_gs)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 HerbConstraints = "1fa96474-3206-4513-b4fa-23913f296dfc"
+HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
 HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
 HerbInterpret = "5bbddadd-02c5-4713-84b8-97364418cca7"
 HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
@@ -509,6 +495,7 @@ PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
 HerbConstraints = "~0.2.2"
+HerbCore = "~0.3.0"
 HerbGrammar = "~0.3.0"
 HerbInterpret = "~0.1.3"
 HerbSearch = "~0.3.0"
@@ -522,7 +509,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "5ee7afaa57cf163e03a42d572d1cb2cb022598e5"
+project_hash = "e8df13c29bfd5a0060b6c72e678efa3df418b0d7"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1251,6 +1238,7 @@ version = "0.13.1+0"
 # ╟─dddca175-3d88-45ce-90da-575c0ba38175
 # ╠═a93d954d-0f09-4b6d-a3a5-62bfe39681e2
 # ╠═6ab37bbc-73e2-4d9a-a8b2-e715a0b61c8f
+# ╟─61cee94c-2481-4268-823b-ca596592b63c
 # ╠═c4441fa4-09ec-4b81-9681-b13b93a9c9c0
 # ╟─67931820-0f43-41e1-898e-5b5bd55e30d1
 # ╠═e41c61a4-0b2c-46da-8f7b-fe6dc529c544
@@ -1259,49 +1247,82 @@ version = "0.13.1+0"
 # ╟─e9c6bc00-21f5-4a99-8bec-63cf2156c233
 # ╠═338f19f1-3a62-4462-b8dc-24424d7644f2
 # ╠═542cd47e-74cd-4b6f-acc9-bf524222e583
+# ╟─63e97576-1c34-464d-a106-d59d5fb1ee38
 # ╠═a6fb2e91-b73a-4032-930f-d884abd539e2
-# ╠═4b49f206-970e-47d2-af65-336ba65b1019
+# ╟─58c1a904-4d87-43f7-bcc3-884a8663c1da
 # ╟─35405357-179b-4e77-9bdc-edf5a550b36d
 # ╠═3954dd49-07a2-4ec2-91b4-9c9596d5c264
-# ╠═9892e91b-9115-4520-9637-f8d7c8905825
-# ╠═a4e58bbc-7c14-4fce-b35d-688b56e0eb61
+# ╟─9892e91b-9115-4520-9637-f8d7c8905825
+# ╟─a4e58bbc-7c14-4fce-b35d-688b56e0eb61
 # ╠═9fb40ceb-8d41-491b-8941-20a8b240eb82
 # ╠═94e0d676-a9c7-4291-8696-15301e541c30
 # ╠═a4a7daed-f89b-44ad-8787-9199c05bf046
 # ╠═4821fd3a-ff2d-4991-99ad-76608d11b1da
-# ╠═8d91b2e3-30b5-4ea2-bd3f-3055bb6d1d5a
+# ╟─b2eb08d7-3e53-46c5-84b1-e1fa0e07e291
+# ╠═606070e1-83a7-4cca-a716-4fa459f78772
 # ╠═52332fa2-7ea7-4226-9460-e0bbc905c619
-# ╟─c26fea48-f812-4f24-bb8c-680e14a55df7
-# ╠═57f5face-d9d5-441a-8e0e-6ef6319fc178
+# ╟─c262116e-138e-4133-a032-d2f50bfbf5bd
 # ╟─9b4b21e0-dc6a-43ae-a511-79988ee99001
+# ╟─115c02c9-ae0c-4623-a61d-831fc6ad55a2
 # ╠═3af650d9-19c6-4351-920d-d2361091f628
+# ╟─4cb08dba-aea5-4c31-998c-844d1fce8c81
+# ╠═f2521a57-267e-4b49-9179-4e9c2e6bdec7
+# ╟─bf038215-1ecf-4e1c-a9be-e133e4497293
+# ╠═6aec7358-225a-4764-9a36-da86234b6cf8
+# ╠═54ecf6b9-3341-49e0-92e9-71190e06d61b
 # ╟─d3ff497e-d2c2-4df6-8e4c-cdca70fd0677
-# ╠═da7f326c-f0d5-4837-ac9a-5bcad604566e
-# ╟─0020b79a-6352-4e2d-93f6-2a1d7b03ae2c
+# ╠═07b54acf-0c0d-40ac-ae18-fb26094b4aca
+# ╠═9efb01cf-b190-4e3e-aa19-11499ba46489
+# ╠═0020b79a-6352-4e2d-93f6-2a1d7b03ae2c
 # ╠═789150a8-862c-48c3-88b8-710b81ab34cf
-# ╟─243165be-a9d2-484d-8046-811a2b0ba139
-# ╠═3d01c6f1-80a6-4904-97e2-775170e97bbf
-# ╟─168c71bf-ce5b-4ab3-b29a-5996981c42a5
+# ╠═db5be2c3-0b36-40b4-bf14-20e2c7063ad7
+# ╠═4048ff37-e7d1-44ee-bfa3-aa058b6f53b6
+# ╠═658c55ac-88c8-4657-a8eb-c9c9b91d0ded
+# ╠═243165be-a9d2-484d-8046-811a2b0ba139
+# ╠═aa45e602-6219-44ea-82a0-b97639f6a450
+# ╠═3f18989a-ae25-4a66-9930-4459407af695
+# ╠═4b97602a-5226-429f-86ea-8ecac3c807fa
+# ╟─ed198b79-1b95-4531-b148-c1037cfdacf4
+# ╠═3c7f6e75-ea70-4ccd-8ad6-5876d50a587d
+# ╠═d62918e4-4113-45bd-81ea-d17d007b83f5
+# ╟─7480d1e4-e417-4d87-80b7-513a098da70e
+# ╠═7e2af72d-b71c-4234-9bca-cb9a90732a91
+# ╠═00d05a7e-ca79-4d6b-828d-b24ef1cb80a2
+# ╠═c70eb1a1-7d6b-413f-bd85-77e1b8c30b94
+# ╠═168c71bf-ce5b-4ab3-b29a-5996981c42a5
 # ╠═a4b522cf-78f0-4d44-88c8-82dd0cdbf952
 # ╠═f313edb9-8fd9-4d78-88cd-89226f5c769d
 # ╟─0da9053a-959b-471e-8918-662ec63da71c
+# ╠═4df84c71-99b5-487f-9db5-c048c0c74151
+# ╠═afe1872c-6641-4fa0-a53e-50c6b4a712ee
+# ╠═969db94c-d583-40d1-a058-097f8117c2e9
 # ╠═0a30fb40-cd45-4661-a501-ae8e45f1e07e
+# ╠═82f7ffa5-2bdc-4153-85fa-d7aca063da12
 # ╟─700270ea-90bd-474b-91d9-0e5ed329776a
-# ╠═8731f312-bfcf-4f6c-86fa-60014dc146d6
-# ╠═46ca65d1-d876-4abc-a562-8d266bad195f
+# ╠═e6e5c63b-34e8-40d6-bc12-bd31f40b4b16
+# ╠═2397f65f-e6b4-4f11-bf66-83440c58b688
+# ╠═7c738d7b-bf05-40c7-b3b7-1512fbae7299
+# ╠═33af905e-e8ca-425d-9805-eb02bec7c26b
+# ╟─4208cd17-6c2a-4480-a535-5a7358e0ab25
+# ╠═bea28b36-6613-4895-98f9-27dfd9e57b09
+# ╠═aa95cb5e-926d-4119-8d08-353f37a59039
+# ╠═285043ef-c295-400f-91c5-f3c6c69ac2bf
+# ╠═36f0e0cf-c871-42c9-956e-054767cbf693
 # ╟─599194a8-3f47-4917-9143-a5fe0d43029f
-# ╠═cb5935ed-d89b-4e25-9243-d201daf18e78
-# ╠═d0c3742e-23e5-4ca1-9e83-b6d1e8a7cded
+# ╠═dd6aee87-cd96-4be1-b8fb-03fffee5ea43
+# ╠═f6a3ed3f-bcf9-4f22-a86e-33255d88e0b2
+# ╠═e25d115f-7549-4606-b96c-9ef700810f7b
+# ╠═94f2bd5e-e11e-42e7-9a3e-3c9d5ae43cd4
+# ╠═eb851d7b-803e-45f6-ad10-fa0bde78826a
+# ╠═73304e3f-05bf-4f0c-9acd-fc8afa87b460
+# ╠═07f11eb1-6b45-441a-a481-57628bad23ae
+# ╠═4ff69f0a-6626-4593-b361-a2387eecc731
+# ╠═0f7f228c-4f95-4f1a-9ca2-2d03384a00c0
 # ╟─5df0ba53-b528-4baf-9980-cafe5d73f9dd
-# ╠═a434645b-d592-4162-a8b4-b4b04cea30a9
-# ╟─38cd9032-27c0-4179-a536-ce59a42ff16a
-# ╠═f8415d48-a51d-4845-8425-fd61ed79c06e
-# ╟─7f88bf4f-d82c-4e5a-a9eb-93870954c79e
-# ╟─53598f8f-9973-4cad-af0c-280f5531bb21
-# ╠═bc971069-08c4-493c-a917-8092493d3233
-# ╠═61a60c9c-36cf-4e86-b697-748b3524d3b4
-# ╠═a5b17c81-b667-4b1c-ab15-ddf1a162683b
-# ╠═e41feac7-6de6-4223-8a21-341b85da52c0
-# ╠═1c4db74a-4caa-4ce5-815f-b631365c5129
+# ╠═99ea1c20-ca2c-4d77-bc3b-06814db1d666
+# ╠═d991edb9-2291-42a7-97ff-58c456515505
+# ╠═d17c2a79-3c14-4c50-a4aa-465f3da011a2
+# ╠═069591a3-b89b-4fc6-afba-2145e32852b7
+# ╠═5bef5754-d81b-4160-8ed6-396d02853d9a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
