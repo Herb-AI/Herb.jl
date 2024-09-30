@@ -8,11 +8,8 @@ using InteractiveUtils
 using PlutoUI
 
 # ╔═╡ c4441fa4-09ec-4b81-9681-b13b93a9c9c0
-using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret, HerbConstraints
+using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret, HerbConstraints, HerbCore
 
-
-# ╔═╡ aa45e602-6219-44ea-82a0-b97639f6a450
-using HerbCore
 
 # ╔═╡ dddca175-3d88-45ce-90da-575c0ba38175
 md"""
@@ -183,7 +180,7 @@ To explore `BFSIterator`, we define another very simple grammar.
 """
 
 # ╔═╡ 3af650d9-19c6-4351-920d-d2361091f628
-begin g3 = @cfgrammar begin
+begin g_3 = @cfgrammar begin
 	    Real = 1 | 2
 	    Real = Real * Real
 	end
@@ -195,7 +192,7 @@ Next, we define a `BFSIterator` with a `max_depth` of 2 and a `max_size` of infi
 """
 
 # ╔═╡ f2521a57-267e-4b49-9179-4e9c2e6bdec7
-iteratorbfs = BFSIterator(g3, :Real, max_depth=2, max_size=typemax(Int))
+iterator_bfs = BFSIterator(g_3, :Real, max_depth=2, max_size=typemax(Int))
 
 # ╔═╡ bf038215-1ecf-4e1c-a9be-e133e4497293
 md"""
@@ -203,10 +200,10 @@ To see all possible solution programs the iterator explores, we use `collect`. I
 """
 
 # ╔═╡ 6aec7358-225a-4764-9a36-da86234b6cf8
-programsbfs = collect(iteratorbfs)
+programs_bfs = collect(iterator_bfs)
 
 # ╔═╡ 54ecf6b9-3341-49e0-92e9-71190e06d61b
-println(programsbfs)
+println(programs_bfs)
 
 # ╔═╡ d3ff497e-d2c2-4df6-8e4c-cdca70fd0677
 md"""
@@ -224,78 +221,45 @@ answer_programs = [
 ]
 
 # ╔═╡ 9efb01cf-b190-4e3e-aa19-11499ba46489
-println(all(p ∈ programsbfs for p ∈ answer_programs))
+println(all(p ∈ programs_bfs for p ∈ answer_programs))
 
 # ╔═╡ 0020b79a-6352-4e2d-93f6-2a1d7b03ae2c
 md"""
 #### Depth-First Search
 
-The `DFSIterator` looks at one branch of the search tree at a time, exploring it unitl a correct program is found or the specified `max_depth` is reached. Only then, the next branch is considered.
+The `DFSIterator` explores one branch of the search tree at a time, fully traversing it unitl a correct program is found or the specified `max_depth` is reached. Only after completing the current branch, it proceeds to the next branch.
 
-Let's `collect` the the trees/programs (TODO), using the same grammar but this time `DFSIterator`. 
+As before, we `collect` the candidate programs using the same grammar, but a `DFSIterator`. 
 """
 
-# ╔═╡ 789150a8-862c-48c3-88b8-710b81ab34cf
-begin
-	g1 = @cfgrammar begin
-	Real = 1 | 2
-	Real = Real * Real
-	end
-	
-end
-
 # ╔═╡ db5be2c3-0b36-40b4-bf14-20e2c7063ad7
-iteratordfs = DFSIterator(g3, :Real, max_depth=2, max_size=typemax(Int))
+iterator_dfs = DFSIterator(g_3, :Real, max_depth=2, max_size=typemax(Int))
 
 # ╔═╡ 4048ff37-e7d1-44ee-bfa3-aa058b6f53b6
-programsdfs = collect(iteratordfs)
+programs_dfs = collect(iterator_dfs)
 
 # ╔═╡ 658c55ac-88c8-4657-a8eb-c9c9b91d0ded
-println(programsdfs)
+println(programs_dfs)
 
 # ╔═╡ 243165be-a9d2-484d-8046-811a2b0ba139
 md"""
-`DFSIterator` also uses by default a **leftmost-first** heuristic. If we want to use a **rightmost-first** heuristic instead, we can create our own iterator `DFSIteratorRightmost`. Also see the tutorial [Top Down Iterator](https://herb-ai.github.io/Herb.jl/dev/tutorials/TopDown/) for how to build iterators is Herb.jl. 
-
-
-
-
-TODO: How to use rightmost heuristic?
+`DFSIterator` also uses by default a **leftmost-first** heuristic. If we want to use a **rightmost-first** heuristic instead, we can create our own iterator `DFSIteratorRightmost` as a sub-type of `TopDownIterator`, using the `@programiterator` macro. Then we implement the functions `priority_function` and `hole_heuristic`. Also see the tutorial [Top Down Iterator](https://herb-ai.github.io/Herb.jl/dev/tutorials/TopDown/) for how to build iterators is Herb.jl. 
 """
-
-# ╔═╡ 3f18989a-ae25-4a66-9930-4459407af695
-# to modify the heuristics, we create a new type
-# abstract type DFSIteratorRightmost <: TopDownIterator end
 
 # ╔═╡ 4b97602a-5226-429f-86ea-8ecac3c807fa
 @programiterator DFSIteratorRightmost() <: TopDownIterator
 
 # ╔═╡ ed198b79-1b95-4531-b148-c1037cfdacf4
 md"""
-By default, `priority_function` for a `TopDownIterator` is that of a BFS iterator. Hence, we need to overwrite it:
+By default, `priority_function` for a `TopDownIterator` is that of a BFS iterator. Hence, we need to provide a new implementation. For this, we can make use of the existing `priority_function` of `DFSIterator`.
 """
 
-# ╔═╡ 3c7f6e75-ea70-4ccd-8ad6-5876d50a587d
-function priority_function(
-    ::DFSIteratorRightmost, 
-    ::AbstractGrammar, 
-    ::AbstractRuleNode, 
-    parent_value::Union{Real, Tuple{Vararg{Real}}},
-    isrequeued::Bool
-)
-    if isrequeued
-        return parent_value;
-    end
-    return parent_value - 1;
-end
-
 # ╔═╡ d62918e4-4113-45bd-81ea-d17d007b83f5
-# Alternative
 priority_function(::DFSIteratorRightmost) = priority_function(DFSIterator())
 
 # ╔═╡ 7480d1e4-e417-4d87-80b7-513a098da70e
 md"""
-Next, we need to overwrite the `hole_heuristic` to rightmost-first.
+Next, we need to implement the `hole_heuristic` to be rightmost-first.
 """
 
 # ╔═╡ 7e2af72d-b71c-4234-9bca-cb9a90732a91
@@ -304,24 +268,41 @@ function hole_heuristic(::DFSIteratorRightmost, node::AbstractRuleNode, max_dept
 end
 
 # ╔═╡ 00d05a7e-ca79-4d6b-828d-b24ef1cb80a2
-iteratordfs_rightmost = DFSIteratorRightmost(g3, :Real, max_depth=2, max_size=typemax(Int))
+iteratordfs_rightmost = DFSIteratorRightmost(g_3, :Real, max_depth=2, max_size=typemax(Int))
+
+# ╔═╡ e0e8042d-ae41-4046-ab4f-5954a0d1cfb7
+programs_dfs_rightmost = collect(iteratordfs_rightmost)
 
 # ╔═╡ c70eb1a1-7d6b-413f-bd85-77e1b8c30b94
-println(collect(iteratordfs_rightmost))
+println(programs_dfs_rightmost)
+
+# ╔═╡ 02010940-df9f-4847-b0be-0bc9c6bb2ad4
+md"""
+We observe that the order of programs has changed. We can also test if both DFS iterators return the same programs:
+"""
+
+# ╔═╡ f5edcb4d-da72-4eeb-b55e-0ace1697133a
+Set(programs_dfs)==Set(programs_dfs_rightmost)
 
 # ╔═╡ 168c71bf-ce5b-4ab3-b29a-5996981c42a5
 md"""
 ## Stochastic search
 
-Whereas deterministic search methods explore the search space in a predictable way, stochastic ones use randomness.
+While deterministic search methods explore the search space in a predictable way, stochastic ones introduce randomness to allow for more flexibility.
 
-We will look at several stochastic search algorithms, usinga a new example.
+In this section, we will look at the stochastic search algorithms: Metropolis-Hastings (MH), Very Large Scale Neighbourhood Search (VLSNS), and Simulated Annealing (SA). In Herb.jl, all of these search methodsthe share a common supertype `StochasticSearchIterator`, which defines the following fields
+ - `examples` 
+ - `cost_function`
+ - `initial_temperature` 
+ - `evaluation_function`.
+
+They are customized by overriding the functions `neighbourhood`, `propose`, `accept` and `temperature` as required.
 
 We start with a simple grammar and a helper function to create the input-output examples for the problem we want to solve.
 """
 
 # ╔═╡ a4b522cf-78f0-4d44-88c8-82dd0cdbf952
-grammar = @csgrammar begin
+g_4 = @csgrammar begin
     X = |(1:5)
     X = X * X
     X = X + X
@@ -335,14 +316,23 @@ function create_problem(f, range=20)
     return Problem(examples), examples
 end
 
+# ╔═╡ 8e75ec35-94dc-4292-ab36-83731b3b9318
+md"""
+Throughout the stochastic search examples, we will use mean-squared-error as cost function. The cost function helps to guide the search by evaluating how well a candidate program solves the given task. This is used to decide whether a proposed program should be accepted or rejected.
+"""
+
+# ╔═╡ eebb9554-b657-4be3-aecf-c0869a2b38fa
+cost_function = mean_squared_error
+
 # ╔═╡ 0da9053a-959b-471e-8918-662ec63da71c
 md"""
 ### Metropolis-Hastings
 
-Metropolis-Hastings (MH) is a method to produce samples from a distribution that may otherwise be difficult to sample. In the context of program synthesis, we want samples from a distribution of programs, based on the grammar. 
+Metropolis-Hastings (MH) is a method to produce samples from a distribution that may otherwise be difficult to sample. In the context of program synthesis, we sample from a distribution of programs defined by the grammar. 
+
 For more information on MH, see for example [this webpage](https://stephens999.github.io/fiveMinuteStats/MH_intro.html).
 
-The example below uses a simple arithmetic example. Try run the code block (TODO) multiple times. You will get different programs every time, as the search is stochastic.
+To illustrate MH, we use a simple arithmetic example.
 """
 
 # ╔═╡ 4df84c71-99b5-487f-9db5-c048c0c74151
@@ -351,14 +341,16 @@ e_mh = x -> x * x + 4
 # ╔═╡ afe1872c-6641-4fa0-a53e-50c6b4a712ee
 problem_mh, examples_mh = create_problem(e_mh)
 
-# ╔═╡ 969db94c-d583-40d1-a058-097f8117c2e9
-cost_function = mean_squared_error
-
+# ╔═╡ 69e91ae9-8475-47dd-826e-8c229faa11e8
+md"""
+Run the following code block to define the iterator and perform the program synthesis multiple times. Since the search process is stochastic, you will likely see different solution programs with each run.
+"""
 
 # ╔═╡ 0a30fb40-cd45-4661-a501-ae8e45f1e07e
 begin
-	iteratormh = MHSearchIterator(grammar, :X, examples_mh, cost_function, max_depth=3) #TODO: What should max_depth be?
+	iteratormh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth=3) 
 	programmh = synth(problem_mh, iteratormh)
+	println("Sollution using MH: ", programmh)
 end
 
 # ╔═╡ 82f7ffa5-2bdc-4153-85fa-d7aca063da12
@@ -368,43 +360,29 @@ programmh
 md"""
 ### Very Large Scale Neighbourhood Search 
 
-The second stochastic search method we consider is Very Large Scale Neighbourhood Search (VLSN). In each iteration, the neighbourhood of the current candidate program is searched for the local optimum to find a better candidate. 
+TODO: what do we want to show with the examples?
 
-TODO: more?
-
+The second stochastic search method we consider is Very Large Scale Neighbourhood Search (VLSN). In each iteration, the algorithm searches the neighbourhood of the current candidate program for a local optimum, aiming to find a better candidate solution.
 
 For more information, see [this article](https://backend.orbit.dtu.dk/ws/portalfiles/portal/5293785/Pisinger.pdf).
 
 Given the same grammar as before, we can try it with some simple examples.
-
-
-
-Using
-large neighborhoods makes it possible to find better candidate solutions in each it-
-eration and hence traverse a more promising search path
-
-#### Example I
 """
 
 # ╔═╡ e6e5c63b-34e8-40d6-bc12-bd31f40b4b16
 e_vlsn = x -> 10
 
 # ╔═╡ 2397f65f-e6b4-4f11-bf66-83440c58b688
-problem_vlsn, examples_vlsn = create_problem(e_vlsn)
+problem_vlsn1, examples_vlsn1 = create_problem(e_vlsn)
 
 # ╔═╡ 7c738d7b-bf05-40c7-b3b7-1512fbae7299
-iteratorvlsn = VLSNSearchIterator(grammar, :X, examples_vlsn, cost_function, max_depth=2) 
+iterator_vlsn1 = VLSNSearchIterator(g_4, :X, examples_vlsn1, cost_function, max_depth=2) 
 
 # ╔═╡ 33af905e-e8ca-425d-9805-eb02bec7c26b
-programvlsn = synth(problem_vlsn, iteratorvlsn)
-# program, cost = search_best(grammar, problem, :X, enumerator=enumerator, error_function=mse_error_function, max_depth=max_depth)
+program_vlsn1 = synth(problem_vlsn1, iterator_vlsn1)
 
-# ╔═╡ 4208cd17-6c2a-4480-a535-5a7358e0ab25
-md"""
-#### Example 2
-
-TODO: What do we want to show with this example?
-"""
+# ╔═╡ 7cbaa721-2bab-4a27-8c18-83f3f81bb336
+println("Solution: ", program_vlsn1)
 
 # ╔═╡ bea28b36-6613-4895-98f9-27dfd9e57b09
 e_vlsn2 = x -> x
@@ -413,16 +391,21 @@ e_vlsn2 = x -> x
 problem_vlsn2, examples_vlsn2 = create_problem(e_vlsn2)
 
 # ╔═╡ 285043ef-c295-400f-91c5-f3c6c69ac2bf
-iterator_vlsn2 = VLSNSearchIterator(grammar, :X, examples_vlsn2, cost_function, max_depth=1) 
+iterator_vlsn2 = VLSNSearchIterator(g_4, :X, examples_vlsn2, cost_function, max_depth=1) 
 
 # ╔═╡ 36f0e0cf-c871-42c9-956e-054767cbf693
 program_vlsn2 = synth(problem_vlsn2, iterator_vlsn2)
+
+# ╔═╡ bff8026e-49ee-4200-ae86-7687767389a5
+println("Solution: ", program_vlsn2)
 
 # ╔═╡ 599194a8-3f47-4917-9143-a5fe0d43029f
 md"""
 ### Simulated Annealing
 
-Simualted Annealing (SA) explores smaller, incremental changes in the candidate program per iteration and refines the solution over time. It is a modified hill-climbing algorithm that, instead of picking the best move (program modification?), picks a random move. If the move improves the solution (candidate program), it is always accepted. Ocassionally, a move towards a worse solution is accepted to escape loca optima. However, this strategy follows a cooling (annealing) schedule, i.e., it starts exploring widely (at high temperature) and gradually becomes more selective (at low temperture), accepting worse solutions less often.
+Simulated Annealing (SA) explores smaller, incremental changes to the candidate program in each iteration, gradually refining the solution. It is a variation of the hill-climbing algorithm: Instead of always selecting the best move, SA picks a random move. If the move improves the solution (i.e., the candidate program), it is accepted.
+
+Occasionally, SA will accept a move that worsens the solution. This allows the algorithm to escape local optima and explore more of the solution space. However, this strategy follows a cooling (annealing) schedule: at the beginning (high temperature), the algorithm explores more broadly and is more likely to accept worse solutions. As the temperature decreases, it becomes more selective, accepting worse solutions less often.
 
 For more information, see [this page](https://www.cs.cmu.edu/afs/cs.cmu.edu/project/learn-43/lib/photoz/.g/web/glossary/anneal.html).
 """
@@ -432,17 +415,14 @@ md"""
 We use the same example as for MH. SA additionally has the option to specify the `initial_temperature` for the annealing (default `initial_temperature=1`). Let's see what effect changing the temperature from 1 to 2 has on the solution program.   
 """
 
-# ╔═╡ f6a3ed3f-bcf9-4f22-a86e-33255d88e0b2
-e_sa = x -> x * x + 4
-
 # ╔═╡ e25d115f-7549-4606-b96c-9ef700810f7b
-problem_sa, examples_sa = create_problem(e_sa)
+problem_sa, examples_sa = create_problem(e_mh)
 
 # ╔═╡ 94f2bd5e-e11e-42e7-9a3e-3c9d5ae43cd4
 initial_temperature1 = 1
 
 # ╔═╡ eb851d7b-803e-45f6-ad10-fa0bde78826a
-iterator_sa1 = SASearchIterator(grammar, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature1) 
+iterator_sa1 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature1) 
 
 # ╔═╡ 73304e3f-05bf-4f0c-9acd-fc8afa87b460
 program_sa1 = synth(problem_sa, iterator_sa1)
@@ -451,14 +431,16 @@ program_sa1 = synth(problem_sa, iterator_sa1)
 initial_temperature2 = 2
 
 # ╔═╡ 4ff69f0a-6626-4593-b361-a2387eecc731
-iterator_sa2 = SASearchIterator(grammar, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature2) 
+iterator_sa2 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature2) 
 
 # ╔═╡ 0f7f228c-4f95-4f1a-9ca2-2d03384a00c0
 
 
 # ╔═╡ 5df0ba53-b528-4baf-9980-cafe5d73f9dd
 md"""
-### Genetic Search
+## Genetic Search
+
+TODO: talk a bit about the iterator.
 
 Genetic search is a type of evolutionary algorithm, which simulates the process of natural selection. It evolves a population of candidate programs through operations like mutation, crossover (recombination), and selection. Then, the fitness of each program is assessed (i.e., how well it satisfies the given specifications). Only the 'fittest' programs are selected for the next generation, thus gradually refining the population of candidate programs.
 
@@ -473,11 +455,8 @@ e_gs = x -> 3 * x * x + (x + 2)
 # ╔═╡ d991edb9-2291-42a7-97ff-58c456515505
 problem_gs, examples_gs = create_problem(e_gs)
 
-# ╔═╡ d17c2a79-3c14-4c50-a4aa-465f3da011a2
-
-
 # ╔═╡ 069591a3-b89b-4fc6-afba-2145e32852b7
-iterator_gs = GeneticSearchIterator(grammar, :X, examples_gs, population_size = 10, mutation_probability = 0.8, maximum_initial_population_depth = 3) 
+iterator_gs = GeneticSearchIterator(g_4, :X, examples_gs, population_size = 10, mutation_probability = 0.8, maximum_initial_population_depth = 3) 
 
 # ╔═╡ 5bef5754-d81b-4160-8ed6-396d02853d9a
 program_gs, error_gs = synth(problem_gs, iterator_gs)
@@ -1273,29 +1252,30 @@ version = "0.13.1+0"
 # ╟─d3ff497e-d2c2-4df6-8e4c-cdca70fd0677
 # ╠═07b54acf-0c0d-40ac-ae18-fb26094b4aca
 # ╠═9efb01cf-b190-4e3e-aa19-11499ba46489
-# ╠═0020b79a-6352-4e2d-93f6-2a1d7b03ae2c
-# ╠═789150a8-862c-48c3-88b8-710b81ab34cf
+# ╟─0020b79a-6352-4e2d-93f6-2a1d7b03ae2c
 # ╠═db5be2c3-0b36-40b4-bf14-20e2c7063ad7
 # ╠═4048ff37-e7d1-44ee-bfa3-aa058b6f53b6
 # ╠═658c55ac-88c8-4657-a8eb-c9c9b91d0ded
-# ╠═243165be-a9d2-484d-8046-811a2b0ba139
-# ╠═aa45e602-6219-44ea-82a0-b97639f6a450
-# ╠═3f18989a-ae25-4a66-9930-4459407af695
+# ╟─243165be-a9d2-484d-8046-811a2b0ba139
 # ╠═4b97602a-5226-429f-86ea-8ecac3c807fa
 # ╟─ed198b79-1b95-4531-b148-c1037cfdacf4
-# ╠═3c7f6e75-ea70-4ccd-8ad6-5876d50a587d
 # ╠═d62918e4-4113-45bd-81ea-d17d007b83f5
 # ╟─7480d1e4-e417-4d87-80b7-513a098da70e
 # ╠═7e2af72d-b71c-4234-9bca-cb9a90732a91
 # ╠═00d05a7e-ca79-4d6b-828d-b24ef1cb80a2
+# ╠═e0e8042d-ae41-4046-ab4f-5954a0d1cfb7
 # ╠═c70eb1a1-7d6b-413f-bd85-77e1b8c30b94
-# ╠═168c71bf-ce5b-4ab3-b29a-5996981c42a5
+# ╟─02010940-df9f-4847-b0be-0bc9c6bb2ad4
+# ╠═f5edcb4d-da72-4eeb-b55e-0ace1697133a
+# ╟─168c71bf-ce5b-4ab3-b29a-5996981c42a5
 # ╠═a4b522cf-78f0-4d44-88c8-82dd0cdbf952
 # ╠═f313edb9-8fd9-4d78-88cd-89226f5c769d
+# ╟─8e75ec35-94dc-4292-ab36-83731b3b9318
+# ╠═eebb9554-b657-4be3-aecf-c0869a2b38fa
 # ╟─0da9053a-959b-471e-8918-662ec63da71c
 # ╠═4df84c71-99b5-487f-9db5-c048c0c74151
 # ╠═afe1872c-6641-4fa0-a53e-50c6b4a712ee
-# ╠═969db94c-d583-40d1-a058-097f8117c2e9
+# ╟─69e91ae9-8475-47dd-826e-8c229faa11e8
 # ╠═0a30fb40-cd45-4661-a501-ae8e45f1e07e
 # ╠═82f7ffa5-2bdc-4153-85fa-d7aca063da12
 # ╟─700270ea-90bd-474b-91d9-0e5ed329776a
@@ -1303,14 +1283,14 @@ version = "0.13.1+0"
 # ╠═2397f65f-e6b4-4f11-bf66-83440c58b688
 # ╠═7c738d7b-bf05-40c7-b3b7-1512fbae7299
 # ╠═33af905e-e8ca-425d-9805-eb02bec7c26b
-# ╟─4208cd17-6c2a-4480-a535-5a7358e0ab25
+# ╠═7cbaa721-2bab-4a27-8c18-83f3f81bb336
 # ╠═bea28b36-6613-4895-98f9-27dfd9e57b09
 # ╠═aa95cb5e-926d-4119-8d08-353f37a59039
 # ╠═285043ef-c295-400f-91c5-f3c6c69ac2bf
 # ╠═36f0e0cf-c871-42c9-956e-054767cbf693
+# ╠═bff8026e-49ee-4200-ae86-7687767389a5
 # ╟─599194a8-3f47-4917-9143-a5fe0d43029f
-# ╠═dd6aee87-cd96-4be1-b8fb-03fffee5ea43
-# ╠═f6a3ed3f-bcf9-4f22-a86e-33255d88e0b2
+# ╟─dd6aee87-cd96-4be1-b8fb-03fffee5ea43
 # ╠═e25d115f-7549-4606-b96c-9ef700810f7b
 # ╠═94f2bd5e-e11e-42e7-9a3e-3c9d5ae43cd4
 # ╠═eb851d7b-803e-45f6-ad10-fa0bde78826a
@@ -1321,7 +1301,6 @@ version = "0.13.1+0"
 # ╟─5df0ba53-b528-4baf-9980-cafe5d73f9dd
 # ╠═99ea1c20-ca2c-4d77-bc3b-06814db1d666
 # ╠═d991edb9-2291-42a7-97ff-58c456515505
-# ╠═d17c2a79-3c14-4c50-a4aa-465f3da011a2
 # ╠═069591a3-b89b-4fc6-afba-2145e32852b7
 # ╠═5bef5754-d81b-4160-8ed6-396d02853d9a
 # ╟─00000000-0000-0000-0000-000000000001
