@@ -161,18 +161,21 @@ md""""This time we find a solution, although a suboptimal one."""
 
 # ╔═╡ 9b4b21e0-dc6a-43ae-a511-79988ee99001
 md"""
-## Search methods
+## Top-down search
 
 Herb.jl provides already implemented, ready-to-use search methods. The core building block of the search is the program iterator, which represents a walk through the program space. All program iterators share the top-level abstract type `ProgramIterator`. For more information on iterators and how to customize them, see [this tutorial](https://herb-ai.github.io/Herb.jl/dev/tutorials/TopDown/).
+
+First, we explore two fundamental deterministic top-down search algorithms: **breadth-first search (BFS)** and **depth-first search (DFS)**. Both algorithms are implemented using the abstract type `TopDownIterator`, which can be customized through the functions 
+- `priority_function`
+- `derivation_heuristic`
+- `hole_heuristic`
 """
 
 # ╔═╡ 115c02c9-ae0c-4623-a61d-831fc6ad55a2
 md"""
-### Deterministic search: BFS and DFS
-
 First, we explore two fundamental deterministic top-down search algorithms: **breadth-first search (BFS)** and **depth-first search (DFS)**. Both algorithms are implemented using the abstract type `TopDownIterator`, which can be customized through the functions priority_function, derivation_heuristic, and hole_heuristic.
 
-#### Breadth-First Search
+### Breadth-First Search
 
 The `BFSIterator` enumerates all possible programs at a given depth before progressing to the next level, ensuring that trees are explored in increasing order of size. This guarantees that smaller programs are evaluated first, and larger, more complex ones are considered only after all smaller ones have been processed.
 
@@ -225,7 +228,7 @@ println(all(p ∈ programs_bfs for p ∈ answer_programs))
 
 # ╔═╡ 0020b79a-6352-4e2d-93f6-2a1d7b03ae2c
 md"""
-#### Depth-First Search
+### Depth-First Search
 
 The `DFSIterator` explores one branch of the search tree at a time, fully traversing it unitl a correct program is found or the specified `max_depth` is reached. Only after completing the current branch, it proceeds to the next branch.
 
