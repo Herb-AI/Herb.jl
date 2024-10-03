@@ -103,13 +103,11 @@ Let's explore how many enumerations are necessary to solve our simple problem.
 """
 
 # ╔═╡ 3954dd49-07a2-4ec2-91b4-9c9596d5c264
-begin
-	for i in range(1, 50)
+for i in range(1, 50)
 	    println(i, " enumerations")
 		iterator = BFSIterator(g_1, :Number, max_depth=i)
 	    solution = @time synth(problem_1, iterator)
 	    println(solution)
-	end
 end
 
 # ╔═╡ 9892e91b-9115-4520-9637-f8d7c8905825
@@ -128,12 +126,10 @@ We will use a new example to see the effect of `allow_evaluation_errors`. We beg
 """
 
 # ╔═╡ 9fb40ceb-8d41-491b-8941-20a8b240eb82
-begin
-	g_2 = @cfgrammar begin
-	    Number = 1
-	    List = []
-	    Index = List[Number]
-	end
+g_2 = @csgrammar begin
+	Number = 1
+	List = []
+	Index = List[Number]
 end
 
 # ╔═╡ 94e0d676-a9c7-4291-8696-15301e541c30
@@ -183,10 +179,9 @@ To explore `BFSIterator`, we define another very simple grammar.
 """
 
 # ╔═╡ 3af650d9-19c6-4351-920d-d2361091f628
-begin g_3 = @cfgrammar begin
+g_3 = @csgrammar begin
 	    Real = 1 | 2
 	    Real = Real * Real
-	end
 end
 
 # ╔═╡ 4cb08dba-aea5-4c31-998c-844d1fce8c81
@@ -254,11 +249,22 @@ md"""
 
 # ╔═╡ ed198b79-1b95-4531-b148-c1037cfdacf4
 md"""
-By default, `priority_function` for a `TopDownIterator` is that of a BFS iterator. Hence, we need to provide a new implementation. For this, we can make use of the existing `priority_function` of `DFSIterator`.
+By default, `priority_function` for a `TopDownIterator` is that of a BFS iterator. Hence, we need to provide a new implementation. 
 """
 
-# ╔═╡ d62918e4-4113-45bd-81ea-d17d007b83f5
-priority_function(::DFSIteratorRightmost) = priority_function(DFSIterator())
+# ╔═╡ 75b1abfd-19ed-43f5-ac65-f8ffde76c581
+function priority_function(
+    ::DFSIteratorRightmost, 
+    ::AbstractGrammar, 
+    ::AbstractRuleNode, 
+    parent_value::Union{Real, Tuple{Vararg{Real}}},
+    isrequeued::Bool
+)
+    if isrequeued
+        return parent_value;
+    end
+    return parent_value - 1;
+end
 
 # ╔═╡ 7480d1e4-e417-4d87-80b7-513a098da70e
 md"""
@@ -351,19 +357,14 @@ Run the following code block to define the iterator and perform the program synt
 
 # ╔═╡ 0a30fb40-cd45-4661-a501-ae8e45f1e07e
 begin
-	iteratormh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth=3) 
-	programmh = synth(problem_mh, iteratormh)
-	println("Sollution using MH: ", programmh)
+	iterator_mh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth=3) 
+	program_mh = synth(problem_mh, iterator_mh)
+	println("Sollution using MH: ", program_mh)
 end
-
-# ╔═╡ 82f7ffa5-2bdc-4153-85fa-d7aca063da12
-programmh
 
 # ╔═╡ 700270ea-90bd-474b-91d9-0e5ed329776a
 md"""
 ### Very Large Scale Neighbourhood Search 
-
-TODO: what do we want to show with the examples?
 
 The second stochastic search method we consider is Very Large Scale Neighbourhood Search (VLSN). In each iteration, the algorithm searches the neighbourhood of the current candidate program for a local optimum, aiming to find a better candidate solution.
 
@@ -436,14 +437,9 @@ initial_temperature2 = 2
 # ╔═╡ 4ff69f0a-6626-4593-b361-a2387eecc731
 iterator_sa2 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature2) 
 
-# ╔═╡ 0f7f228c-4f95-4f1a-9ca2-2d03384a00c0
-
-
 # ╔═╡ 5df0ba53-b528-4baf-9980-cafe5d73f9dd
 md"""
 ## Genetic Search
-
-TODO: talk a bit about the iterator.
 
 Genetic search is a type of evolutionary algorithm, which simulates the process of natural selection. It evolves a population of candidate programs through operations like mutation, crossover (recombination), and selection. Then, the fitness of each program is assessed (i.e., how well it satisfies the given specifications). Only the 'fittest' programs are selected for the next generation, thus gradually refining the population of candidate programs.
 
@@ -1262,7 +1258,7 @@ version = "0.13.1+0"
 # ╟─243165be-a9d2-484d-8046-811a2b0ba139
 # ╠═4b97602a-5226-429f-86ea-8ecac3c807fa
 # ╟─ed198b79-1b95-4531-b148-c1037cfdacf4
-# ╠═d62918e4-4113-45bd-81ea-d17d007b83f5
+# ╠═75b1abfd-19ed-43f5-ac65-f8ffde76c581
 # ╟─7480d1e4-e417-4d87-80b7-513a098da70e
 # ╠═7e2af72d-b71c-4234-9bca-cb9a90732a91
 # ╠═00d05a7e-ca79-4d6b-828d-b24ef1cb80a2
@@ -1280,7 +1276,6 @@ version = "0.13.1+0"
 # ╠═afe1872c-6641-4fa0-a53e-50c6b4a712ee
 # ╟─69e91ae9-8475-47dd-826e-8c229faa11e8
 # ╠═0a30fb40-cd45-4661-a501-ae8e45f1e07e
-# ╠═82f7ffa5-2bdc-4153-85fa-d7aca063da12
 # ╟─700270ea-90bd-474b-91d9-0e5ed329776a
 # ╠═e6e5c63b-34e8-40d6-bc12-bd31f40b4b16
 # ╠═2397f65f-e6b4-4f11-bf66-83440c58b688
@@ -1300,7 +1295,6 @@ version = "0.13.1+0"
 # ╠═73304e3f-05bf-4f0c-9acd-fc8afa87b460
 # ╠═07f11eb1-6b45-441a-a481-57628bad23ae
 # ╠═4ff69f0a-6626-4593-b361-a2387eecc731
-# ╠═0f7f228c-4f95-4f1a-9ca2-2d03384a00c0
 # ╟─5df0ba53-b528-4baf-9980-cafe5d73f9dd
 # ╠═99ea1c20-ca2c-4d77-bc3b-06814db1d666
 # ╠═d991edb9-2291-42a7-97ff-58c456515505
