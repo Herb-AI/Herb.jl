@@ -8,7 +8,7 @@ using HerbSearch
 using HerbSpecification
 
 using Test
-import Pkg
+using Pkg
 
 @testset verbose=false "Herb" begin
    @test 1==1 # dummy test
