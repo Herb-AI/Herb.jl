@@ -139,7 +139,10 @@ problem_2 = Problem([IOExample(Dict(), x) for x ∈ 1:5])
 iterator_3 = BFSIterator(g_2, :Index, max_depth=2)
 
 # ╔═╡ 4821fd3a-ff2d-4991-99ad-76608d11b1da
+# ╠═╡ disabled = true
+#=╠═╡
 solution_3 = synth(problem_2, iterator_3)
+  ╠═╡ =#
 
 # ╔═╡ b2eb08d7-3e53-46c5-84b1-e1fa0e07e291
 md"""

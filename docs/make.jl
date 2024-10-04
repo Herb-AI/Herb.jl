@@ -1,6 +1,10 @@
-using Documenter
+using Documenter:
+    HTML,
+    deploydocs,
+    makedocs
 
-using Pluto, PlutoSliderServer
+using PlutoStaticHTML
+using Pkg: Pkg
 
 using Herb
 
@@ -11,26 +15,19 @@ using HerbInterpret
 using HerbCore
 using HerbSpecification
 
-# Create md file for tutorial that embeds html file
-basedir = joinpath(@__DIR__, "src", "tutorials")
-html_files = filter!(f -> occursin(r"\.html$", f), readdir(basedir)) # assumes all html file in directory are tutorials
+tutorials_dir = joinpath(dirname(@__DIR__), "docs", "src", "tutorials")
 
-for f in html_files
-    html_path = joinpath(basedir, f)
-    filename = replace(f, ".html" => "")
-    md_path = joinpath(basedir, "$filename.md")
-    content = """
-    # Tutorial $filename
-
-    <iframe src="$html_path" width="100%" height="600px"></iframe> 
-    """
-    open(md_path, "w") do file
-        write(
-            file,
-            content
-        )
-    end
+function build()
+    println("Building notebooks in $tutorials_dir")
+    use_distributed = false
+    output_format = documenter_output
+    bopts = BuildOptions(tutorials_dir; use_distributed, output_format)
+    build_notebooks(bopts)
+    Pkg.activate(@__DIR__)
+    return nothing
 end
+
+build()
 
 
 makedocs(
@@ -62,9 +59,9 @@ makedocs(
             "HerbSearch.jl" => "HerbSearch/index.md",
         ],
     ],
-    format=Documenter.HTML(
+    format=HTML(
         sidebar_sitename=false,
-        size_threshold=512000,
+        size_threshold=2^20,
     ),
     warnonly=[:missing_docs, :cross_references, :doctest]
 )
