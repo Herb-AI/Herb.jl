@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Abstract Syntax Trees · Herb.jl</title><meta name="title" content="Abstract Syntax Trees · Herb.jl"/><meta property="og:title" content="Abstract Syntax Trees · Herb.jl"/><meta property="twitter:title" content="Abstract Syntax Trees · Herb.jl"/><meta name="description" content="Documentation for Herb.jl."/><meta property="og:description" content="Documentation for Herb.jl."/><meta property="twitter:description" content="Documentation for Herb.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="Herb.jl logo"/></a><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><span class="tocitem">Basics</span><ul><li><a class="tocitem" href="../../">Herb.jl</a></li><li><a class="tocitem" href="../../install/">Installation Guide</a></li><li><a class="tocitem" href="../../get_started/">Getting Started</a></li><li><a class="tocitem" href="../../concepts/">Architecture and core concepts</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../getting_started_with_herb/">A more verbose getting started with Herb.jl</a></li><li><a class="tocitem" href="../defining_grammars/">Defining Grammars in Herb.jl</a></li><li><a class="tocitem" href="../advanced_search/">Advanced Search Procedures</a></li><li><a class="tocitem" href="../TopDown/">Top Down Iterator</a></li><li><a class="tocitem" href="../getting_started_with_constraints/">Getting started with Constraints</a></li><li><a class="tocitem" href="../working_with_interpreters/">Working with custom interpreters</a></li><li class="is-active"><a class="tocitem" href>Abstract Syntax Trees</a><ul class="internal"><li><a class="tocitem" href="#Abstract-syntax-trees"><span>Abstract syntax trees</span></a></li><li><a class="tocitem" href="#A-simple-example-program"><span>A simple example program</span></a></li><li><a class="tocitem" href="#Another-example:-FizzBuzz"><span>Another example: FizzBuzz</span></a></li></ul></li></ul></li><li><span class="tocitem">Sub-Modules</span><ul><li><a class="tocitem" href="../../HerbCore/">HerbCore.jl</a></li><li><a class="tocitem" href="../../HerbGrammar/">HerbGrammar.jl</a></li><li><a class="tocitem" href="../../HerbSpecification/">HerbSpecification.jl</a></li><li><a class="tocitem" href="../../HerbInterpret/">HerbInterpret.jl</a></li><li><a class="tocitem" href="../../HerbConstraints/">HerbConstraints.jl</a></li><li><a class="tocitem" href="../../HerbSearch/">HerbSearch.jl</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Abstract Syntax Trees</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Abstract Syntax Trees</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl/blob/main/docs/src/tutorials/abstract_syntax_trees.jl" title="View source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><style>
+    #documenter-page table {
+        display: table !important;
+        margin: 2rem auto !important;
+        border-top: 2pt solid rgba(0,0,0,0.2);
+        border-bottom: 2pt solid rgba(0,0,0,0.2);
+    }
+
+    #documenter-page pre, #documenter-page div {
+        margin-top: 1.4rem !important;
+        margin-bottom: 1.4rem !important;
+    }
+
+    .code-output {
+        padding: 0.7rem 0.5rem !important;
+    }
+
+    .admonition-body {
+        padding: 0em 1.25em !important;
+    }
+</style>
+
+<!-- PlutoStaticHTML.Begin -->
+<!--
+    # This information is used for caching.
+    [PlutoStaticHTML.State]
+    input_sha = "96b5848edd651492bf8fe03b766171a45148fedb4dd56111fe707177f55866a9"
+    julia_version = "1.10.5"
+-->
+
+<div class="markdown"><h1>Herb tutorial: Abstract syntax trees</h1></div>
+
+
+<div class="markdown"><p>In this tutorial, you will learn</p><ul><li><p>How to represent a computer program as an abstract syntax tree  in Herb.</p></li><li><p>How to replace parts of the tree to modify the program.</p></li></ul></div>
+
+<h2 id="Abstract-syntax-trees"><a class="docs-heading-anchor" href="#Abstract-syntax-trees">Abstract syntax trees</a><a id="Abstract-syntax-trees-1"></a><a class="docs-heading-anchor-permalink" href="#Abstract-syntax-trees" title="Permalink"></a></h2><div class="markdown">
+<p>The syntactic structure of a computer program can be represented in a hierarchical tree structure, a so-called <em>Abstract Syntax Tree (AST)</em>. The syntax of a programming language is typically defined using a formal grammar, a set of rules on how valid programs can be constructed. ASTs are derived from the grammar, but are abstractions in the sense that they omit details such as parenthesis, semicolons, etc. and only retain what's necessary to capture the program structure. </p><p>In the context of program synthesis, ASTs are often used to define the space of all possible programs which is searched to find one that satisfies the given specifications. During the search process, different ASTs, each corresponding to a different program, are generated and evaluated until a suitable one is found.</p><p>Each <em>node</em> of the AST represents a construct in the program (e.g., a variable, an operator, a statement, or a function) and this construct corresponds to a rule in the formal grammar.  An <em>edge</em> describes the relationship between constructs, and the tree structure captures the nesting of constructs. </p></div>
+
+<h2 id="A-simple-example-program"><a class="docs-heading-anchor" href="#A-simple-example-program">A simple example program</a><a id="A-simple-example-program-1"></a><a class="docs-heading-anchor-permalink" href="#A-simple-example-program" title="Permalink"></a></h2><div class="markdown">
+<p>We first consider the simple program 5*(x+3). We will define a grammar that is sufficient to represent this program and use it to construct a AST for our program.</p></div>
+
+
+<div class="markdown"><h3>Define the grammar</h3></div>
+
+<pre class='language-julia'><code class='language-julia'>begin 
+    using PlutoUI
+    
+    using HerbCore
+    using HerbGrammar
+    using HerbInterpret
+end</code></pre>
+
+
+<pre class='language-julia'><code class='language-julia'>grammar = @csgrammar begin
+        Number = |(0:9)
+        Number = x
+        Number = Number + Number
+        Number = Number * Number
+    end</code></pre>
+<pre class="code-output documenter-example-output" id="var-grammar">1: Number = 0
+2: Number = 1
+3: Number = 2
+4: Number = 3
+5: Number = 4
+6: Number = 5
+7: Number = 6
+8: Number = 7
+9: Number = 8
+10: Number = 9
+11: Number = x
+12: Number = Number + Number
+13: Number = Number * Number
+</pre>
+
+
+<div class="markdown"><h3>Construct the syntax tree</h3></div>
+
+
+<div class="markdown"><p>The AST of this program is shown in the diagram below. The number in each node refers to the index of the corresponding rule in our grammar. </p></div>
+
+
+<div class="markdown"><pre><code class="language-mermaid">    flowchart 
+    id1((13)) ---
+    id2((6))
+    id1 --- id3((12))
+    id4((11))
+    id5((4))
+    id3 --- id4
+    id3 --- id5</code></pre></div>
+
+
+<div class="markdown"><pre><code class="language-mermaid">    flowchart 
+    id1((13)) ---
+    id2((6))
+    id1 --- id3((12))
+    id4((11))
+    id5((4))
+    id3 --- id4
+    id3 --- id5</code></pre></div>
+
+
+<div class="markdown"><p>In <code>Herb.jl</code>, the <code>HerbCore.RuleNode</code> is used to represent both an individual node, but also entire ASTs or sub-trees. This is achieved by nesting instances of <code>RuleNode</code>. A <code>RuleNode</code> can be instantiated by providing the index of the grammar rule that the node represents and a vector of child nodes. </p></div>
+
+<pre class='language-julia'><code class='language-julia'>syntaxtree = RuleNode(13, [RuleNode(6), RuleNode(12, [RuleNode(11), RuleNode(4)])])</code></pre>
+<pre class="code-output documenter-example-output" id="var-syntaxtree">13{6,12{11,4}}</pre>
+
+
+<div class="markdown"><p>We can confirm that our AST is correct by displaying it in a more human-readable way, using <code>HerbGrammar.rulenode2expr</code> and by testing it on a few input examples using <code>HerbInterpret.execute_on_input</code>.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>rulenode2expr(syntaxtree, grammar)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash642064">:(5 * (x + 3))</pre>
+
+<pre class='language-julia'><code class='language-julia'># test solution on inputs
+execute_on_input(grammar, syntaxtree, Dict(:x =&gt; 10))</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash156207">65</pre>
+
+<h2 id="Another-example:-FizzBuzz"><a class="docs-heading-anchor" href="#Another-example:-FizzBuzz">Another example: FizzBuzz</a><a id="Another-example:-FizzBuzz-1"></a><a class="docs-heading-anchor-permalink" href="#Another-example:-FizzBuzz" title="Permalink"></a></h2><div class="markdown">
+<p>Let's look at a more interesting example.  The program <code>fizbuzz()</code> is based on the popular <em>FizzBuzz</em> problem. Given an integer number, the program simply returns a <code>String</code> of that number, but replace numbers divisible by 3 with <code>"Fizz"</code>, numbers divisible by 5 with <code>"Buzz"</code>, and number divisible by both 3 and 5 with <code>"FizzBuzz"</code>.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>function fizzbuzz(x)
+    if x % 5 == 0 && x % 3 == 0
+        return "FizzBuzz"
+    else
+        if x % 3 == 0
+            return  "Fizz"
+        else
+            if x % 5 == 0
+                return "Buzz"
+            else
+                return string(x)
+            end
+        end
+    end
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-fizzbuzz">fizzbuzz (generic function with 1 method)</pre>
+
+
+<div class="markdown"><h3>Define the grammar</h3><p>Let's define a grammar with all the rules that we need.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>grammar_fizzbuzz = @csgrammar begin
+    Int = input1
+    Int = 0 | 3 | 5
+    String = "Fizz" | "Buzz" | "FizzBuzz"
+    String = string(Int)
+    Return = String
+    Int = Int % Int
+    Bool = Int == Int
+    Int = Bool ? Int : Int
+    Bool = Bool && Bool
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-grammar_fizzbuzz">1: Int = input1
+2: Int = 0
+3: Int = 3
+4: Int = 5
+5: String = Fizz
+6: String = Buzz
+7: String = FizzBuzz
+8: String = string(Int)
+9: Return = String
+10: Int = Int % Int
+11: Bool = Int == Int
+12: Int = if Bool
+    Int
+else
+    Int
+end
+13: Bool = Bool &amp;&amp; Bool
+</pre>
+
+
+<div class="markdown"><h3>Construct the syntax tree</h3></div>
+
+
+<div class="markdown"><p>Given the grammar, the AST of <code>fizzbuzz()</code> looks like this:</p></div>
+
+
+<div class="markdown"><pre><code class="language-mermaid">flowchart 
+    id1((12)) --- id21((13))
+    id1--- id22((9))
+    id1--- id23((12))
+
+    id21 --- id31((11))
+    id21 --- id32((11))
+
+    id31 --- id41((10))
+    id31 --- id42((2))
+
+    id41 --- id51((1))
+    id41 --- id52((4))
+
+    id32 --- id43((10)) 
+    id32 --- id44((2))
+
+    id43 --- id53((1))
+    id43 --- id54((3))
+
+    id22 --- id33((7))
+    id23 --- id34((11))
+
+    id34 --- id45((10))
+    id34 --- id46((2))
+
+    id45 --- id55((1))
+    id45 --- id56((3))
+
+    id23 --- id35((9))
+    id35 --- id47((5))
+
+    id23 --- id36((12))
+    id36 --- id48((11))
+    id48 --- id57((10))
+    id57 --- id61((1))
+    id57 --- id62((4))
+    id48 --- id58((2))
+
+    id36 --- id49((9))
+    id49 --- id59((6))
+
+    id36 --- id410((9))
+    id410 --- id510((8))
+    id510 --- id63((1))
+    
+    
+    </code></pre></div>
+
+
+<div class="markdown"><p>As before, we use nest instanced of <code>RuleNode</code> to implement the AST.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>fizzbuzz_syntaxtree = RuleNode(12, [
+               RuleNode(13, [
+                   RuleNode(11, [
+                       RuleNode(10, [
+                           RuleNode(1),
+                           RuleNode(4)
+                       ]),
+                       RuleNode(2)
+                   ]),
+                   RuleNode(11, [
+                       RuleNode(10, [
+                           RuleNode(1),
+                           RuleNode(3)
+                       ]),
+                       RuleNode(2)
+                   ])
+               ]),
+               RuleNode(9, [
+                   RuleNode(7)
+               
+               ]),
+               RuleNode(12, [
+                   RuleNode(11, [
+                       RuleNode(10, [
+                           RuleNode(1),
+                           RuleNode(3),
+                       ]),
+                       RuleNode(2)
+                   ]),
+                   RuleNode(9, [
+                       RuleNode(5)
+                   ]),
+                   RuleNode(12, [
+                       RuleNode(11, [
+                           RuleNode(10, [
+                               RuleNode(1),
+                               RuleNode(4)
+                           ]),
+                           RuleNode(2)
+                       ]),
+                       RuleNode(9, [
+                           RuleNode(6)
+                       ]),
+                       RuleNode(9, [
+                           RuleNode(8, [
+                                RuleNode(1)
+                            ])
+                       ])
+                   ])
+               ]) 
+    ])</code></pre>
+<pre class="code-output documenter-example-output" id="var-fizzbuzz_syntaxtree">12{13{11{10{1,4}2}11{10{1,3}2}}9{7}12{11{10{1,3}2}9{5}12{11{10{1,4}2}9{6}9{8{1}}}}}</pre>
+
+
+<div class="markdown"><p>And we check our syntax tree is correct:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>rulenode2expr(fizzbuzz_syntaxtree, grammar_fizzbuzz)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash153198">:(if input1 % 5 == 0 &amp;&amp; input1 % 3 == 0
+      "FizzBuzz"
+  else
+      if input1 % 3 == 0
+          "Fizz"
+      else
+          if input1 % 5 == 0
+              "Buzz"
+          else
+              string(input1)
+          end
+      end
+  end)</pre>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    # test solution on inputs
+    input = [Dict(:input1 =&gt; 3), Dict(:input1 =&gt; 5), Dict(:input1 =&gt;15), Dict(:input1 =&gt; 22)]
+    output1 = execute_on_input(grammar_fizzbuzz, fizzbuzz_syntaxtree, input)
+    output1
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-output1">4-element Vector{Any}:
+ "Fizz"
+ "Buzz"
+ "FizzBuzz"
+ "22"</pre>
+
+
+<div class="markdown"><h3>Modify the AST/program</h3><p>There are several ways to modify an AST and hence, a program. You can</p><ul><li><p>directly replace a node with <code>HerbCore.swap_node()</code></p></li><li><p>insert a rule node with <code>insert!</code></p></li></ul><p>Let's modify our example such that if the input number is divisible by 3, the program returns "Buzz" instead of "Fizz".  We use <code>swap_node()</code> to replace the node of the AST that corresponds to rule 5 in the grammar (<code>String = Fizz</code>) with rule 6 (<code>String = Buzz</code>). To do so, <code>swap_node()</code> needs the tree that contains the node we want to modify, the new node we want to replace the node with, and the path to that node.</p><p>Note that <code>swap_node()</code> modifies the tree, hence we make a deep copy of it first.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    modified_fizzbuzz_syntaxtree = deepcopy(fizzbuzz_syntaxtree)
+    newnode = RuleNode(6)
+    path = [3, 2, 1]
+    swap_node(modified_fizzbuzz_syntaxtree, newnode, path)
+    rulenode2expr(modified_fizzbuzz_syntaxtree, grammar_fizzbuzz)
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-newnode">:(if input1 % 5 == 0 &amp;&amp; input1 % 3 == 0
+      "FizzBuzz"
+  else
+      if input1 % 3 == 0
+          "Buzz"
+      else
+          if input1 % 5 == 0
+              "Buzz"
+          else
+              string(input1)
+          end
+      end
+  end)</pre>
+
+
+<div class="markdown"><p>Let's confirm that we modified the AST, and hence the program, correctly:</p></div>
+
+<pre class='language-julia'><code class='language-julia'># test solution on same inputs as before
+execute_on_input(grammar_fizzbuzz, modified_fizzbuzz_syntaxtree, input)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash144804">4-element Vector{Any}:
+ "Buzz"
+ "Buzz"
+ "FizzBuzz"
+ "22"</pre>
+
+
+<div class="markdown"><p>An alternative way to modify the AST is by using <code>insert!()</code>. This requires to provide the location of the node that we want to as <code>NodeLoc</code>. <code>NodeLoc</code> points to a node in the tree and consists of the parent and the child index of the node. Again, we make a deep copy of the original AST first.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    anothermodified_fizzbuzz_syntaxtree = deepcopy(fizzbuzz_syntaxtree)
+    # get the node we want to modify and instantiate a NodeLoc from it.
+    node = get_node_at_location(anothermodified_fizzbuzz_syntaxtree, [3, 2, 1])
+    nodeloc = NodeLoc(node, 0)
+    # replace the node
+    insert!(node, nodeloc, newnode)
+    rulenode2expr(anothermodified_fizzbuzz_syntaxtree, grammar_fizzbuzz)
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-anothermodified_fizzbuzz_syntaxtree">:(if input1 % 5 == 0 &amp;&amp; input1 % 3 == 0
+      "FizzBuzz"
+  else
+      if input1 % 3 == 0
+          "Buzz"
+      else
+          if input1 % 5 == 0
+              "Buzz"
+          else
+              string(input1)
+          end
+      end
+  end)</pre>
+
+
+<div class="markdown"><p>Again, we check that we modified the program as intended:</p></div>
+
+<pre class='language-julia'><code class='language-julia'># test on same inputs as before
+execute_on_input(grammar_fizzbuzz, anothermodified_fizzbuzz_syntaxtree, input)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash112966">4-element Vector{Any}:
+ "Buzz"
+ "Buzz"
+ "FizzBuzz"
+ "22"</pre>
+
+<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_interpreters/">« Working with custom interpreters</a><a class="docs-footer-nextpage" href="../../HerbCore/">HerbCore.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Friday 4 October 2024 09:37">Friday 4 October 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
