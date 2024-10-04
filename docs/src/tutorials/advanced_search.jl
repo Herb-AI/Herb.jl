@@ -11,6 +11,9 @@ using PlutoUI
 using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret, HerbConstraints, HerbCore
 
 
+# ╔═╡ e0b2bfe8-bad3-47a3-803f-04b4a9deb232
+using Test
+
 # ╔═╡ dddca175-3d88-45ce-90da-575c0ba38175
 md"""
 # Advanced Search Procedures in Herb.jl
@@ -139,7 +142,7 @@ problem_2 = Problem([IOExample(Dict(), x) for x ∈ 1:5])
 iterator_3 = BFSIterator(g_2, :Index, max_depth=2)
 
 # ╔═╡ 4821fd3a-ff2d-4991-99ad-76608d11b1da
-solution_3 = synth(problem_2, iterator_3)
+Test.@test_throws HerbSearch.EvaluationError synth(problem_2, iterator_3)
 
 # ╔═╡ b2eb08d7-3e53-46c5-84b1-e1fa0e07e291
 md"""
@@ -470,6 +473,7 @@ HerbInterpret = "5bbddadd-02c5-4713-84b8-97364418cca7"
 HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
 HerbSpecification = "6d54aada-062f-46d8-85cf-a1ceaf058a06"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 HerbConstraints = "~0.2.2"
@@ -487,7 +491,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "e8df13c29bfd5a0060b6c72e678efa3df418b0d7"
+project_hash = "0ffb99b60bda019fda3cc31f30ebdb78c9cca62d"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1235,6 +1239,7 @@ version = "0.13.1+0"
 # ╠═9fb40ceb-8d41-491b-8941-20a8b240eb82
 # ╠═94e0d676-a9c7-4291-8696-15301e541c30
 # ╠═a4a7daed-f89b-44ad-8787-9199c05bf046
+# ╠═e0b2bfe8-bad3-47a3-803f-04b4a9deb232
 # ╠═4821fd3a-ff2d-4991-99ad-76608d11b1da
 # ╟─b2eb08d7-3e53-46c5-84b1-e1fa0e07e291
 # ╠═606070e1-83a7-4cca-a716-4fa459f78772
