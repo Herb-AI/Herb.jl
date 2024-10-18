@@ -33,7 +33,7 @@ problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 The problem is given now, let us search for a solution with `HerbSearch`. For now we will just use the default parameters searching for a satisfying program over the grammar, given the problem and a starting symbol using
 
 ```julia
-iterator = BFSIterator(g₁, :Number, max_depth=5)
+iterator = BFSIterator(g, :Number, max_depth=5)
 solution, flag = synth(problem, iterator)
 println(solution)
 ```
@@ -70,7 +70,7 @@ g = @csgrammar begin
 end
 
 problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
-iterator = BFSIterator(g₁, :Number, max_depth=5)
+iterator = BFSIterator(g, :Number, max_depth=5)
 
 solution, flag = synth(problem, iterator)
 program = rulenode2expr(solution, g) # should yield 2*6 +1 
