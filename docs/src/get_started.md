@@ -1,6 +1,6 @@
 # Getting Started
 
-You can either paste this code into the Julia REPL or into a seperate file, e.g. `get_started.jl` followed by `julia get_started.jl`.
+You can either paste this code into the Julia REPL or into a seperate file, e.g. `get_started.jl`. If using a separate file you can execute using `julia get_started.jl` or `julia --project=. get_started.jl` depending on whether you installed Herb.jl globally or in a project.
 
 To begin, we need to import all needed packages using
 
