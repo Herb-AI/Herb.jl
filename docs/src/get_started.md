@@ -1,6 +1,6 @@
 # Getting Started
 
-You can either paste this code into the Julia REPL or into a seperate file, e.g. `get_started.jl` followed by `julia get_started.jl`.
+You can either paste this code into the Julia REPL or into a seperate file, e.g. `get_started.jl`. If using a separate file you can execute using `julia get_started.jl` or `julia --project=. get_started.jl` depending on whether you installed Herb.jl globally or in a project.
 
 To begin, we need to import all needed packages using
 
@@ -33,7 +33,7 @@ problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 The problem is given now, let us search for a solution with `HerbSearch`. For now we will just use the default parameters searching for a satisfying program over the grammar, given the problem and a starting symbol using
 
 ```julia
-iterator = BFSIterator(g₁, :Number, max_depth=5)
+iterator = BFSIterator(g, :Number, max_depth=5)
 solution, flag = synth(problem, iterator)
 println(solution)
 ```
@@ -44,10 +44,13 @@ Eventually, we want to test our solution on some other inputs using `HerbInterpr
 
 ```julia
 program = rulenode2expr(solution, g) # should yield 2*6+1
+println(program)
 
 output = execute_on_input(SymbolTable(g), program, Dict(:x => 6)) 
 println(output)
 ```
+
+If you run the completed code it will output both the generated Julia expression and the result from assigning value.
 
 Just like that we tackled (almost) all modules of Herb.jl.
 
@@ -70,10 +73,11 @@ g = @csgrammar begin
 end
 
 problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
-iterator = BFSIterator(g₁, :Number, max_depth=5)
+iterator = BFSIterator(g, :Number, max_depth=5)
 
 solution, flag = synth(problem, iterator)
 program = rulenode2expr(solution, g) # should yield 2*6 +1 
+println(program)
 
 output = execute_on_input(SymbolTable(g), program, Dict(:x => 6)) 
 println(output)
