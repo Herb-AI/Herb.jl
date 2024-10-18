@@ -44,10 +44,13 @@ Eventually, we want to test our solution on some other inputs using `HerbInterpr
 
 ```julia
 program = rulenode2expr(solution, g) # should yield 2*6+1
+println(program)
 
 output = execute_on_input(SymbolTable(g), program, Dict(:x => 6)) 
 println(output)
 ```
+
+If you run the completed code it will output both the generated Julia expression and the result from assigning value.
 
 Just like that we tackled (almost) all modules of Herb.jl.
 
@@ -74,6 +77,7 @@ iterator = BFSIterator(g, :Number, max_depth=5)
 
 solution, flag = synth(problem, iterator)
 program = rulenode2expr(solution, g) # should yield 2*6 +1 
+println(program)
 
 output = execute_on_input(SymbolTable(g), program, Dict(:x => 6)) 
 println(output)
