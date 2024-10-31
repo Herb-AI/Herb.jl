@@ -128,7 +128,7 @@ Search is done by passing the grammar, the problem and the starting point like b
 begin
     problem_2 = HerbSpecification.Problem("example2", [HerbSpecification.IOExample(Dict(:x => x), 168) for x ∈ 1:5])
     iterator_2 = HerbSearch.BFSIterator(g, :Number, max_depth=4, max_size=30)
-    expr_2, flag = HerbSearch.synth(problem_2, iterator_2)
+    expr_2, flag_2 = HerbSearch.synth(problem_2, iterator_2)
     print(expr_2)
     program_2 = rulenode2expr(expr_2, g)
     println(program_2)
@@ -144,7 +144,7 @@ In any case, this concludes our first introduction to the `Herb.jl` program synt
 # ╔═╡ c06d09a5-138a-4821-8a60-074fa7ec026d
 begin
     problem_3 = HerbSpecification.Problem("example3", [HerbSpecification.IOExample(Dict(:x => x), 167) for x ∈ 1:5])
-    expr_3, flag = HerbSearch.synth(problem_3, iterator_2)
+    expr_3, flag_3 = HerbSearch.synth(problem_3, iterator_2)
     print(expr_3)
     program_3 = rulenode2expr(expr_3, g)
     println(program_3)
