@@ -7,9 +7,9 @@ CurrentModule=Herb
 
 ## Why Herb.jl?
 
-When writing research software we almost always investigate highly specific properties or algorithms of our domain, leading to us building the tools from scratch over and over again. The very same holds for the field of program synthesis: Tools are hard to run, benchmarks are hard to get and prepare, and its hard to adapt our existing code to a novel idea.
+When writing research software we almost always investigate highly specific properties or algorithms of our domain, leading to us building the tools from scratch over and over again. The very same holds for the field of program synthesis: Tools are hard to run, benchmarks are hard to get and prepare, and it is hard to adapt our existing code to a novel idea.
 
-Herb.jl will take care of this for you and helps you defining, solving and extending your program synthesis problems.
+Herb.jl will take care of this for you and helps you in defining, solving and extending your program synthesis problems.
 
 Herb.jl provides...
 - a unified and universal framework for program synthesis
@@ -46,6 +46,17 @@ Pages = ["install.md", "get_started.md", "concepts.md"]
 ```
 
 ## Advanced content
-
 ```@contents
+Pages = [p * "/index.md" for p in readdir(joinpath(dirname(@__FILE__), "..", "src")) if occursin("Herb", p)]
+Depth = 1
 ```
+
+## Tutorials
+To familiarize yourself with Herb, we have created several tutorials:
+- [A more verbose getting started with Herb.jl](tutorials/getting_started_with_herb.md)
+- [Defining Grammars in Herb.jl](tutorials/defining_grammars.md)
+- [Advanced Search Procedures](tutorials/advanced_search.md)
+- [Top Down Iterator](tutorials/TopDown.md)
+- [Getting started with Constraints](tutorials/getting_started_with_constraints.md)
+- [Working with custom interpreters](tutorials/working_with_interpreters.md)
+- [Abstract Syntax Trees](tutorials/abstract_syntax_trees.md)
