@@ -25,8 +25,8 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "96b5848edd651492bf8fe03b766171a45148fedb4dd56111fe707177f55866a9"
-    julia_version = "1.10.5"
+    input_sha = "3781c38b001201db2366ced765851c222b2926752aea75c15d791e69afdc2547"
+    julia_version = "1.11.1"
 -->
 
 <div class="markdown"><h1>Herb tutorial: Abstract syntax trees</h1></div>
@@ -50,6 +50,9 @@
     using HerbGrammar
     using HerbInterpret
 end</code></pre>
+
+
+
 
 
 <pre class='language-julia'><code class='language-julia'>grammar = @csgrammar begin
@@ -80,17 +83,7 @@ end</code></pre>
 <div class="markdown"><p>The AST of this program is shown in the diagram below. The number in each node refers to the index of the corresponding rule in our grammar. </p></div>
 
 
-<div class="markdown"><pre><code class="language-mermaid">    flowchart 
-    id1((13)) ---
-    id2((6))
-    id1 --- id3((12))
-    id4((11))
-    id5((4))
-    id3 --- id4
-    id3 --- id5</code></pre></div>
-
-
-<div class="markdown"><pre><code class="language-mermaid">    flowchart 
+<div class="markdown"><pre><code class="language-mermaid">    flowchart TD
     id1((13)) ---
     id2((6))
     id1 --- id3((12))
@@ -116,7 +109,7 @@ execute_on_input(grammar, syntaxtree, Dict(:x =&gt; 10))</code></pre>
 <pre class="code-output documenter-example-output" id="var-hash156207">65</pre>
 
 <h2 id="Another-example:-FizzBuzz"><a class="docs-heading-anchor" href="#Another-example:-FizzBuzz">Another example: FizzBuzz</a><a id="Another-example:-FizzBuzz-1"></a><a class="docs-heading-anchor-permalink" href="#Another-example:-FizzBuzz" title="Permalink"></a></h2><div class="markdown">
-<p>Let's look at a more interesting example.  The program <code>fizbuzz()</code> is based on the popular <em>FizzBuzz</em> problem. Given an integer number, the program simply returns a <code>String</code> of that number, but replace numbers divisible by 3 with <code>"Fizz"</code>, numbers divisible by 5 with <code>"Buzz"</code>, and number divisible by both 3 and 5 with <code>"FizzBuzz"</code>.</p></div>
+<p>Let's look at a more interesting example.  The program <code>fizzbuzz()</code> is based on the popular <em>FizzBuzz</em> problem. Given an integer number, the program simply returns a <code>String</code> of that number, but replace numbers divisible by 3 with <code>"Fizz"</code>, numbers divisible by 5 with <code>"Buzz"</code>, and number divisible by both 3 and 5 with <code>"FizzBuzz"</code>.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>function fizzbuzz(x)
     if x % 5 == 0 && x % 3 == 0
@@ -175,7 +168,7 @@ end
 <div class="markdown"><p>Given the grammar, the AST of <code>fizzbuzz()</code> looks like this:</p></div>
 
 
-<div class="markdown"><pre><code class="language-mermaid">flowchart 
+<div class="markdown"><pre><code class="language-mermaid">flowchart TD
     id1((12)) --- id21((13))
     id1--- id22((9))
     id1--- id23((12))
@@ -219,10 +212,7 @@ end
 
     id36 --- id410((9))
     id410 --- id510((8))
-    id510 --- id63((1))
-    
-    
-    </code></pre></div>
+    id510 --- id63((1))</code></pre></div>
 
 
 <div class="markdown"><p>As before, we use nest instanced of <code>RuleNode</code> to implement the AST.</p></div>
@@ -382,4 +372,4 @@ execute_on_input(grammar_fizzbuzz, anothermodified_fizzbuzz_syntaxtree, input)</
  "FizzBuzz"
  "22"</pre>
 
-<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_interpreters/">« Working with custom interpreters</a><a class="docs-footer-nextpage" href="../../HerbCore/">HerbCore.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Friday 4 October 2024 16:09">Friday 4 October 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_interpreters/">« Working with custom interpreters</a><a class="docs-footer-nextpage" href="../../HerbCore/">HerbCore.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Thursday 14 November 2024 14:51">Thursday 14 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -25,16 +25,16 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "3a64f4fd93b0aae78d20c193e0c7baf004f437ba419ab0abf46950fbb8355a8e"
-    julia_version = "1.10.5"
+    input_sha = "6198813c6365351fb36946922e2dc9ff8cdbb3d0bc62991fa9e710414507bf23"
+    julia_version = "1.11.1"
 -->
 
 <div class="markdown"><h1>Advanced Search Procedures in Herb.jl</h1><p><a href="">A more verbose getting started with Herb.jl</a> described the concept of a program space and showed how to search it with Herb.jl, using a simple breadth-first-search (BFS) iterator for the search.  This tutorial takes a closer look at advanced search procedures hat can be employed to find a solution program to a program synthesis problem. </p><p>More specifically, you will learn about</p><ul><li><p><strong>Parameters</strong> that can be specified and their effect on the search procedure.  </p></li><li><p><strong>Deterministic search methods</strong> BFS and DFS.</p></li><li><p><strong>Stochastic search methods</strong>, which introduce randomness to search the program space. We will look at Metropolis-Hastings, Very Large Scale Neighbourhood Search, Simulated Annealing and Genetic Search.</p></li></ul></div>
 
-<pre class='language-julia'><code class='language-julia'>using PlutoUI</code></pre>
 
 
-<pre class='language-julia'><code class='language-julia'>TableOfContents()</code></pre>
+
+
 
 
 
@@ -88,16 +88,17 @@ end</code></pre>
 
 <div class="markdown"><p>To see the effect <code>max_depth</code> has on the number of memory allocations made during the program synthesis process, we use the <code>@time</code> macro.  </p></div>
 
-<pre class='language-julia'><code class='language-julia'>begin
-    println("Solution for max_depth = 3:")
-    solution_1 = @time synth(problem_1, iterator_1)
-    println(solution_1)
-    println("----------------------")
-    println("Solution for max_depth = 6:")
-    solution_2 = @time synth(problem_1, iterator_2)
-    println(solution_2)
-end</code></pre>
 
+<div class="markdown"><p>Solution for max_depth = 3:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>solution_1 = @time synth(problem_1, iterator_1)</code></pre>
+<pre class="code-output documenter-example-output" id="var-solution_1">(4{3,4{1,3}}, optimal_program)</pre>
+
+
+<div class="markdown"><p>Solution for max_depth = 6:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>solution_2 = @time synth(problem_1, iterator_2)</code></pre>
+<pre class="code-output documenter-example-output" id="var-solution_2">(4{3,4{1,3}}, optimal_program)</pre>
 
 
 <div class="markdown"><p>While increasing <code>max_depth</code> allows us to explore more complex and deeper program trees, which may lead to a better solution, it also requires more memory allocation and can increase the execution time. </p></div>
@@ -105,13 +106,30 @@ end</code></pre>
 
 <div class="markdown"><h3><code>max_enumerations</code></h3><p><code>max_enumerations</code> defines the maximum number of candidate programs that can be evaluated before the search is terminated. </p><p>Let's explore how many enumerations are necessary to solve our simple problem.</p></div>
 
-<pre class='language-julia'><code class='language-julia'>for i in range(1, 50)
-        println(i, " enumerations")
+<pre class='language-julia'><code class='language-julia'>result = begin
+    arr = []
+    for i in range(1, 50)
         iterator = BFSIterator(g_1, :Number, max_depth=i)
         solution = @time synth(problem_1, iterator)
-        println(solution)
+        push!(arr, solution)
+    end
+    arr
 end</code></pre>
-
+<pre class="code-output documenter-example-output" id="var-result">50-element Vector{Any}:
+ (3,, suboptimal_program)
+ (4{2,1}, suboptimal_program)
+ (4{3,4{1,3}}, optimal_program)
+ (4{3,4{1,3}}, optimal_program)
+ (4{3,4{1,3}}, optimal_program)
+ (4{3,4{1,3}}, optimal_program)
+ (4{3,4{1,3}}, optimal_program)
+ ⋮
+ (4{3,4{1,3}}, optimal_program)
+ (4{3,4{1,3}}, optimal_program)
+ (4{3,4{1,3}}, optimal_program)
+ (4{3,4{1,3}}, optimal_program)
+ (4{3,4{1,3}}, optimal_program)
+ (4{3,4{1,3}}, optimal_program)</pre>
 
 
 <div class="markdown"><p>At <code>i = 3</code>, we observe that an optimal program is found. Increasing the number of enumerations beyond that does not affect the solution or the number of memory allocations. </p></div>
@@ -150,9 +168,6 @@ end</code></pre>
 
 <pre class='language-julia'><code class='language-julia'>solution_4 = synth(problem_2, iterator_3, allow_evaluation_errors=true)</code></pre>
 <pre class="code-output documenter-example-output" id="var-solution_4">(3{2,1}, suboptimal_program)</pre>
-
-<pre class='language-julia'><code class='language-julia'>println("solution: ", solution_4)</code></pre>
-
 
 
 <div class="markdown"><p>"This time we find a solution, although a suboptimal one.</p></div>
@@ -193,9 +208,6 @@ end</code></pre>
  3{2,2}
  3{2,1}</pre>
 
-<pre class='language-julia'><code class='language-julia'>println(programs_bfs)</code></pre>
-
-
 
 <div class="markdown"><p>Let's verify that the iterator returns the programs we expect (keep in mind we use a leftmost-first heuristic).</p></div>
 
@@ -215,8 +227,8 @@ end</code></pre>
  3{2,1}
  3{2,2}</pre>
 
-<pre class='language-julia'><code class='language-julia'>println(all(p ∈ programs_bfs for p ∈ answer_programs))</code></pre>
-
+<pre class='language-julia'><code class='language-julia'>all(p ∈ programs_bfs for p ∈ answer_programs)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash466172">true</pre>
 
 
 <div class="markdown"><h3>Depth-First Search</h3><p>The <code>DFSIterator</code> explores one branch of the search tree at a time, fully traversing it unitl a correct program is found or the specified <code>max_depth</code> is reached. Only after completing the current branch, it proceeds to the next branch.</p><p>As before, we <code>collect</code> the candidate programs using the same grammar, but a <code>DFSIterator</code>. </p></div>
@@ -235,9 +247,6 @@ end</code></pre>
  3{2,2}
  3{2,1}
  2,</pre>
-
-<pre class='language-julia'><code class='language-julia'>println(programs_dfs)</code></pre>
-
 
 
 <div class="markdown"><p><code>DFSIterator</code> also uses by default a <strong>leftmost-first</strong> heuristic. If we want to use a <strong>rightmost-first</strong> heuristic instead, we can create our own iterator <code>DFSIteratorRightmost</code> as a sub-type of <code>TopDownIterator</code>, using the <code>@programiterator</code> macro. Then we implement the functions <code>priority_function</code> and <code>hole_heuristic</code>. Also see the tutorial <a href="https://herb-ai.github.io/Herb.jl/dev/tutorials/TopDown/">Top Down Iterator</a> for how to build iterators is Herb.jl. </p></div>
@@ -284,9 +293,6 @@ end</code></pre>
  3{1,2}
  3{2,2}
  3{2,1}</pre>
-
-<pre class='language-julia'><code class='language-julia'>println(programs_dfs_rightmost)</code></pre>
-
 
 
 <div class="markdown"><p>We observe that the order of programs has changed. We can also test if both DFS iterators return the same programs:</p></div>
@@ -347,6 +353,9 @@ end</code></pre>
 
 
 
+
+
+
 <div class="markdown"><h3>Very Large Scale Neighbourhood Search</h3><p>The second stochastic search method we consider is Very Large Scale Neighbourhood Search (VLSN). In each iteration, the algorithm searches the neighbourhood of the current candidate program for a local optimum, aiming to find a better candidate solution.</p><p>For more information, see <a href="https://backend.orbit.dtu.dk/ws/portalfiles/portal/5293785/Pisinger.pdf">this article</a>.</p><p>Given the same grammar as before, we can try it with some simple examples.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>e_vlsn = x -&gt; 10</code></pre>
@@ -365,13 +374,10 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 10)], HerbSearch.mean_squared_error, 2, 1, HerbInterpret.execute_on_input)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 10)], mean_squared_error, 2, 1, execute_on_input)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_vlsn1 = synth(problem_vlsn1, iterator_vlsn1)</code></pre>
-<pre class="code-output documenter-example-output" id="var-program_vlsn1">(6{2,5}, optimal_program)</pre>
-
-<pre class='language-julia'><code class='language-julia'>println("Solution: ", program_vlsn1)</code></pre>
-
+<pre class="code-output documenter-example-output" id="var-program_vlsn1">(7{5,5}, optimal_program)</pre>
 
 <pre class='language-julia'><code class='language-julia'>e_vlsn2 = x -&gt; x</code></pre>
 <pre class="code-output documenter-example-output" id="var-e_vlsn2">#11 (generic function with 1 method)</pre>
@@ -389,13 +395,10 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 1), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 1), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 2), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 3), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 4), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 7), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 9), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 11), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 12), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 14), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 15), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 17), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 18), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 19), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 20)], HerbSearch.mean_squared_error, 2, 1, HerbInterpret.execute_on_input)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 1), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 1), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 2), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 3), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 4), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 7), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 9), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 11), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 12), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 14), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 15), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 17), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 18), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 19), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 20)], mean_squared_error, 2, 1, execute_on_input)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_vlsn2 = synth(problem_vlsn2, iterator_vlsn2)</code></pre>
 <pre class="code-output documenter-example-output" id="var-program_vlsn2">(9,, optimal_program)</pre>
-
-<pre class='language-julia'><code class='language-julia'>println("Solution: ", program_vlsn2)</code></pre>
-
 
 
 <div class="markdown"><h3>Simulated Annealing</h3><p>Simulated Annealing (SA) explores smaller, incremental changes to the candidate program in each iteration, gradually refining the solution. It is a variation of the hill-climbing algorithm: Instead of always selecting the best move, SA picks a random move. If the move improves the solution (i.e., the candidate program), it is accepted.</p><p>Occasionally, SA will accept a move that worsens the solution. This allows the algorithm to escape local optima and explore more of the solution space. However, this strategy follows a cooling (annealing) schedule: at the beginning (high temperature), the algorithm explores more broadly and is more likely to accept worse solutions. As the temperature decreases, it becomes more selective, accepting worse solutions less often.</p><p>For more information, see <a href="https://www.cs.cmu.edu/afs/cs.cmu.edu/project/learn-43/lib/photoz/.g/web/glossary/anneal.html">this page</a>.</p></div>
@@ -419,7 +422,7 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)], HerbSearch.mean_squared_error, 1, 0.99, HerbInterpret.execute_on_input)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)], mean_squared_error, 1, 0.99, execute_on_input)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_sa1 = synth(problem_sa, iterator_sa1)</code></pre>
 <pre class="code-output documenter-example-output" id="var-program_sa1">(8{6{9,9}8{1,5}}, optimal_program)</pre>
@@ -437,7 +440,7 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)], HerbSearch.mean_squared_error, 2, 0.99, HerbInterpret.execute_on_input)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)], mean_squared_error, 2, 0.99, execute_on_input)</pre>
 
 <h2 id="Genetic-Search"><a class="docs-heading-anchor" href="#Genetic-Search">Genetic Search</a><a id="Genetic-Search-1"></a><a class="docs-heading-anchor-permalink" href="#Genetic-Search" title="Permalink"></a></h2><div class="markdown">
 <p>Genetic search is a type of evolutionary algorithm, which simulates the process of natural selection. It evolves a population of candidate programs through operations like mutation, crossover (recombination), and selection. Then, the fitness of each program is assessed (i.e., how well it satisfies the given specifications). Only the 'fittest' programs are selected for the next generation, thus gradually refining the population of candidate programs.</p><p>For more information, see <a href="https://www.geeksforgeeks.org/genetic-algorithms/">here</a>.</p><p>We show the example of finding a lambda function. Try varying the parameters of the genetic search to see what happens.</p></div>
@@ -458,9 +461,9 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 9223372036854775807), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 32), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 54), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 82), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 116), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 156), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 202), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 254), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 312), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 376), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 446), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 522), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 604), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 692), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 786), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 886), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 992), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 1104), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 1222)], HerbInterpret.execute_on_input, 10, 0.8, 3)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 9223372036854775807), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 32), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 54), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 82), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 116), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 156), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 202), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 254), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 312), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 376), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 446), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 522), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 604), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 692), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 786), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 886), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 992), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 1104), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 1222)], execute_on_input, 10, 0.8, 3)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_gs, error_gs = synth(problem_gs, iterator_gs)</code></pre>
-<pre class="code-output documenter-example-output" id="var-program_gs">(7{7{7{5,8{1,3}}7{6{7{9,7{9,9}}9}8{8{1,1}1}}}9}, optimal_program)</pre>
+<pre class="code-output documenter-example-output" id="var-program_gs">(8{7{7{2,6{7{4,8{6{7{7{7{2,6{8{1,4}9}}6{9,3}}1}9}3}}9}}6{1,5}}5}, optimal_program)</pre>
 
-<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../defining_grammars/">« Defining Grammars in Herb.jl</a><a class="docs-footer-nextpage" href="../TopDown/">Top Down Iterator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Friday 4 October 2024 16:09">Friday 4 October 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../defining_grammars/">« Defining Grammars in Herb.jl</a><a class="docs-footer-nextpage" href="../TopDown/">Top Down Iterator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Thursday 14 November 2024 14:51">Thursday 14 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

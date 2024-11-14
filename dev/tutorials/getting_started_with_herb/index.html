@@ -25,8 +25,8 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "58dab227fb0629c6e64443a3f5195de482d335a94c06848c6af590c7896f8274"
-    julia_version = "1.10.5"
+    input_sha = "c9a0e8790f25f7c8d21a6cdb6bde99fbef45fff20aa88d46f18dd32806165699"
+    julia_version = "1.11.1"
 -->
 
 <div class="markdown"><h1>Search</h1><p>This notebook describes how you can search a program space as defined by a grammar. Specifically, we will look at example-based search, where the goal is to find a program that is able to transform the inputs of every example to the corresponding output.</p></div>
@@ -117,9 +117,8 @@ examples = [HerbSpecification.IOExample(Dict(:x =&gt; x), 3x + 5) for x ∈ 1:5]
     problem_2 = HerbSpecification.Problem("example2", [HerbSpecification.IOExample(Dict(:x =&gt; x), 168) for x ∈ 1:5])
     iterator_2 = HerbSearch.BFSIterator(g, :Real, max_depth=4, max_size=30)
     expr_2 = HerbSearch.synth(problem_2, iterator_2)
-    print(expr_2)
 end</code></pre>
-
+<pre class="code-output documenter-example-output" id="var-iterator_2">(14{14{4,9}8}, optimal_program)</pre>
 
 
 <div class="markdown"><p>We see that our synthesizer can find a program to construct the value <code>168</code>, though a fun experiment would be trying to get the value <code>167</code>, what do you think would happen? You can try below, using the same iterator.</p><p>In any case, this concludes our first introduction to the <code>Herb.jl</code> program synthesis framework. You can see more examples in this repository, or explore yourself. Enjoy!</p></div>
@@ -127,8 +126,7 @@ end</code></pre>
 <pre class='language-julia'><code class='language-julia'>begin
     problem_3 = HerbSpecification.Problem("example3", [HerbSpecification.IOExample(Dict(:x =&gt; x), 167) for x ∈ 1:5])
     expr_3 = HerbSearch.synth(problem_3, iterator_2)
-    print(expr_3)
 end</code></pre>
+<pre class="code-output documenter-example-output" id="var-problem_3">(12{13{6,1}14{14{3,10}10}}, optimal_program)</pre>
 
-
-<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../concepts/">« Architecture and core concepts</a><a class="docs-footer-nextpage" href="../defining_grammars/">Defining Grammars in Herb.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Friday 4 October 2024 16:09">Friday 4 October 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../concepts/">« Architecture and core concepts</a><a class="docs-footer-nextpage" href="../defining_grammars/">Defining Grammars in Herb.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Thursday 14 November 2024 14:51">Thursday 14 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
