@@ -5,13 +5,15 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ c784cbc3-19fc-45c9-b344-db10cf7a81fa
-begin 
-	using PlutoUI
-	
-	using HerbCore
-	using HerbGrammar
-	using HerbInterpret
-end
+# hide 
+using PlutoUI
+
+# ╔═╡ 8f3dba2b-cfdc-4042-9ca4-b3bf0dbaf637
+# hide
+using Kroki
+
+# ╔═╡ 4ab41dab-63f0-4ee0-b30d-532513406a0f
+using HerbCore, HerbGrammar, HerbInterpret
 
 # ╔═╡ 65fbf850-74ae-4ea4-85f0-683095c73fba
 md"""
@@ -45,9 +47,6 @@ We first consider the simple program 5*(x+3). We will define a grammar that is s
 md"""
 ### Define the grammar"""
 
-# ╔═╡ 4ab41dab-63f0-4ee0-b30d-532513406a0f
-
-
 # ╔═╡ 9f54f013-e8b9-4e0d-8bac-9867f5d1a393
 grammar = @csgrammar begin
         Number = |(0:9)
@@ -65,9 +64,8 @@ md"""
 The AST of this program is shown in the diagram below. The number in each node refers to the index of the corresponding rule in our grammar. """
 
 # ╔═╡ 64c2a6ce-5e3b-413b-bcb7-84936137439f
-md"""
-```mermaid
-    flowchart TD
+Diagram(:mermaid, """
+flowchart TD
     id1((13)) ---
     id2((6))
     id1 --- id3((12))
@@ -75,15 +73,14 @@ md"""
     id5((4))
     id3 --- id4
     id3 --- id5
-```
-"""
+""")
 
 # ╔═╡ 29b37a82-d022-453e-bf65-672aa94e4c87
 md"""
 In `Herb.jl`, the `HerbCore.RuleNode` is used to represent both an individual node, but also entire ASTs or sub-trees. This is achieved by nesting instances of `RuleNode`. A `RuleNode` can be instantiated by providing the index of the grammar rule that the node represents and a vector of child nodes. """
 
 # ╔═╡ 822d9601-284d-4d30-9551-605684f83d90
-syntaxtree = RuleNode(13, [RuleNode(6), RuleNode(12, [RuleNode(11), RuleNode(4)])])
+syntaxtree = HerbGrammar.RuleNode(13, [RuleNode(6), RuleNode(12, [RuleNode(11), RuleNode(4)])])
 
 # ╔═╡ 351210d1-20b6-4695-b9fe-f1136d4447d5
 md"""
@@ -148,8 +145,7 @@ md"""
 Given the grammar, the AST of `fizzbuzz()` looks like this:"""
 
 # ╔═╡ 6a663bce-155b-4c0d-94ec-7dc5fbba348a
-md"""
-```mermaid
+Diagram(:mermaid, """
 flowchart TD
     id1((12)) --- id21((13))
     id1--- id22((9))
@@ -195,8 +191,7 @@ flowchart TD
     id36 --- id410((9))
     id410 --- id510((8))
     id510 --- id63((1))
-```
-"""
+""")
 
 # ╔═╡ d9272c48-a7da-4ca0-af15-98c0fe4a3f24
 md"""
@@ -331,13 +326,15 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
 HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
 HerbInterpret = "5bbddadd-02c5-4713-84b8-97364418cca7"
+Kroki = "b3565e16-c1f2-4fe9-b4ab-221c88942068"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
-HerbCore = "~0.2.0"
-HerbGrammar = "~0.2.1"
-HerbInterpret = "~0.1.2"
-PlutoUI = "~0.7.59"
+HerbCore = "~0.3.1"
+HerbGrammar = "~0.4.0"
+HerbInterpret = "~0.1.4"
+Kroki = "~1.0.0"
+PlutoUI = "~0.7.60"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -346,7 +343,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "d7f8bf7232fa30ef1b0ebfa845c2ec09e025cc88"
+project_hash = "7bcd4eed8ad9f87a311a57027c1ef2b213fd532a"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -377,6 +374,11 @@ version = "1.11.0"
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 version = "1.11.0"
 
+[[deps.BitFlags]]
+git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
+uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
+version = "0.1.9"
+
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "8873e196c2eb87962a2048b3b8e08946535864a1"
@@ -388,6 +390,12 @@ deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jl
 git-tree-sha1 = "009060c9a6168704143100f36ab08f06c2af4642"
 uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
 version = "1.18.2+1"
+
+[[deps.CodecZlib]]
+deps = ["TranscodingStreams", "Zlib_jll"]
+git-tree-sha1 = "bce6804e5e6044c6daab27bb533d1295e4a2e759"
+uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
+version = "0.7.6"
 
 [[deps.ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
@@ -416,6 +424,12 @@ deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "1.1.1+0"
 
+[[deps.ConcurrentUtilities]]
+deps = ["Serialization", "Sockets"]
+git-tree-sha1 = "ea32b83ca4fefa1768dc84e504cc0a94fb1ab8d1"
+uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
+version = "2.4.2"
+
 [[deps.DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
 git-tree-sha1 = "1d0a14036acb104d9e89698bd408f63ab58cdc82"
@@ -432,10 +446,22 @@ deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 version = "1.11.0"
 
+[[deps.DocStringExtensions]]
+deps = ["LibGit2"]
+git-tree-sha1 = "2fb1e02f2b635d0845df5d7c167fec4dd739b00d"
+uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+version = "0.9.3"
+
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 version = "1.6.0"
+
+[[deps.ExceptionUnwrapping]]
+deps = ["Test"]
+git-tree-sha1 = "dcb08a0d93ec0b1cdc4af184b26b591e9695423a"
+uuid = "460bff9d-24e4-43bc-9d9f-a8973cb893f4"
+version = "0.1.10"
 
 [[deps.Expat_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -489,6 +515,12 @@ git-tree-sha1 = "1dc470db8b1131cfc7fb4c115de89fe391b9e780"
 uuid = "86223c79-3864-5bf0-83f7-82e725a168b6"
 version = "1.12.0"
 
+[[deps.HTTP]]
+deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
+git-tree-sha1 = "1336e07ba2eb75614c99496501a8f4b233e9fafe"
+uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+version = "1.10.10"
+
 [[deps.HarfBuzz_ICU_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "HarfBuzz_jll", "ICU_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg"]
 git-tree-sha1 = "6ccbc4fdf65c8197738c2d68cc55b74b19c97ac2"
@@ -502,21 +534,21 @@ uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
 version = "2.8.1+1"
 
 [[deps.HerbCore]]
-git-tree-sha1 = "f3312458fa882d4adaeecadf8f4b5721ec6e3322"
+git-tree-sha1 = "98a4c7b30a8a752bb33bddc2475f6554602b588b"
 uuid = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
-version = "0.2.0"
+version = "0.3.1"
 
 [[deps.HerbGrammar]]
 deps = ["AbstractTrees", "DataStructures", "HerbCore", "Serialization", "TreeView"]
-git-tree-sha1 = "c5c7fd92a7502459db394115a10669f10643a440"
+git-tree-sha1 = "0bd40db4936ad39926246ebddcee7b5df2a332ba"
 uuid = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
-version = "0.2.2"
+version = "0.4.0"
 
 [[deps.HerbInterpret]]
 deps = ["HerbCore", "HerbGrammar", "HerbSpecification"]
-git-tree-sha1 = "3723e5ace26a2f2cd342b28689dea543491687c6"
+git-tree-sha1 = "2c1486af643e1abf4b191315db210068994f5b15"
 uuid = "5bbddadd-02c5-4713-84b8-97364418cca7"
-version = "0.1.2"
+version = "0.1.4"
 
 [[deps.HerbSpecification]]
 git-tree-sha1 = "ce13a9a2b7970686ef4befc2e79c2e6f1a2c4dc6"
@@ -574,6 +606,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "25ee0be4d43d0269027024d75a24c24d6c6e590c"
 uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
 version = "3.0.4+0"
+
+[[deps.Kroki]]
+deps = ["Base64", "CodecZlib", "DocStringExtensions", "HTTP", "JSON", "Markdown", "Reexport"]
+git-tree-sha1 = "8ff3884b3f5613214b520d6054f8df8ce0de1396"
+uuid = "b3565e16-c1f2-4fe9-b4ab-221c88942068"
+version = "1.0.0"
 
 [[deps.LERC_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -684,6 +722,12 @@ version = "2.12.0+0"
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 version = "1.11.0"
 
+[[deps.LoggingExtras]]
+deps = ["Dates", "Logging"]
+git-tree-sha1 = "f02b56007b064fbfddb4c9cd60161b6dd0f40df3"
+uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
+version = "1.1.0"
+
 [[deps.MIMEs]]
 git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
 uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
@@ -699,6 +743,12 @@ version = "0.5.13"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
+
+[[deps.MbedTLS]]
+deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
+git-tree-sha1 = "c067a280ddc25f196b5e7df3877c6b226d390aaf"
+uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
+version = "1.1.9"
 
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -727,6 +777,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Libtiff_jll", "LittleCMS_jll", "Pk
 git-tree-sha1 = "76374b6e7f632c130e78100b166e5a48464256f8"
 uuid = "643b3616-a352-519d-856d-80112ee9badc"
 version = "2.4.0+0"
+
+[[deps.OpenSSL]]
+deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
+git-tree-sha1 = "38cb508d080d21dc1128f7fb04f20387ed4c0af4"
+uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
+version = "1.4.3"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -825,6 +881,11 @@ deps = ["Distributed", "Mmap", "Random", "Serialization"]
 uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
 version = "1.11.0"
 
+[[deps.SimpleBufferStream]]
+git-tree-sha1 = "f305871d2f381d21527c770d4788c06c097c9bc1"
+uuid = "777ac1f9-54b0-4bf8-805c-2214025038e7"
+version = "1.2.0"
+
 [[deps.SimpleTraits]]
 deps = ["InteractiveUtils", "MacroTools"]
 git-tree-sha1 = "5d7e3f4e11935503d3ecaf7186eac40602e7d231"
@@ -900,6 +961,11 @@ deps = ["LaTeXStrings", "Poppler_jll", "Requires", "tectonic_jll"]
 git-tree-sha1 = "79e2d29b216ef24a0f4f905532b900dcf529aa06"
 uuid = "37f6aa50-8035-52d0-81c2-5a1d08754b2d"
 version = "3.5.0"
+
+[[deps.TranscodingStreams]]
+git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
+uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
+version = "0.11.3"
 
 [[deps.TreeView]]
 deps = ["CommonSubexpressions", "Graphs", "MacroTools", "TikzGraphs"]
@@ -1031,7 +1097,8 @@ version = "0.13.1+0"
 # ╟─8ff96964-e39e-4762-ae03-e9166e163fca
 # ╟─bff155ab-ff0e-452b-a8f5-fe744e41a30f
 # ╟─caa3446e-c5df-4dac-905a-20515f681074
-# ╠═c784cbc3-19fc-45c9-b344-db10cf7a81fa
+# ╟─c784cbc3-19fc-45c9-b344-db10cf7a81fa
+# ╟─8f3dba2b-cfdc-4042-9ca4-b3bf0dbaf637
 # ╠═4ab41dab-63f0-4ee0-b30d-532513406a0f
 # ╠═9f54f013-e8b9-4e0d-8bac-9867f5d1a393
 # ╟─46fbbe87-ee6e-4874-9708-20a42347ff18

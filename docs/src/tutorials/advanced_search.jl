@@ -8,12 +8,17 @@ using InteractiveUtils
 # hide
 using PlutoUI
 
+# ╔═╡ d52591c1-7544-4543-a4a1-2a1b94bd1d87
+# hide
+using PrettyTables
+
+# ╔═╡ c0748da9-24da-4365-ba67-43bd593d5ea6
+# hide
+using Test
+
 # ╔═╡ c4441fa4-09ec-4b81-9681-b13b93a9c9c0
 using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret, HerbConstraints, HerbCore
 
-
-# ╔═╡ e0b2bfe8-bad3-47a3-803f-04b4a9deb232
-using Test
 
 # ╔═╡ dddca175-3d88-45ce-90da-575c0ba38175
 md"""
@@ -91,13 +96,19 @@ Solution for max_depth = 3:
 # ╔═╡ a6fb2e91-b73a-4032-930f-d884abd539e2
 solution_1 = @time synth(problem_1, iterator_1)
 
+# ╔═╡ d44afab4-dca1-4507-ab4d-0d2573603fa7
+rulenode2expr(solution_1[1], g_1)
+
 # ╔═╡ d1b02aac-f93d-4643-98da-62eb74933e5b
 md"""
 Solution for max_depth = 6:
 """
 
 # ╔═╡ e1d2cb58-5409-4eed-8ce1-9636e5ee2d1e
-solution_2 = @time synth(problem_1, iterator_2)
+begin
+	solution_2 = @time synth(problem_1, iterator_2)
+	rulenode2expr(solution_2[1], g_1)
+end
 
 # ╔═╡ 58c1a904-4d87-43f7-bcc3-884a8663c1da
 md"""
@@ -113,14 +124,20 @@ Let's explore how many enumerations are necessary to solve our simple problem.
 """
 
 # ╔═╡ 3954dd49-07a2-4ec2-91b4-9c9596d5c264
-result = begin
-	arr = []
+begin
+	solutions = []
+	times = []
+	nodes = []
+	iterations = []
 	for i in range(1, 50)
 		iterator = BFSIterator(g_1, :Number, max_depth=i)
-		solution = @time synth(problem_1, iterator)
-		push!(arr, solution)
+		solution = @timed synth(problem_1, iterator)
+		push!(times, solution.time)
+		push!(nodes, solution[1][1])
+		push!(solutions, rulenode2expr(solution[1][1], g_1))
+		push!(iterations, i)
 	end
-	arr
+	pretty_table(HTML, [iterations nodes solutions times], header=["Iteration", "RuleNode", "Program", "Duration"])
 end
 
 # ╔═╡ 9892e91b-9115-4520-9637-f8d7c8905825
@@ -217,16 +234,19 @@ Let's verify that the iterator returns the programs we expect (keep in mind we u
 
 # ╔═╡ 07b54acf-0c0d-40ac-ae18-fb26094b4aca
 answer_programs = [
-    RuleNode(1),
-    RuleNode(2),
-    RuleNode(3, [RuleNode(1), RuleNode(1)]),
-    RuleNode(3, [RuleNode(1), RuleNode(2)]),
-    RuleNode(3, [RuleNode(2), RuleNode(1)]),
-    RuleNode(3, [RuleNode(2), RuleNode(2)])
+	RuleNode(1),
+	RuleNode(2),
+	RuleNode(3, [RuleNode(1), RuleNode(1)]),
+	RuleNode(3, [RuleNode(1), RuleNode(2)]),
+	RuleNode(3, [RuleNode(2), RuleNode(1)]),
+	RuleNode(3, [RuleNode(2), RuleNode(2)])
 ]
 
+# ╔═╡ a2ce4b5c-da9a-468a-8bf3-5a784e123266
+rulenode_programs = [rulenode2expr(r, g_3) for r in answer_programs]
+
 # ╔═╡ 9efb01cf-b190-4e3e-aa19-11499ba46489
-all(p ∈ programs_bfs for p ∈ answer_programs)
+found_all_programs = all(p ∈ programs_bfs for p ∈ answer_programs)
 
 # ╔═╡ 0020b79a-6352-4e2d-93f6-2a1d7b03ae2c
 md"""
@@ -358,13 +378,18 @@ Run the following code block to define the iterator and perform the program synt
 
 # ╔═╡ 0a30fb40-cd45-4661-a501-ae8e45f1e07e
 begin
-	iterator_mh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth=3) 
-	program_mh = synth(problem_mh, iterator_mh)
-	println("Solution using MH: ", program_mh)
+	rules = []
+	programs = []
+	iters = []
+	for i in range(1, 3)
+		iterator_mh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth=3) 
+		program_mh = synth(problem_mh, iterator_mh)
+		push!(rules, program_mh[1])
+		push!(programs, rulenode2expr(program_mh[1], g_4))
+		push!(iters, i)
+	end
+	pretty_table(HTML, [iters rules programs], header=["Run", "RuleNode", "Program"])
 end
-
-# ╔═╡ 3d29e321-e82e-4bf8-8be3-781ab5f561a2
-
 
 # ╔═╡ 700270ea-90bd-474b-91d9-0e5ed329776a
 md"""
@@ -456,7 +481,10 @@ problem_gs, examples_gs = create_problem(e_gs)
 iterator_gs = GeneticSearchIterator(g_4, :X, examples_gs, population_size = 10, mutation_probability = 0.8, maximum_initial_population_depth = 3) 
 
 # ╔═╡ 5bef5754-d81b-4160-8ed6-396d02853d9a
-program_gs, error_gs = synth(problem_gs, iterator_gs)
+begin
+	program_gs, error_gs = synth(problem_gs, iterator_gs)
+	rulenode2expr(program_gs, g_4)
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -468,6 +496,7 @@ HerbInterpret = "5bbddadd-02c5-4713-84b8-97364418cca7"
 HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
 HerbSpecification = "6d54aada-062f-46d8-85cf-a1ceaf058a06"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
@@ -478,6 +507,7 @@ HerbInterpret = "~0.1.3"
 HerbSearch = "~0.3.0"
 HerbSpecification = "~0.1.0"
 PlutoUI = "~0.7.59"
+PrettyTables = "~2.4.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -486,7 +516,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "73f8122c6ae5b467aa0add1406bff57483e6e09d"
+project_hash = "edca5a73f01350950590d222b2bce4d0cb1a613d"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -556,6 +586,11 @@ deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "1.1.1+0"
 
+[[deps.Crayons]]
+git-tree-sha1 = "249fe38abf76d48563e2f4556bebd215aa317e15"
+uuid = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
+version = "4.1.1"
+
 [[deps.DataAPI]]
 git-tree-sha1 = "abe83f3a2f1b857aac70ef8b269080af17764bbe"
 uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
@@ -566,6 +601,11 @@ deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
 git-tree-sha1 = "1d0a14036acb104d9e89698bd408f63ab58cdc82"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 version = "0.18.20"
+
+[[deps.DataValueInterfaces]]
+git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
+uuid = "e2d170a0-9d28-54be-80f0-106bbe20a464"
+version = "1.0.0"
 
 [[deps.Dates]]
 deps = ["Printf"]
@@ -724,6 +764,11 @@ version = "1.11.0"
 git-tree-sha1 = "630b497eafcc20001bba38a4651b327dcfc491d2"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
 version = "0.2.2"
+
+[[deps.IteratorInterfaceExtensions]]
+git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
+uuid = "82899510-4779-5014-852e-03e436cf321d"
+version = "1.0.0"
 
 [[deps.JLLWrappers]]
 deps = ["Artifacts", "Preferences"]
@@ -986,6 +1031,12 @@ git-tree-sha1 = "9306f6085165d270f7e3db02af26a400d580f5c6"
 uuid = "21216c6a-2e73-6563-6e65-726566657250"
 version = "1.4.3"
 
+[[deps.PrettyTables]]
+deps = ["Crayons", "LaTeXStrings", "Markdown", "PrecompileTools", "Printf", "Reexport", "StringManipulation", "Tables"]
+git-tree-sha1 = "1101cd475833706e4d0e7b122218257178f48f34"
+uuid = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+version = "2.4.0"
+
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
@@ -1082,6 +1133,12 @@ git-tree-sha1 = "5cf7606d6cef84b543b483848d4ae08ad9832b21"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 version = "0.34.3"
 
+[[deps.StringManipulation]]
+deps = ["PrecompileTools"]
+git-tree-sha1 = "a6b1675a536c5ad1a60e5a5153e1fee12eb146e3"
+uuid = "892a3eda-7b42-436c-8928-eab12a02cf0e"
+version = "0.4.0"
+
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
@@ -1091,6 +1148,18 @@ version = "7.7.0+0"
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 version = "1.0.3"
+
+[[deps.TableTraits]]
+deps = ["IteratorInterfaceExtensions"]
+git-tree-sha1 = "c06b2f539df1c6efa794486abfb6ed2022561a39"
+uuid = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
+version = "1.0.1"
+
+[[deps.Tables]]
+deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "OrderedCollections", "TableTraits"]
+git-tree-sha1 = "598cd7c1f68d1e205689b1c2fe65a9f85846f297"
+uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+version = "1.12.0"
 
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]
@@ -1242,6 +1311,8 @@ version = "0.13.1+0"
 # ╟─dddca175-3d88-45ce-90da-575c0ba38175
 # ╟─a93d954d-0f09-4b6d-a3a5-62bfe39681e2
 # ╟─6ab37bbc-73e2-4d9a-a8b2-e715a0b61c8f
+# ╟─d52591c1-7544-4543-a4a1-2a1b94bd1d87
+# ╟─c0748da9-24da-4365-ba67-43bd593d5ea6
 # ╟─61cee94c-2481-4268-823b-ca596592b63c
 # ╠═c4441fa4-09ec-4b81-9681-b13b93a9c9c0
 # ╟─67931820-0f43-41e1-898e-5b5bd55e30d1
@@ -1254,6 +1325,7 @@ version = "0.13.1+0"
 # ╟─63e97576-1c34-464d-a106-d59d5fb1ee38
 # ╠═7e251a07-0041-4dc2-ac09-94fb01075c03
 # ╠═a6fb2e91-b73a-4032-930f-d884abd539e2
+# ╠═d44afab4-dca1-4507-ab4d-0d2573603fa7
 # ╠═d1b02aac-f93d-4643-98da-62eb74933e5b
 # ╠═e1d2cb58-5409-4eed-8ce1-9636e5ee2d1e
 # ╟─58c1a904-4d87-43f7-bcc3-884a8663c1da
@@ -1264,7 +1336,6 @@ version = "0.13.1+0"
 # ╠═9fb40ceb-8d41-491b-8941-20a8b240eb82
 # ╠═94e0d676-a9c7-4291-8696-15301e541c30
 # ╠═a4a7daed-f89b-44ad-8787-9199c05bf046
-# ╠═e0b2bfe8-bad3-47a3-803f-04b4a9deb232
 # ╠═4821fd3a-ff2d-4991-99ad-76608d11b1da
 # ╟─b2eb08d7-3e53-46c5-84b1-e1fa0e07e291
 # ╠═606070e1-83a7-4cca-a716-4fa459f78772
@@ -1278,6 +1349,7 @@ version = "0.13.1+0"
 # ╠═6aec7358-225a-4764-9a36-da86234b6cf8
 # ╟─d3ff497e-d2c2-4df6-8e4c-cdca70fd0677
 # ╠═07b54acf-0c0d-40ac-ae18-fb26094b4aca
+# ╠═a2ce4b5c-da9a-468a-8bf3-5a784e123266
 # ╠═9efb01cf-b190-4e3e-aa19-11499ba46489
 # ╟─0020b79a-6352-4e2d-93f6-2a1d7b03ae2c
 # ╠═db5be2c3-0b36-40b4-bf14-20e2c7063ad7
@@ -1302,7 +1374,6 @@ version = "0.13.1+0"
 # ╠═afe1872c-6641-4fa0-a53e-50c6b4a712ee
 # ╟─69e91ae9-8475-47dd-826e-8c229faa11e8
 # ╠═0a30fb40-cd45-4661-a501-ae8e45f1e07e
-# ╠═3d29e321-e82e-4bf8-8be3-781ab5f561a2
 # ╠═700270ea-90bd-474b-91d9-0e5ed329776a
 # ╠═e6e5c63b-34e8-40d6-bc12-bd31f40b4b16
 # ╠═2397f65f-e6b4-4f11-bf66-83440c58b688
