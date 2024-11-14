@@ -1,29 +1,16 @@
-module HerbTest
-
-using HerbConstraints
-using HerbCore
-using HerbInterpret
-using HerbGrammar
-using HerbSearch
-using HerbSpecification
-
+using Aqua
+using Herb
 using Test
-using Pkg
+include(joinpath(@__DIR__, "..", "docs", "build_notebooks.jl"))
 
-@testset verbose=false "Herb" begin
-   @test 1==1 # dummy test
-   println("\n--- HerbConstraints tests ---")
-   Pkg.test("HerbConstraints")
-   println("\n--- HerbCore tests ---")
-   Pkg.test("HerbCore")
-   println("\n--- HerbInterpret tests ---")
-   Pkg.test("HerbInterpret")
-   println("\n--- HerbGrammar tests ---")
-   Pkg.test("HerbGrammar")
-   println("\n--- HerbSearch tests ---")
-   Pkg.test("HerbSearch")
-   println("\n--- HerbSpecification tests ---")
-   Pkg.test("HerbSpecification")
+@testset "Herb" begin
+   @testset "Aqua.jl" begin
+      Aqua.test_all(Herb)
+   end
+
+   @testset "Build notebooks" begin
+      tutorials_dir = joinpath(dirname(@__DIR__), "docs", "src", "tutorials")
+      # Smoke test to make sure building the notebooks doesn't error
+      @test build(tutorials_dir) isa Any
+   end
 end
-
-end # module
