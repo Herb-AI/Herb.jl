@@ -1,18 +1,14 @@
 module Herb
 
-using HerbCore
-using HerbConstraints
-using HerbGrammar
-using HerbInterpret
-using HerbSearch
-using HerbSpecification
+using Reexport
 
-export 
-    HerbCore,
-    HerbConstraints,
-    HerbGrammar,
-    HerbInterpret,
-    HerbSearch,
-    HerbSpecification
+@reexport begin
+    using HerbCore
+    using HerbConstraints
+    using HerbGrammar
+    using HerbInterpret
+    using HerbSearch
+    using HerbSpecification
+end
     
 end # module
