@@ -5,10 +5,7 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ e0a7076c-9345-40ef-a26e-99e8bad31463
-begin
-    using HerbGrammar
-    using HerbInterpret
-end
+using HerbGrammar, HerbInterpret
 
 # ╔═╡ 55719688-3940-11ef-1f29-f51dea064ff3
 md"# Using the Julia interpreter

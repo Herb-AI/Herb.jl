@@ -25,11 +25,17 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "6198813c6365351fb36946922e2dc9ff8cdbb3d0bc62991fa9e710414507bf23"
+    input_sha = "8b15557db90fca82d4c70ec7f28ad68e32b78e77c9db0a2731be62559e1510ca"
     julia_version = "1.11.1"
 -->
 
 <div class="markdown"><h1>Advanced Search Procedures in Herb.jl</h1><p><a href="">A more verbose getting started with Herb.jl</a> described the concept of a program space and showed how to search it with Herb.jl, using a simple breadth-first-search (BFS) iterator for the search.  This tutorial takes a closer look at advanced search procedures hat can be employed to find a solution program to a program synthesis problem. </p><p>More specifically, you will learn about</p><ul><li><p><strong>Parameters</strong> that can be specified and their effect on the search procedure.  </p></li><li><p><strong>Deterministic search methods</strong> BFS and DFS.</p></li><li><p><strong>Stochastic search methods</strong>, which introduce randomness to search the program space. We will look at Metropolis-Hastings, Very Large Scale Neighbourhood Search, Simulated Annealing and Genetic Search.</p></li></ul></div>
+
+
+
+
+
+
 
 
 
@@ -94,11 +100,17 @@ end</code></pre>
 <pre class='language-julia'><code class='language-julia'>solution_1 = @time synth(problem_1, iterator_1)</code></pre>
 <pre class="code-output documenter-example-output" id="var-solution_1">(4{3,4{1,3}}, optimal_program)</pre>
 
+<pre class='language-julia'><code class='language-julia'>rulenode2expr(solution_1[1], g_1)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash195477">:(x + (1 + x))</pre>
+
 
 <div class="markdown"><p>Solution for max_depth = 6:</p></div>
 
-<pre class='language-julia'><code class='language-julia'>solution_2 = @time synth(problem_1, iterator_2)</code></pre>
-<pre class="code-output documenter-example-output" id="var-solution_2">(4{3,4{1,3}}, optimal_program)</pre>
+<pre class='language-julia'><code class='language-julia'>begin
+    solution_2 = @time synth(problem_1, iterator_2)
+    rulenode2expr(solution_2[1], g_1)
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-solution_2">:(x + (1 + x))</pre>
 
 
 <div class="markdown"><p>While increasing <code>max_depth</code> allows us to explore more complex and deeper program trees, which may lead to a better solution, it also requires more memory allocation and can increase the execution time. </p></div>
@@ -106,30 +118,22 @@ end</code></pre>
 
 <div class="markdown"><h3><code>max_enumerations</code></h3><p><code>max_enumerations</code> defines the maximum number of candidate programs that can be evaluated before the search is terminated. </p><p>Let's explore how many enumerations are necessary to solve our simple problem.</p></div>
 
-<pre class='language-julia'><code class='language-julia'>result = begin
-    arr = []
+<pre class='language-julia'><code class='language-julia'>begin
+    solutions = []
+    times = []
+    nodes = []
+    iterations = []
     for i in range(1, 50)
         iterator = BFSIterator(g_1, :Number, max_depth=i)
-        solution = @time synth(problem_1, iterator)
-        push!(arr, solution)
+        solution = @timed synth(problem_1, iterator)
+        push!(times, solution.time)
+        push!(nodes, solution[1][1])
+        push!(solutions, rulenode2expr(solution[1][1], g_1))
+        push!(iterations, i)
     end
-    arr
+    pretty_table(HTML, [iterations nodes solutions times], header=["Iteration", "RuleNode", "Program", "Duration"])
 end</code></pre>
-<pre class="code-output documenter-example-output" id="var-result">50-element Vector{Any}:
- (3,, suboptimal_program)
- (4{2,1}, suboptimal_program)
- (4{3,4{1,3}}, optimal_program)
- (4{3,4{1,3}}, optimal_program)
- (4{3,4{1,3}}, optimal_program)
- (4{3,4{1,3}}, optimal_program)
- (4{3,4{1,3}}, optimal_program)
- ⋮
- (4{3,4{1,3}}, optimal_program)
- (4{3,4{1,3}}, optimal_program)
- (4{3,4{1,3}}, optimal_program)
- (4{3,4{1,3}}, optimal_program)
- (4{3,4{1,3}}, optimal_program)
- (4{3,4{1,3}}, optimal_program)</pre>
+<table><thead><tr class="header headerLastRow"><th style="text-align: right;">Iteration</th><th style="text-align: right;">RuleNode</th><th style="text-align: right;">Program</th><th style="text-align: right;">Duration</th></tr></thead><tbody><tr><td style="text-align: right;">1</td><td style="text-align: right;">3,</td><td style="text-align: right;">x</td><td style="text-align: right;">0.00329703</td></tr><tr><td style="text-align: right;">2</td><td style="text-align: right;">4{2,1}</td><td style="text-align: right;">2 + 1</td><td style="text-align: right;">0.000169567</td></tr><tr><td style="text-align: right;">3</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.000810646</td></tr><tr><td style="text-align: right;">4</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.000944887</td></tr><tr><td style="text-align: right;">5</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00106868</td></tr><tr><td style="text-align: right;">6</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00115877</td></tr><tr><td style="text-align: right;">7</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00114473</td></tr><tr><td style="text-align: right;">8</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112335</td></tr><tr><td style="text-align: right;">9</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00114328</td></tr><tr><td style="text-align: right;">10</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.0264388</td></tr><tr><td style="text-align: right;">11</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00119803</td></tr><tr><td style="text-align: right;">12</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00114042</td></tr><tr><td style="text-align: right;">13</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00114257</td></tr><tr><td style="text-align: right;">14</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00111379</td></tr><tr><td style="text-align: right;">15</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00119949</td></tr><tr><td style="text-align: right;">16</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00113245</td></tr><tr><td style="text-align: right;">17</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112661</td></tr><tr><td style="text-align: right;">18</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00114534</td></tr><tr><td style="text-align: right;">19</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00113832</td></tr><tr><td style="text-align: right;">20</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00115585</td></tr><tr><td style="text-align: right;">21</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.0011191</td></tr><tr><td style="text-align: right;">22</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00113724</td></tr><tr><td style="text-align: right;">23</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112837</td></tr><tr><td style="text-align: right;">24</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00114684</td></tr><tr><td style="text-align: right;">25</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00114675</td></tr><tr><td style="text-align: right;">26</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112863</td></tr><tr><td style="text-align: right;">27</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.0011304</td></tr><tr><td style="text-align: right;">28</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00113351</td></tr><tr><td style="text-align: right;">29</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00114483</td></tr><tr><td style="text-align: right;">30</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112259</td></tr><tr><td style="text-align: right;">31</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112806</td></tr><tr><td style="text-align: right;">32</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00114775</td></tr><tr><td style="text-align: right;">33</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112524</td></tr><tr><td style="text-align: right;">34</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00113104</td></tr><tr><td style="text-align: right;">35</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00111964</td></tr><tr><td style="text-align: right;">36</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112972</td></tr><tr><td style="text-align: right;">37</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112753</td></tr><tr><td style="text-align: right;">38</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00113174</td></tr><tr><td style="text-align: right;">39</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00116792</td></tr><tr><td style="text-align: right;">40</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112571</td></tr><tr><td style="text-align: right;">41</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00111197</td></tr><tr><td style="text-align: right;">42</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00111416</td></tr><tr><td style="text-align: right;">43</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00113663</td></tr><tr><td style="text-align: right;">44</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00112347</td></tr><tr><td style="text-align: right;">45</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.0011161</td></tr><tr><td style="text-align: right;">46</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00115104</td></tr><tr><td style="text-align: right;">47</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00113408</td></tr><tr><td style="text-align: right;">48</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00113578</td></tr><tr><td style="text-align: right;">49</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.0011268</td></tr><tr><td style="text-align: right;">50</td><td style="text-align: right;">4{3,4{1,3}}</td><td style="text-align: right;">x + (1 + x)</td><td style="text-align: right;">0.00115618</td></tr></tbody></table>
 
 
 <div class="markdown"><p>At <code>i = 3</code>, we observe that an optimal program is found. Increasing the number of enumerations beyond that does not affect the solution or the number of memory allocations. </p></div>
@@ -155,9 +159,6 @@ end</code></pre>
 2: List = []
 3: Index = List[Number]
 , SolverState(3{2,1}, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2))</pre>
-
-<pre class='language-julia'><code class='language-julia'>using Test</code></pre>
-
 
 <pre class='language-julia'><code class='language-julia'>Test.@test_throws HerbSearch.EvaluationError synth(problem_2, iterator_3)</code></pre>
 <pre class="code-output documenter-example-output" id="var-hash467858">Test Passed
@@ -227,8 +228,17 @@ end</code></pre>
  3{2,1}
  3{2,2}</pre>
 
-<pre class='language-julia'><code class='language-julia'>all(p ∈ programs_bfs for p ∈ answer_programs)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash466172">true</pre>
+<pre class='language-julia'><code class='language-julia'>rulenode_programs = [rulenode2expr(r, g_3) for r in answer_programs]</code></pre>
+<pre class="code-output documenter-example-output" id="var-rulenode_programs">6-element Vector{Any}:
+ 1
+ 2
+  :(1 * 1)
+  :(1 * 2)
+  :(2 * 1)
+  :(2 * 2)</pre>
+
+<pre class='language-julia'><code class='language-julia'>found_all_programs = all(p ∈ programs_bfs for p ∈ answer_programs)</code></pre>
+<pre class="code-output documenter-example-output" id="var-found_all_programs">true</pre>
 
 
 <div class="markdown"><h3>Depth-First Search</h3><p>The <code>DFSIterator</code> explores one branch of the search tree at a time, fully traversing it unitl a correct program is found or the specified <code>max_depth</code> is reached. Only after completing the current branch, it proceeds to the next branch.</p><p>As before, we <code>collect</code> the candidate programs using the same grammar, but a <code>DFSIterator</code>. </p></div>
@@ -337,7 +347,7 @@ end</code></pre>
 <div class="markdown"><h3>Metropolis-Hastings</h3><p>Metropolis-Hastings (MH) is a method to produce samples from a distribution that may otherwise be difficult to sample. In the context of program synthesis, we sample from a distribution of programs defined by the grammar. </p><p>For more information on MH, see for example <a href="https://stephens999.github.io/fiveMinuteStats/MH_intro.html">this webpage</a>.</p><p>To illustrate MH, we use a simple arithmetic example.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>e_mh = x -&gt; x * x + 4</code></pre>
-<pre class="code-output documenter-example-output" id="var-e_mh">#7 (generic function with 1 method)</pre>
+<pre class="code-output documenter-example-output" id="var-e_mh">#9 (generic function with 1 method)</pre>
 
 <pre class='language-julia'><code class='language-julia'>problem_mh, examples_mh = create_problem(e_mh)</code></pre>
 <pre class="code-output documenter-example-output" id="var-examples_mh">(Problem{Vector{IOExample}}("", IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)]), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)])</pre>
@@ -346,20 +356,25 @@ end</code></pre>
 <div class="markdown"><p>Run the following code block to define the iterator and perform the program synthesis multiple times. Since the search process is stochastic, you will likely see different solution programs with each run.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>begin
-    iterator_mh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth=3) 
-    program_mh = synth(problem_mh, iterator_mh)
-    println("Sollution using MH: ", program_mh)
+    rules = []
+    programs = []
+    iters = []
+    for i in range(1, 3)
+        iterator_mh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth=3) 
+        program_mh = synth(problem_mh, iterator_mh)
+        push!(rules, program_mh[1])
+        push!(programs, rulenode2expr(program_mh[1], g_4))
+        push!(iters, i)
+    end
+    pretty_table(HTML, [iters rules programs], header=["Run", "RuleNode", "Program"])
 end</code></pre>
-
-
-
-
+<table><thead><tr class="header headerLastRow"><th style="text-align: right;">Run</th><th style="text-align: right;">RuleNode</th><th style="text-align: right;">Program</th></tr></thead><tbody><tr><td style="text-align: right;">1</td><td style="text-align: right;">7{4,6{9,9}}</td><td style="text-align: right;">4 + x * x</td></tr><tr><td style="text-align: right;">2</td><td style="text-align: right;">7{8{5,1}6{9,9}}</td><td style="text-align: right;">(5 - 1) + x * x</td></tr><tr><td style="text-align: right;">3</td><td style="text-align: right;">7{4,6{9,9}}</td><td style="text-align: right;">4 + x * x</td></tr></tbody></table>
 
 
 <div class="markdown"><h3>Very Large Scale Neighbourhood Search</h3><p>The second stochastic search method we consider is Very Large Scale Neighbourhood Search (VLSN). In each iteration, the algorithm searches the neighbourhood of the current candidate program for a local optimum, aiming to find a better candidate solution.</p><p>For more information, see <a href="https://backend.orbit.dtu.dk/ws/portalfiles/portal/5293785/Pisinger.pdf">this article</a>.</p><p>Given the same grammar as before, we can try it with some simple examples.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>e_vlsn = x -&gt; 10</code></pre>
-<pre class="code-output documenter-example-output" id="var-e_vlsn">#9 (generic function with 1 method)</pre>
+<pre class="code-output documenter-example-output" id="var-e_vlsn">#11 (generic function with 1 method)</pre>
 
 <pre class='language-julia'><code class='language-julia'>problem_vlsn1, examples_vlsn1 = create_problem(e_vlsn)</code></pre>
 <pre class="code-output documenter-example-output" id="var-examples_vlsn1">(Problem{Vector{IOExample}}("", IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 10)]), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 10)])</pre>
@@ -377,10 +392,10 @@ end</code></pre>
 , SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 10)], mean_squared_error, 2, 1, execute_on_input)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_vlsn1 = synth(problem_vlsn1, iterator_vlsn1)</code></pre>
-<pre class="code-output documenter-example-output" id="var-program_vlsn1">(7{5,5}, optimal_program)</pre>
+<pre class="code-output documenter-example-output" id="var-program_vlsn1">(6{2,5}, optimal_program)</pre>
 
 <pre class='language-julia'><code class='language-julia'>e_vlsn2 = x -&gt; x</code></pre>
-<pre class="code-output documenter-example-output" id="var-e_vlsn2">#11 (generic function with 1 method)</pre>
+<pre class="code-output documenter-example-output" id="var-e_vlsn2">#13 (generic function with 1 method)</pre>
 
 <pre class='language-julia'><code class='language-julia'>problem_vlsn2, examples_vlsn2 = create_problem(e_vlsn2)</code></pre>
 <pre class="code-output documenter-example-output" id="var-examples_vlsn2">(Problem{Vector{IOExample}}("", IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 1), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 2), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 3), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 4), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 7), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 9), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 11), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 12), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 14), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 15), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 17), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 18), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 19), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 20)]), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 1), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 2), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 3), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 4), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 7), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 9), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 11), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 12), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 14), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 15), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 17), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 18), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 19), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 20)])</pre>
@@ -425,7 +440,7 @@ end</code></pre>
 , SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)], mean_squared_error, 1, 0.99, execute_on_input)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_sa1 = synth(problem_sa, iterator_sa1)</code></pre>
-<pre class="code-output documenter-example-output" id="var-program_sa1">(8{6{9,9}8{1,5}}, optimal_program)</pre>
+<pre class="code-output documenter-example-output" id="var-program_sa1">(7{4,6{9,9}}, optimal_program)</pre>
 
 <pre class='language-julia'><code class='language-julia'>initial_temperature2 = 2</code></pre>
 <pre class="code-output documenter-example-output" id="var-initial_temperature2">2</pre>
@@ -446,7 +461,7 @@ end</code></pre>
 <p>Genetic search is a type of evolutionary algorithm, which simulates the process of natural selection. It evolves a population of candidate programs through operations like mutation, crossover (recombination), and selection. Then, the fitness of each program is assessed (i.e., how well it satisfies the given specifications). Only the 'fittest' programs are selected for the next generation, thus gradually refining the population of candidate programs.</p><p>For more information, see <a href="https://www.geeksforgeeks.org/genetic-algorithms/">here</a>.</p><p>We show the example of finding a lambda function. Try varying the parameters of the genetic search to see what happens.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>e_gs = x -&gt; 3 * x * x + (x + 2)</code></pre>
-<pre class="code-output documenter-example-output" id="var-e_gs">#13 (generic function with 1 method)</pre>
+<pre class="code-output documenter-example-output" id="var-e_gs">#15 (generic function with 1 method)</pre>
 
 <pre class='language-julia'><code class='language-julia'>problem_gs, examples_gs = create_problem(e_gs)</code></pre>
 <pre class="code-output documenter-example-output" id="var-examples_gs">(Problem{Vector{IOExample}}("", IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 32), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 54), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 82), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 116), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 156), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 202), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 254), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 312), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 376), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 446), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 522), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 604), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 692), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 786), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 886), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 992), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 1104), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 1222)]), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 32), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 54), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 82), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 116), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 156), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 202), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 254), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 312), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 376), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 446), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 522), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 604), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 692), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 786), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 886), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 992), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 1104), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 1222)])</pre>
@@ -463,7 +478,10 @@ end</code></pre>
 9: X = x
 , SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 9223372036854775807), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 32), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 54), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 82), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 116), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 156), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 202), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 254), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 312), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 376), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 446), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 522), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 604), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 692), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 786), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 886), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 992), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 1104), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 1222)], execute_on_input, 10, 0.8, 3)</pre>
 
-<pre class='language-julia'><code class='language-julia'>program_gs, error_gs = synth(problem_gs, iterator_gs)</code></pre>
-<pre class="code-output documenter-example-output" id="var-program_gs">(8{7{7{2,6{7{4,8{6{7{7{7{2,6{8{1,4}9}}6{9,3}}1}9}3}}9}}6{1,5}}5}, optimal_program)</pre>
+<pre class='language-julia'><code class='language-julia'>begin
+    program_gs, error_gs = synth(problem_gs, iterator_gs)
+    rulenode2expr(program_gs, g_4)
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-program_gs">:((x * ((x + ((((3 + (2 - 3)) - 2) + x) + x)) + (3 - 3)) + (1 + 1)) + x)</pre>
 
-<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../defining_grammars/">« Defining Grammars in Herb.jl</a><a class="docs-footer-nextpage" href="../TopDown/">Top Down Iterator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Thursday 14 November 2024 14:51">Thursday 14 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../defining_grammars/">« Defining Grammars in Herb.jl</a><a class="docs-footer-nextpage" href="../TopDown/">Top Down Iterator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Thursday 14 November 2024 15:58">Thursday 14 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
