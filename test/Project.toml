@@ -1,0 +1,13 @@
+[deps]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Herb = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
+HerbConstraints = "1fa96474-3206-4513-b4fa-23913f296dfc"
+HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
+HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
+HerbInterpret = "5bbddadd-02c5-4713-84b8-97364418cca7"
+HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
+HerbSpecification = "6d54aada-062f-46d8-85cf-a1ceaf058a06"
+JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
+PlutoStaticHTML = "359b1769-a58e-495b-9770-312e911026ad"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
