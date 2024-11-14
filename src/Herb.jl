@@ -10,7 +10,7 @@ using HerbSpecification
 export 
     HerbCore,
     HerbConstraints,
-    HerbGrammars,
+    HerbGrammar,
     HerbInterpret,
     HerbSearch,
     HerbSpecification
