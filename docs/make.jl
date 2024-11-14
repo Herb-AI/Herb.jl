@@ -1,34 +1,19 @@
-using Documenter:
-    HTML,
-    deploydocs,
-    makedocs
-
-using PlutoStaticHTML
-using Pkg: Pkg
-
+using Documenter: HTML, deploydocs, makedocs
 using Herb
-
 using HerbConstraints
-using HerbSearch
+using HerbCore
 using HerbGrammar
 using HerbInterpret
-using HerbCore
+using HerbSearch
 using HerbSpecification
+using Pkg
+using PlutoStaticHTML
+include(joinpath(@__DIR__, "..", "docs", "build_notebooks.jl"))
 
 tutorials_dir = joinpath(dirname(@__DIR__), "docs", "src", "tutorials")
 
-function build()
-    println("Building notebooks in $tutorials_dir")
-    use_distributed = false
-    output_format = documenter_output
-    bopts = BuildOptions(tutorials_dir; use_distributed, output_format)
-    build_notebooks(bopts)
-    Pkg.activate(@__DIR__)
-    return nothing
-end
-
-build()
-
+Pkg.activate(@__DIR__)
+build(tutorials_dir)
 
 makedocs(
     modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbSpecification, HerbInterpret, HerbCore],
