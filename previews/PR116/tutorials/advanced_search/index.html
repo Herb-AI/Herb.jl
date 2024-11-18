@@ -75,7 +75,7 @@ end</code></pre>
 3: Number = x
 4: Number = Number + Number
 5: Number = Number * Number
-, SolverState(hole[Bool[1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3))</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3))</pre>
 
 <pre class='language-julia'><code class='language-julia'>iterator_2 = BFSIterator(g_1, :Number, max_depth=6)</code></pre>
 <pre class="code-output documenter-example-output" id="var-iterator_2">BFSIterator(GenericSolver(1: Number = 1
@@ -83,7 +83,7 @@ end</code></pre>
 3: Number = x
 4: Number = Number + Number
 5: Number = Number * Number
-, SolverState(hole[Bool[1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 6))</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 6))</pre>
 
 
 <div class="markdown"><p>To see the effect <code>max_depth</code> has on the number of memory allocations made during the program synthesis process, we use the <code>@time</code> macro.  </p></div>
@@ -179,15 +179,15 @@ end</code></pre>
 <pre class="code-output documenter-example-output" id="var-iterator_bfs">BFSIterator(GenericSolver(1: Real = 1
 2: Real = 2
 3: Real = Real * Real
-, SolverState(hole[Bool[1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2))</pre>
+, SolverState(hole[Bool[1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2))</pre>
 
 
 <div class="markdown"><p>To see all possible solution programs the iterator explores, we use <code>collect</code>. It returs a list of the programs, ordered by increasing size and depth. </p></div>
 
 <pre class='language-julia'><code class='language-julia'>programs_bfs = collect(iterator_bfs)</code></pre>
 <pre class="code-output documenter-example-output" id="var-programs_bfs">6-element Vector{RuleNode}:
- 1,
- 2,
+ 1
+ 2
  3{1,1}
  3{1,2}
  3{2,2}
@@ -208,8 +208,8 @@ end</code></pre>
     RuleNode(3, [RuleNode(2), RuleNode(2)])
 ]</code></pre>
 <pre class="code-output documenter-example-output" id="var-answer_programs">6-element Vector{RuleNode}:
- 1,
- 2,
+ 1
+ 2
  3{1,1}
  3{1,2}
  3{2,1}
@@ -225,16 +225,16 @@ end</code></pre>
 <pre class="code-output documenter-example-output" id="var-iterator_dfs">DFSIterator(GenericSolver(1: Real = 1
 2: Real = 2
 3: Real = Real * Real
-, SolverState(hole[Bool[1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2))</pre>
+, SolverState(hole[Bool[1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2))</pre>
 
 <pre class='language-julia'><code class='language-julia'>programs_dfs = collect(iterator_dfs)</code></pre>
 <pre class="code-output documenter-example-output" id="var-programs_dfs">6-element Vector{RuleNode}:
- 1,
+ 1
  3{1,1}
  3{1,2}
  3{2,2}
  3{2,1}
- 2,</pre>
+ 2</pre>
 
 <pre class='language-julia'><code class='language-julia'>println(programs_dfs)</code></pre>
 
@@ -274,12 +274,12 @@ end</code></pre>
 <pre class="code-output documenter-example-output" id="var-iteratordfs_rightmost">DFSIteratorRightmost(GenericSolver(1: Real = 1
 2: Real = 2
 3: Real = Real * Real
-, SolverState(hole[Bool[1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2))</pre>
+, SolverState(hole[Bool[1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2))</pre>
 
 <pre class='language-julia'><code class='language-julia'>programs_dfs_rightmost = collect(iteratordfs_rightmost)</code></pre>
 <pre class="code-output documenter-example-output" id="var-programs_dfs_rightmost">6-element Vector{RuleNode}:
- 1,
- 2,
+ 1
+ 2
  3{1,1}
  3{1,2}
  3{2,2}
@@ -365,7 +365,7 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 10)], mean_squared_error, 2, 1, execute_on_input)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 2), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 10)], mean_squared_error, 2, 1, execute_on_input)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_vlsn1 = synth(problem_vlsn1, iterator_vlsn1)</code></pre>
 <pre class="code-output documenter-example-output" id="var-program_vlsn1">(6{2,5}, optimal_program)</pre>
@@ -389,10 +389,10 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 1), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 1), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 2), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 3), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 4), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 7), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 9), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 11), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 12), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 14), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 15), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 17), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 18), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 19), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 20)], mean_squared_error, 2, 1, execute_on_input)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 1), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 1), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 2), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 3), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 4), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 7), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 9), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 11), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 12), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 14), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 15), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 17), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 18), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 19), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 20)], mean_squared_error, 2, 1, execute_on_input)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_vlsn2 = synth(problem_vlsn2, iterator_vlsn2)</code></pre>
-<pre class="code-output documenter-example-output" id="var-program_vlsn2">(9,, optimal_program)</pre>
+<pre class="code-output documenter-example-output" id="var-program_vlsn2">(9, optimal_program)</pre>
 
 <pre class='language-julia'><code class='language-julia'>println("Solution: ", program_vlsn2)</code></pre>
 
@@ -419,10 +419,10 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)], mean_squared_error, 1, 0.99, execute_on_input)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)], mean_squared_error, 1, 0.99, execute_on_input)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_sa1 = synth(problem_sa, iterator_sa1)</code></pre>
-<pre class="code-output documenter-example-output" id="var-program_sa1">(8{6{9,9}8{1,5}}, optimal_program)</pre>
+<pre class="code-output documenter-example-output" id="var-program_sa1">(7{6{9,9},4}, optimal_program)</pre>
 
 <pre class='language-julia'><code class='language-julia'>initial_temperature2 = 2</code></pre>
 <pre class="code-output documenter-example-output" id="var-initial_temperature2">2</pre>
@@ -437,7 +437,7 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)], mean_squared_error, 2, 0.99, execute_on_input)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 3), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 5), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 13), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 20), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 29), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 40), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 53), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 68), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 85), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 104), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 125), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 148), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 173), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 200), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 229), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 260), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 293), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 328), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 365), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 404)], mean_squared_error, 2, 0.99, execute_on_input)</pre>
 
 <h2 id="Genetic-Search"><a class="docs-heading-anchor" href="#Genetic-Search">Genetic Search</a><a id="Genetic-Search-1"></a><a class="docs-heading-anchor-permalink" href="#Genetic-Search" title="Permalink"></a></h2><div class="markdown">
 <p>Genetic search is a type of evolutionary algorithm, which simulates the process of natural selection. It evolves a population of candidate programs through operations like mutation, crossover (recombination), and selection. Then, the fitness of each program is assessed (i.e., how well it satisfies the given specifications). Only the 'fittest' programs are selected for the next generation, thus gradually refining the population of candidate programs.</p><p>For more information, see <a href="https://www.geeksforgeeks.org/genetic-algorithms/">here</a>.</p><p>We show the example of finding a lambda function. Try varying the parameters of the genetic search to see what happens.</p></div>
@@ -458,9 +458,9 @@ end</code></pre>
 7: X = X + X
 8: X = X - X
 9: X = x
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 9223372036854775807), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 32), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 54), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 82), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 116), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 156), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 202), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 254), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 312), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 376), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 446), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 522), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 604), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 692), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 786), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 886), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 992), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 1104), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 1222)], execute_on_input, 10, 0.8, 3)</pre>
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 9223372036854775807), IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 6), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 16), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 32), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 54), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 82), IOExample(Dict{Symbol, Any}(:x =&gt; 6), 116), IOExample(Dict{Symbol, Any}(:x =&gt; 7), 156), IOExample(Dict{Symbol, Any}(:x =&gt; 8), 202), IOExample(Dict{Symbol, Any}(:x =&gt; 9), 254), IOExample(Dict{Symbol, Any}(:x =&gt; 10), 312), IOExample(Dict{Symbol, Any}(:x =&gt; 11), 376), IOExample(Dict{Symbol, Any}(:x =&gt; 12), 446), IOExample(Dict{Symbol, Any}(:x =&gt; 13), 522), IOExample(Dict{Symbol, Any}(:x =&gt; 14), 604), IOExample(Dict{Symbol, Any}(:x =&gt; 15), 692), IOExample(Dict{Symbol, Any}(:x =&gt; 16), 786), IOExample(Dict{Symbol, Any}(:x =&gt; 17), 886), IOExample(Dict{Symbol, Any}(:x =&gt; 18), 992), IOExample(Dict{Symbol, Any}(:x =&gt; 19), 1104), IOExample(Dict{Symbol, Any}(:x =&gt; 20), 1222)], execute_on_input, 10, 0.8, 3)</pre>
 
 <pre class='language-julia'><code class='language-julia'>program_gs, error_gs = synth(problem_gs, iterator_gs)</code></pre>
-<pre class="code-output documenter-example-output" id="var-program_gs">(7{7{8{4,2}9}6{6{9,3}9}}, optimal_program)</pre>
+<pre class="code-output documenter-example-output" id="var-program_gs">(7{7{9,7{5,6{7{7{6{2,9},8{9,8{5,2}}},8{4,1}},9}}},8{1,4}}, optimal_program)</pre>
 
-<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../defining_grammars/">« Defining Grammars in Herb.jl</a><a class="docs-footer-nextpage" href="../TopDown/">Top Down Iterator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Thursday 14 November 2024 12:45">Thursday 14 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../defining_grammars/">« Defining Grammars in Herb.jl</a><a class="docs-footer-nextpage" href="../TopDown/">Top Down Iterator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Monday 18 November 2024 09:21">Monday 18 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
