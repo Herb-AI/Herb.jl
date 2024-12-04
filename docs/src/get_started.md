@@ -1,6 +1,6 @@
 # Getting Started
 
-You can either paste this code into the Julia REPL or into a seperate file, e.g. `get_started.jl`. If using a separate file you can execute using `julia get_started.jl` or `julia --project=. get_started.jl` depending on whether you installed Herb.jl globally or in a project.
+You can either paste this code into the Julia REPL or into a separate file, e.g. `get_started.jl`. If using a separate file you can execute using `julia get_started.jl` or `julia --project=. get_started.jl` depending on whether you installed Herb.jl globally or in a project.
 
 To begin, we need to import all needed packages using
 
@@ -30,7 +30,7 @@ Second, the problem specification can be provided using e.g. input/output exampl
 problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 ```
 
-The problem is given now, let us search for a solution with `HerbSearch`. For now we will just use the default parameters searching for a satisfying program over the grammar, given the problem and a starting symbol using
+The problem is given now, let us search for a solution with `HerbSearch`. For now, we will just use the default parameters searching for a satisfying program over the grammar, given the problem and a starting symbol using
 
 ```julia
 iterator = BFSIterator(g, :Number, max_depth=5)

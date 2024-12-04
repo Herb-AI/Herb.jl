@@ -15,6 +15,7 @@ tutorials_dir = joinpath(dirname(@__DIR__), "docs", "src", "tutorials")
 Pkg.activate(@__DIR__)
 build(tutorials_dir)
 
+# NOTE: tutorials should be added manually on the homepage (src/index.md)
 makedocs(
     modules=[HerbConstraints, HerbSearch, HerbGrammar, HerbSpecification, HerbInterpret, HerbCore],
     authors="PONYs",

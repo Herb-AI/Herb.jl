@@ -2,8 +2,18 @@
 
 The core building block in Herb is a program iterator.
 A program iterator represents a walk through the program space; different iterators provide different ways of iterating through program space. 
-From the program synthesis point of view, program iterators actaully represent program spaces.
+From the program synthesis point of view, program iterators actually represent program spaces.
 
+```mermaid
+    flowchart TD
+    id1((13)) ---
+    id2((6))
+    id1 --- id3((12))
+    id4((11))
+    id5((4))
+    id3 --- id4
+    id3 --- id5
+```
 
 ### Iterator hierarchy
 
@@ -20,7 +30,7 @@ Stochastic search further provides specific iterators:
  - `VLNSearchIterator` for traversals with Very Large Neighbourhood Search
  - `SASearchIterator` for Simulated Annealing
 
- We provide generic and customiseable implementations of each of these iterators, so that users can easily tweak them by through multiple dispatch. Keep reading!
+ We provide generic and customisable implementations of each of these iterators, so that users can easily tweak them by through multiple dispatch. Keep reading!
 
 
 ### Iterator design
@@ -28,7 +38,7 @@ Stochastic search further provides specific iterators:
 Program iterators follow the standard Julia `Iterator` interface.
 That is, every iterator should implement two functions:
  - `iterate(<:ProgramIterator)::(RuleNode,Any)` to get the first program. The function takes a program iterator as an input, returning the first program and a state (which can be anything)
- - `iterate(<:ProgramIterator,Any)::(RuleNode,Any)` to get the consequtive programs. The function takes the progrma iterator and the state from the previous iteration, and return the next program and the next state.
+ - `iterate(<:ProgramIterator,Any)::(RuleNode,Any)` to get the consecutive programs. The function takes the program iterator and the state from the previous iteration, and return the next program and the next state.
 
 
 
@@ -38,9 +48,9 @@ That is, every iterator should implement two functions:
 
 ## Top Down iterator
 
-We illustarate how to build iterators with a Top Down iterator.
+We illustrate how to build iterators with a Top Down iterator.
 The top Down iterator is build as a best-first iterator: it maintains a priority queue of programs and always pops the first element of the queue. 
-The iterator is customiseable through the following functions:
+The iterator is customisable through the following functions:
 - priority_function: dictating the order of programs in the priority queue
 - derivation_heuristic: dictating in which order to explore the derivations rules within a single hole
 - hole_heuristic: dictating which hole to expand next
@@ -110,7 +120,7 @@ The `SolverState` and `UniformIterator` are specialised data structure to improv
 
 Herb uses a data structure of `UniformTrees` to represent all programs with an AST of the same shape, where each node has the same type. the `UniformIterator` is an iterator efficiently iterating over that structure.
 
-The `SolverState` represents non-uniform trees -- ASTs whose shape we haven't compeltely determined yet. `SolverState` is used as an intermediate representation betfore we reach `UniformTree`s on which partial constraint propagation is done.
+The `SolverState` represents non-uniform trees -- ASTs whose shape we haven't completely determined yet. `SolverState` is used as an intermediate representation before we reach `UniformTree`s on which partial constraint propagation is done.
 
 In principle, you should never construct ASTs yourself directly; you should leave that to the constraint solver.
 
@@ -131,7 +141,7 @@ function _find_next_complete_tree(
 
 ```
 
-If it is a Uniform Iterator, that is an interator where all the holes have the same shape, then it iterates over the solutions.
+If it is a Uniform Iterator, that is an iterator where all the holes have the same shape, then it iterates over the solutions.
 
 ``` julia
 

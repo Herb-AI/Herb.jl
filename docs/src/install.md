@@ -2,7 +2,7 @@
 
 Before installing Herb.jl, ensure that you have a running Julia distribution installed (Julia version 1.7 and above were tested). 
 
-Thanks to Julia's package management, installing Herb.jl is very straighforward. 
+Thanks to Julia's package management, installing Herb.jl is very straightforward. 
 Activate the default Julia REPL using
 
 ```shell
