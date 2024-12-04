@@ -25,42 +25,37 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "c9a0e8790f25f7c8d21a6cdb6bde99fbef45fff20aa88d46f18dd32806165699"
-    julia_version = "1.11.1"
+    input_sha = "361aeaad2da119fce2f746faf0ab8d828b93973c4ad9da9a5a051a7c57418312"
+    julia_version = "1.11.2"
 -->
 
 <div class="markdown"><h1>Search</h1><p>This notebook describes how you can search a program space as defined by a grammar. Specifically, we will look at example-based search, where the goal is to find a program that is able to transform the inputs of every example to the corresponding output.</p></div>
 
 
-<div class="markdown"><h3>Setup</h3><p>First, we start with the setup. We need to access to all the function in the Herb.jl framework.</p></div>
+<div class="markdown"><h3>Setup</h3><p>First, we start with the setup. We need access to all the function in the Herb.jl framework.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret, HerbConstraints</code></pre>
 
 
 
-<div class="markdown"><h3>Defining the program space</h3><p>Next, we start by creating a grammar. We define a context-free grammar as a <a href="@ref"><code>HerbGrammar.ContextSpecificGrammar</code></a> without any constraints. A context-free grammar is just a simple set of production rules for defining combinations of terminal symbols (in our case real numbers). </p><p>Contrary, we could define a context-sensitive grammar, when the production rules only hold in a certain context. However, for more information on this, please see our tutorial on <a href="defining_grammars.md">defining grammars</a>.</p><p>For now, we specify a simple grammar (using the <code>@csgrammar</code> macro) for dealing with integers and explain all the rules individually:</p><ol><li><p>First, we specify our interval <code>[0:9]</code> on real numbers and also constrain them to be integer.</p></li><li><p>Then, we can also use the variable <code>x</code> to hold an integer.</p></li><li><p>The third rule determines we can add two integers.</p></li><li><p>The fourth rule determines we can subtract an integer from another.</p></li><li><p>Finally, we also allow the multiplication of two integers.</p></li></ol><p>If you run this cell, you can see all the rules rolled out.</p></div>
+<div class="markdown"><h3>Defining the program space</h3><p>Next, we start by creating a grammar. We define a context-free grammar as a <a href="@ref"><code>HerbGrammar.ContextSpecificGrammar</code></a> without any constraints. A context-free grammar is just a simple set of production rules for defining combinations of terminal symbols (in our case integers). </p><p>Alternatively we could define a context-sensitive grammar, when the production rules only hold in a certain context. For more information on this, please see our tutorial on <a href="defining_grammars.md">defining grammars</a>.</p><p>For now, we specify a simple grammar (using the <code>@csgrammar</code> macro) for dealing with integers and explain all the rules individually:</p><ol><li><p>First, we specify our number values and constrain them to being positive even integers.</p></li><li><p>Then, we can also use the variable <code>x</code> to hold an integer.</p></li><li><p>The third rule determines we can add two integers.</p></li><li><p>The fourth rule determines we can subtract an integer from another.</p></li><li><p>Finally, we also allow the multiplication of two integers.</p></li></ol><p>If you run this cell, you can see all the rules rolled out.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>g = HerbGrammar.@csgrammar begin
-    Real = |(0:9)
-    Real = x
-    Real = Real + Real
-    Real = Real - Real
-    Real = Real * Real
+    Number = 0|2|4|6|8
+    Number = x
+    Number = Number + Number
+    Number = Number - Number
+    Number = Number * Number
 end</code></pre>
-<pre class="code-output documenter-example-output" id="var-g">1: Real = 0
-2: Real = 1
-3: Real = 2
-4: Real = 3
-5: Real = 4
-6: Real = 5
-7: Real = 6
-8: Real = 7
-9: Real = 8
-10: Real = 9
-11: Real = x
-12: Real = Real + Real
-13: Real = Real - Real
-14: Real = Real * Real
+<pre class="code-output documenter-example-output" id="var-g">1: Number = 0
+2: Number = 2
+3: Number = 4
+4: Number = 6
+5: Number = 8
+6: Number = x
+7: Number = Number + Number
+8: Number = Number - Number
+9: Number = Number * Number
 </pre>
 
 
@@ -70,63 +65,64 @@ end</code></pre>
 <div class="markdown"><p>As mentioned before, we are looking at example-based search.  This means that the problem is defined by a set of input-output examples.  A single example hence consists of an input and an output. The input is defined as a dictionary, with a value assigned to each variable in the grammar. It is important to write the variable name as a <code>Symbol</code> instead of a string. A <code>Symbol</code> in Julia is written with a colon prefix, i.e. <code>:x</code>.  The output of the input-output example is just a single value for this specific grammar, but could possibly relate to e.g. arrays of values, too.</p><p>In the cell below we automatically generate some examples for <code>x</code> assigning values <code>1-5</code>.</p></div>
 
 <pre class='language-julia'><code class='language-julia'># Create input-output examples
-examples = [HerbSpecification.IOExample(Dict(:x =&gt; x), 3x + 5) for x ∈ 1:5]</code></pre>
+examples = [HerbSpecification.IOExample(Dict(:x =&gt; x), 4x + 6) for x ∈ 1:5]</code></pre>
 <pre class="code-output documenter-example-output" id="var-examples">5-element Vector{IOExample}:
- IOExample(Dict{Symbol, Any}(:x =&gt; 1), 8)
- IOExample(Dict{Symbol, Any}(:x =&gt; 2), 11)
- IOExample(Dict{Symbol, Any}(:x =&gt; 3), 14)
- IOExample(Dict{Symbol, Any}(:x =&gt; 4), 17)
- IOExample(Dict{Symbol, Any}(:x =&gt; 5), 20)</pre>
+ IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10)
+ IOExample(Dict{Symbol, Any}(:x =&gt; 2), 14)
+ IOExample(Dict{Symbol, Any}(:x =&gt; 3), 18)
+ IOExample(Dict{Symbol, Any}(:x =&gt; 4), 22)
+ IOExample(Dict{Symbol, Any}(:x =&gt; 5), 26)</pre>
 
 
 <div class="markdown"><p>Now that we have some input-output examples, we can define the problem.  Next to the examples, a problem also contains a name meant to link to the file path, which can be used to keep track of current examples.  For now, this is irrelevant, and you can give the program any name you like.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>problem_1 = HerbSpecification.Problem("example", examples)</code></pre>
-<pre class="code-output documenter-example-output" id="var-problem_1">Problem{Vector{IOExample}}("example", IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 8), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 11), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 14), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 17), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 20)])</pre>
+<pre class="code-output documenter-example-output" id="var-problem_1">Problem{Vector{IOExample}}("example", IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 14), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 18), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 22), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 26)])</pre>
 
 
-<div class="markdown"><h3>Searching</h3><p>Now that we have defined the search space and the goal of the search, we can start the search. </p><p>Of course, our problem is underdefined as there might be multiple programs that satisfy our examples.  Let us consider the case where we also have a ternary if-then-else operator and standard boolean operators in our grammar: we could synthesize the program <code>x ≤ 5 ? 3x+5 : 0</code>.  This program satisfies all our examples, but we don't expect it to generalize very well.</p><p>To search through a program space, we first need to define a <a href="@ref"><code>HerbSearch.ProgramIterator</code></a>, which can be instantiated with different iterators, for now we use a simple <a href="@ref"><code>HerbSearch.BFSIterator</code></a>. For more advanced search methods check out our tutorial on <a href=".advanced_search.md">advanced search</a>. For more information about iterators, check out our tutorial on <a href=".working_with_interpreters.md">working with interpreters</a>. </p><p>In general, we assume that a smaller program is more general than a larger program.  Therefore, we search for the smallest program in our grammar that satisfies our examples.  This can be done using a breadth-first search over the program/search space.</p><p>This search is very basic; it makes use of an enumeration technique, where we enumerate programs one-by-one until we find a program that matches our examples. The search procedure has a built-in default evaluator to verify the candidate programs with the given input. The search procedure also has a built-in search procedure using breadth-first search. </p><p>So, we only need to give our grammar and the problem to our search procedure, along with a starting <code>Symbol</code>, in our case a <code>Real</code>. </p></div>
+<div class="markdown"><h3>Searching</h3><p>Now that we have defined the search space and the goal of the search, we can start the search. </p><p>Of course, our problem is underdefined as there might be multiple programs that satisfy our examples.  Let us consider the case where we also have a ternary if-then-else operator and standard boolean operators in our grammar: we could synthesize the program <code>x ≤ 5 ? 3x+5 : 0</code>.  This program satisfies all our examples, but we don't expect it to generalize very well.</p><p>To search through a program space, we first need to define a <a href="@ref"><code>HerbSearch.ProgramIterator</code></a>, which can be instantiated with different iterators, for now we use a simple <a href="@ref"><code>HerbSearch.BFSIterator</code></a>. For more advanced search methods check out our tutorial on <a href=".advanced_search.md">advanced search</a>. For more information about iterators, check out our tutorial on <a href=".working_with_interpreters.md">working with interpreters</a>. </p><p>In general, we assume that a smaller program is more general than a larger program.  Therefore, we search for the smallest program in our grammar that satisfies our examples.  This can be done using a breadth-first search over the program/search space.</p><p>This search is very basic; it makes use of an enumeration technique, where we enumerate programs one-by-one until we find a program that matches our examples. The search procedure has a built-in default evaluator to verify the candidate programs with the given input. The search procedure also has a built-in search procedure using breadth-first search. </p><p>So, we only need to give our grammar and the problem to our search procedure, along with a starting <code>Symbol</code>, in our case a <code>Number</code>. </p></div>
 
-<pre class='language-julia'><code class='language-julia'>iterator_1 = BFSIterator(g, :Real)</code></pre>
-<pre class="code-output documenter-example-output" id="var-iterator_1">BFSIterator(GenericSolver(1: Real = 0
-2: Real = 1
-3: Real = 2
-4: Real = 3
-5: Real = 4
-6: Real = 5
-7: Real = 6
-8: Real = 7
-9: Real = 8
-10: Real = 9
-11: Real = x
-12: Real = Real + Real
-13: Real = Real - Real
-14: Real = Real * Real
-, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 9223372036854775807))</pre>
+<pre class='language-julia'><code class='language-julia'>iterator_1 = BFSIterator(g, :Number)</code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_1">BFSIterator(GenericSolver(1: Number = 0
+2: Number = 2
+3: Number = 4
+4: Number = 6
+5: Number = 8
+6: Number = x
+7: Number = Number + Number
+8: Number = Number - Number
+9: Number = Number * Number
+, SolverState(hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, true, false, 9223372036854775807, 9223372036854775807))</pre>
 
 <pre class='language-julia'><code class='language-julia'>synth(problem_1, iterator_1)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash471578">(12{14{4,11}6}, optimal_program)</pre>
+<pre class="code-output documenter-example-output" id="var-hash471578">(7{9{6,3},4}, optimal_program)</pre>
 
 
 <div class="markdown"><p>As you can see, the search procedure found the correct program!</p></div>
 
 
-<div class="markdown"><h3>Defining the search procedure</h3><p>In the previous case, we used the built-ins of the search procedure. However, we can also give a custom enumerator to the search procedure and define a few more values.</p><p>We first define a new problem to test with, we are looking for the programs that can compute the value <code>167</code>. We immediately pass the examples to the problem and then set up the new search.</p><p>Search is done by passing the grammar, the problem and the starting point like before. We now also specify the enumeration function to be used, and now we use depth-first search. Then, we give the maximum depth of the programs we want to search for <code>(3)</code>, the maximum number of nodes in the Abstract Syntax Tree that exists during search <code>(10)</code>, and the maximum time in seconds allowed for the search.</p></div>
+<div class="markdown"><h3>Defining the search procedure</h3><p>In the previous case, we used the built-ins of the search procedure. However, we can also give a custom enumerator to the search procedure and define a few more values.</p><p>We first define a new problem to test with, we are looking for the programs that can compute the value <code>168</code>. We immediately pass the examples to the problem and then set up the new search.</p><p>Search is done by passing the grammar, the problem and the starting point like before. We now also specify the enumeration function to be used, and now we use depth-first search. Then, we give the maximum depth of the programs we want to search for <code>(3)</code>, the maximum number of nodes in the Abstract Syntax Tree that exists during search <code>(10)</code>, and the maximum time in seconds allowed for the search.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>begin
     problem_2 = HerbSpecification.Problem("example2", [HerbSpecification.IOExample(Dict(:x =&gt; x), 168) for x ∈ 1:5])
-    iterator_2 = HerbSearch.BFSIterator(g, :Real, max_depth=4, max_size=30)
-    expr_2 = HerbSearch.synth(problem_2, iterator_2)
+    iterator_2 = HerbSearch.BFSIterator(g, :Number, max_depth=4, max_size=30)
+    expr_2, flag_2 = HerbSearch.synth(problem_2, iterator_2)
+    println(expr_2)
+    program_2 = rulenode2expr(expr_2, g)
+    println(program_2)
 end</code></pre>
-<pre class="code-output documenter-example-output" id="var-iterator_2">(14{14{4,9}8}, optimal_program)</pre>
+
 
 
 <div class="markdown"><p>We see that our synthesizer can find a program to construct the value <code>168</code>, though a fun experiment would be trying to get the value <code>167</code>, what do you think would happen? You can try below, using the same iterator.</p><p>In any case, this concludes our first introduction to the <code>Herb.jl</code> program synthesis framework. You can see more examples in this repository, or explore yourself. Enjoy!</p></div>
 
 <pre class='language-julia'><code class='language-julia'>begin
     problem_3 = HerbSpecification.Problem("example3", [HerbSpecification.IOExample(Dict(:x =&gt; x), 167) for x ∈ 1:5])
-    expr_3 = HerbSearch.synth(problem_3, iterator_2)
+    expr_3, flag_3 = HerbSearch.synth(problem_3, iterator_2)
+    println(expr_3)
+    program_3 = rulenode2expr(expr_3, g)
+    println(program_3)
 end</code></pre>
-<pre class="code-output documenter-example-output" id="var-problem_3">(12{13{6,1}14{14{3,10}10}}, optimal_program)</pre>
 
-<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../concepts/">« Architecture and core concepts</a><a class="docs-footer-nextpage" href="../defining_grammars/">Defining Grammars in Herb.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Thursday 14 November 2024 15:58">Thursday 14 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+
+<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../concepts/">« Architecture and core concepts</a><a class="docs-footer-nextpage" href="../defining_grammars/">Defining Grammars in Herb.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Wednesday 4 December 2024 11:42">Wednesday 4 December 2024</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

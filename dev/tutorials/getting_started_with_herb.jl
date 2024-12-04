@@ -18,20 +18,20 @@ Specifically, we will look at example-based search, where the goal is to find a 
 # ╔═╡ 841f097d-a389-4dd2-9ad3-1a2292568634
 md"""
 ### Setup
-First, we start with the setup. We need to access to all the function in the Herb.jl framework.
+First, we start with the setup. We need access to all the function in the Herb.jl framework.
 """
 
 # ╔═╡ db7fe47b-ab3e-4705-b6ac-2733b9e81434
 md"""
 ### Defining the program space
 
-Next, we start by creating a grammar. We define a context-free grammar as a [`HerbGrammar.ContextSpecificGrammar`](@ref) without any constraints. A context-free grammar is just a simple set of production rules for defining combinations of terminal symbols (in our case real numbers). 
+Next, we start by creating a grammar. We define a context-free grammar as a [`HerbGrammar.ContextSpecificGrammar`](@ref) without any constraints. A context-free grammar is just a simple set of production rules for defining combinations of terminal symbols (in our case integers). 
 
-Contrary, we could define a context-sensitive grammar, when the production rules only hold in a certain context. However, for more information on this, please see our tutorial on [defining grammars](defining_grammars.md).
+Alternatively we could define a context-sensitive grammar, when the production rules only hold in a certain context. For more information on this, please see our tutorial on [defining grammars](defining_grammars.md).
 
 For now, we specify a simple grammar (using the `@csgrammar` macro) for dealing with integers and explain all the rules individually:
 
-1. First, we specify our interval `[0:9]` on real numbers and also constrain them to be integer.
+1. First, we specify our number values and constrain them to being positive even integers.
 2. Then, we can also use the variable `x` to hold an integer.
 3. The third rule determines we can add two integers.
 4. The fourth rule determines we can subtract an integer from another.
@@ -42,11 +42,11 @@ If you run this cell, you can see all the rules rolled out.
 
 # ╔═╡ 763b378b-66f9-481e-a3da-ca37825eb255
 g = HerbGrammar.@csgrammar begin
-    Real = |(0:9)
-    Real = x
-    Real = Real + Real
-    Real = Real - Real
-    Real = Real * Real
+    Number = 0|2|4|6|8
+    Number = x
+    Number = Number + Number
+    Number = Number - Number
+    Number = Number * Number
 end
 
 # ╔═╡ 6d01dfe8-9048-4696-916c-b33fbc97268b
@@ -69,7 +69,7 @@ In the cell below we automatically generate some examples for `x` assigning valu
 
 # ╔═╡ 8bf48b7a-0ff5-4015-81d3-ed2eeeceff1c
 # Create input-output examples
-examples = [HerbSpecification.IOExample(Dict(:x => x), 3x + 5) for x ∈ 1:5]
+examples = [HerbSpecification.IOExample(Dict(:x => x), 4x + 6) for x ∈ 1:5]
 
 # ╔═╡ 2baa7f33-c86d-40e2-9253-720ec19e4c43
 md"""
@@ -99,11 +99,11 @@ This can be done using a breadth-first search over the program/search space.
 
 This search is very basic; it makes use of an enumeration technique, where we enumerate programs one-by-one until we find a program that matches our examples. The search procedure has a built-in default evaluator to verify the candidate programs with the given input. The search procedure also has a built-in search procedure using breadth-first search. 
 
-So, we only need to give our grammar and the problem to our search procedure, along with a starting `Symbol`, in our case a `Real`. 
+So, we only need to give our grammar and the problem to our search procedure, along with a starting `Symbol`, in our case a `Number`. 
 """
 
 # ╔═╡ d553f37b-bc8a-4426-a98b-fb195ed994d9
-iterator_1 = BFSIterator(g, :Real)
+iterator_1 = BFSIterator(g, :Number)
 
 # ╔═╡ e1910236-9783-4989-a014-c3f7ccdf33d3
 synth(problem_1, iterator_1)
@@ -119,7 +119,7 @@ md"""
 
 In the previous case, we used the built-ins of the search procedure. However, we can also give a custom enumerator to the search procedure and define a few more values.
 
-We first define a new problem to test with, we are looking for the programs that can compute the value `167`. We immediately pass the examples to the problem and then set up the new search.
+We first define a new problem to test with, we are looking for the programs that can compute the value `168`. We immediately pass the examples to the problem and then set up the new search.
 
 Search is done by passing the grammar, the problem and the starting point like before. We now also specify the enumeration function to be used, and now we use depth-first search. Then, we give the maximum depth of the programs we want to search for `(3)`, the maximum number of nodes in the Abstract Syntax Tree that exists during search `(10)`, and the maximum time in seconds allowed for the search.
 """
@@ -127,8 +127,11 @@ Search is done by passing the grammar, the problem and the starting point like b
 # ╔═╡ cdab3f55-37e4-4aee-bae1-14d3475cbdcd
 begin
     problem_2 = HerbSpecification.Problem("example2", [HerbSpecification.IOExample(Dict(:x => x), 168) for x ∈ 1:5])
-    iterator_2 = HerbSearch.BFSIterator(g, :Real, max_depth=4, max_size=30)
-    expr_2 = HerbSearch.synth(problem_2, iterator_2)
+    iterator_2 = HerbSearch.BFSIterator(g, :Number, max_depth=4, max_size=30)
+    expr_2, flag_2 = HerbSearch.synth(problem_2, iterator_2)
+    println(expr_2)
+    program_2 = rulenode2expr(expr_2, g)
+    println(program_2)
 end
 
 # ╔═╡ 5ad86beb-eb25-4bae-b0c2-a33d1a38581a
@@ -141,7 +144,10 @@ In any case, this concludes our first introduction to the `Herb.jl` program synt
 # ╔═╡ c06d09a5-138a-4821-8a60-074fa7ec026d
 begin
     problem_3 = HerbSpecification.Problem("example3", [HerbSpecification.IOExample(Dict(:x => x), 167) for x ∈ 1:5])
-    expr_3 = HerbSearch.synth(problem_3, iterator_2)
+    expr_3, flag_3 = HerbSearch.synth(problem_3, iterator_2)
+    println(expr_3)
+    program_3 = rulenode2expr(expr_3, g)
+    println(program_3)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
