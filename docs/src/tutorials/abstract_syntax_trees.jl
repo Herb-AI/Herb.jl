@@ -13,7 +13,7 @@ using PlutoUI
 using Kroki
 
 # ╔═╡ 4ab41dab-63f0-4ee0-b30d-532513406a0f
-using HerbCore, HerbGrammar, HerbInterpret
+using Herb
 
 # ╔═╡ 65fbf850-74ae-4ea4-85f0-683095c73fba
 md"""

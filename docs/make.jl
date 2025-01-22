@@ -1,11 +1,5 @@
 using Documenter: HTML, deploydocs, makedocs
 using Herb
-using HerbConstraints
-using HerbCore
-using HerbGrammar
-using HerbInterpret
-using HerbSearch
-using HerbSpecification
 using Pkg
 using PlutoStaticHTML
 include(joinpath(@__DIR__, "..", "docs", "build_notebooks.jl"))

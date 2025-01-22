@@ -5,7 +5,7 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ 84549502-876a-4ffc-8069-1ffc17622f9a
-using HerbGrammar, HerbConstraints
+using Herb
 
 # ╔═╡ 93b96839-9676-477b-aebb-e50d733a6719
 md"""

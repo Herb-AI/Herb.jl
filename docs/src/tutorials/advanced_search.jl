@@ -17,8 +17,7 @@ using PrettyTables
 using Test
 
 # ╔═╡ c4441fa4-09ec-4b81-9681-b13b93a9c9c0
-using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret, HerbConstraints, HerbCore
-
+using Herb
 
 # ╔═╡ dddca175-3d88-45ce-90da-575c0ba38175
 md"""
@@ -163,7 +162,7 @@ g_2 = @csgrammar begin
 end
 
 # ╔═╡ 94e0d676-a9c7-4291-8696-15301e541c30
-problem_2 = Problem([IOExample(Dict(), x) for x ∈ 1:5])
+problem_2 = Problem([IOExample(Dict{Symbol,Any}(), x) for x ∈ 1:5])
 
 # ╔═╡ a4a7daed-f89b-44ad-8787-9199c05bf046
 iterator_3 = BFSIterator(g_2, :Index, max_depth=2)
