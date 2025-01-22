@@ -25,8 +25,8 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "52eaf54220c8386bc36f4d8e6759028fc6b66b7a4c76bed2b7f6354aa4e3c52c"
-    julia_version = "1.11.1"
+    input_sha = "23f1b9e657e98a182aa3a400472634ac1e30abf3e8b119d102426e9fa1d43ffb"
+    julia_version = "1.11.3"
 -->
 
 <div class="markdown"><h1>Search</h1><p>This notebook describes how you can search a program space as defined by a grammar. Specifically, we will look at example-based search, where the goal is to find a program that is able to transform the inputs of every example to the corresponding output.</p></div>
@@ -34,7 +34,7 @@
 
 <div class="markdown"><h3>Setup</h3><p>First, we start with the setup. We need access to all the function in the Herb.jl framework.</p></div>
 
-<pre class='language-julia'><code class='language-julia'>using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret, HerbConstraints</code></pre>
+<pre class='language-julia'><code class='language-julia'>using Herb</code></pre>
 
 
 
@@ -66,18 +66,18 @@ end</code></pre>
 
 <pre class='language-julia'><code class='language-julia'># Create input-output examples
 examples = [HerbSpecification.IOExample(Dict(:x =&gt; x), 4x + 6) for x ∈ 1:5]</code></pre>
-<pre class="code-output documenter-example-output" id="var-examples">5-element Vector{IOExample}:
- IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10)
- IOExample(Dict{Symbol, Any}(:x =&gt; 2), 14)
- IOExample(Dict{Symbol, Any}(:x =&gt; 3), 18)
- IOExample(Dict{Symbol, Any}(:x =&gt; 4), 22)
- IOExample(Dict{Symbol, Any}(:x =&gt; 5), 26)</pre>
+<pre class="code-output documenter-example-output" id="var-examples">5-element Vector{IOExample{Int64, Int64}}:
+ IOExample{Int64, Int64}(Dict(:x =&gt; 1), 10)
+ IOExample{Int64, Int64}(Dict(:x =&gt; 2), 14)
+ IOExample{Int64, Int64}(Dict(:x =&gt; 3), 18)
+ IOExample{Int64, Int64}(Dict(:x =&gt; 4), 22)
+ IOExample{Int64, Int64}(Dict(:x =&gt; 5), 26)</pre>
 
 
 <div class="markdown"><p>Now that we have some input-output examples, we can define the problem.  Next to the examples, a problem also contains a name meant to link to the file path, which can be used to keep track of current examples.  For now, this is irrelevant, and you can give the program any name you like.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>problem_1 = HerbSpecification.Problem("example", examples)</code></pre>
-<pre class="code-output documenter-example-output" id="var-problem_1">Problem{Vector{IOExample}}("example", IOExample[IOExample(Dict{Symbol, Any}(:x =&gt; 1), 10), IOExample(Dict{Symbol, Any}(:x =&gt; 2), 14), IOExample(Dict{Symbol, Any}(:x =&gt; 3), 18), IOExample(Dict{Symbol, Any}(:x =&gt; 4), 22), IOExample(Dict{Symbol, Any}(:x =&gt; 5), 26)])</pre>
+<pre class="code-output documenter-example-output" id="var-problem_1">Problem{Vector{IOExample{Int64, Int64}}}("example", IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 14), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 18), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 22), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 26)])</pre>
 
 
 <div class="markdown"><h3>Searching</h3><p>Now that we have defined the search space and the goal of the search, we can start the search. </p><p>Of course, our problem is underdefined as there might be multiple programs that satisfy our examples.  Let us consider the case where we also have a ternary if-then-else operator and standard boolean operators in our grammar: we could synthesize the program <code>x ≤ 5 ? 3x+5 : 0</code>.  This program satisfies all our examples, but we don't expect it to generalize very well.</p><p>To search through a program space, we first need to define a <a href="@ref"><code>HerbSearch.ProgramIterator</code></a>, which can be instantiated with different iterators, for now we use a simple <a href="@ref"><code>HerbSearch.BFSIterator</code></a>. For more advanced search methods check out our tutorial on <a href=".advanced_search.md">advanced search</a>. For more information about iterators, check out our tutorial on <a href=".working_with_interpreters.md">working with interpreters</a>. </p><p>In general, we assume that a smaller program is more general than a larger program.  Therefore, we search for the smallest program in our grammar that satisfies our examples.  This can be done using a breadth-first search over the program/search space.</p><p>This search is very basic; it makes use of an enumeration technique, where we enumerate programs one-by-one until we find a program that matches our examples. The search procedure has a built-in default evaluator to verify the candidate programs with the given input. The search procedure also has a built-in search procedure using breadth-first search. </p><p>So, we only need to give our grammar and the problem to our search procedure, along with a starting <code>Symbol</code>, in our case a <code>Number</code>. </p></div>
@@ -107,7 +107,7 @@ examples = [HerbSpecification.IOExample(Dict(:x =&gt; x), 4x + 6) for x ∈ 1:5]
     problem_2 = HerbSpecification.Problem("example2", [HerbSpecification.IOExample(Dict(:x =&gt; x), 168) for x ∈ 1:5])
     iterator_2 = HerbSearch.BFSIterator(g, :Number, max_depth=4, max_size=30)
     expr_2, flag_2 = HerbSearch.synth(problem_2, iterator_2)
-    print(expr_2)
+    println(expr_2)
     program_2 = rulenode2expr(expr_2, g)
     println(program_2)
 end</code></pre>
@@ -119,10 +119,10 @@ end</code></pre>
 <pre class='language-julia'><code class='language-julia'>begin
     problem_3 = HerbSpecification.Problem("example3", [HerbSpecification.IOExample(Dict(:x =&gt; x), 167) for x ∈ 1:5])
     expr_3, flag_3 = HerbSearch.synth(problem_3, iterator_2)
-    print(expr_3)
+    println(expr_3)
     program_3 = rulenode2expr(expr_3, g)
     println(program_3)
 end</code></pre>
 
 
-<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../concepts/">« Architecture and core concepts</a><a class="docs-footer-nextpage" href="../defining_grammars/">Defining Grammars in Herb.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Monday 18 November 2024 09:21">Monday 18 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<!-- PlutoStaticHTML.End --></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../concepts/">« Architecture and core concepts</a><a class="docs-footer-nextpage" href="../defining_grammars/">Defining Grammars in Herb.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Wednesday 22 January 2025 20:53">Wednesday 22 January 2025</span>. Using Julia version 1.11.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
