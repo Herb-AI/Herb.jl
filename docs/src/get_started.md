@@ -2,10 +2,10 @@
 
 You can either paste this code into the Julia REPL or into a separate file, e.g. `get_started.jl`. If using a separate file you can execute using `julia get_started.jl` or `julia --project=. get_started.jl` depending on whether you installed Herb.jl globally or in a project.
 
-To begin, we need to import all needed packages using
+To begin, we need to import `Herb`.
 
 ```julia
-using HerbGrammar, HerbSpecification, HerbSearch, HerbInterpret
+using Herb
 ```
 
 To define a program synthesis problem, we need a grammar and specification. 
@@ -61,7 +61,7 @@ See our other tutorials!
 ## The full code example
 
 ```julia
-using HerbSearch, HerbSpecification, HerbInterpret, HerbGrammar
+using Herb
 
 # define our very simple context-free grammar
 # Can add and multiply an input variable x or the integers 1,2.
