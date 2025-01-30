@@ -1,4 +1,5 @@
 using Documenter: HTML, deploydocs, makedocs
+using DocumenterMermaid
 using Herb
 using HerbConstraints
 using HerbCore

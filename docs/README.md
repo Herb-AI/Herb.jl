@@ -13,3 +13,6 @@ Compiling is automatically triggered whenever pushing to this branch. If you wan
 ## Help!
 
 If help is needed reach out to [THinnerichs](https://github.com/thinnerichs).
+
+#### Note
+The `other` folder contains some old material that is not hosted on our website. 
