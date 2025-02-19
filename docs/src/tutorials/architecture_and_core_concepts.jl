@@ -10,6 +10,12 @@ using PlutoUI
 # ╔═╡ a7192eb2-2583-44ae-a176-59e58bd751c1
 using Herb
 
+# ╔═╡ c8b6066a-5b93-498a-8f74-59544f635ea5
+using Kroki
+
+# ╔═╡ 86e43713-8e45-4ad2-9e91-46a095752293
+using Test # TODO: do I need to import this?
+
 # ╔═╡ 00cb9e76-ed1d-11ef-0b64-152537924f72
 md"
 # Herb Architecture and Core Concepts
@@ -72,6 +78,8 @@ Herb.jl instead  leaverages the existing Julia parser and interpreter.
 
 TODO (rewrite): Julia supports _meta-programming,_ which allows us to invoke the Julia parser and Julia interpreter for our own needs. In our case, we want to use the `Julia`'s parser to _parse_ the grammar definition and use `Julia`'s interpreter to interpret the programs. The advantage of using this approach is that users can write the grammar definition inside the code. 
 
+(Rather than implementing separate tools, Herb.jl treats grammar definitions as regular Julia code. This means you can write grammars directly in your code while getting all the power of Julia's native parsing and execution capabilities.)
+
 Let's look at a simple example.
 
 "
@@ -116,20 +124,228 @@ grammar.types[6]
 
 # ╔═╡ 03ca4570-8719-4763-9256-9ad04f3ceb4d
 md"
-To see all the fields of the grammar, type `?` from the REPL to enter _help_ mode, followed by the type `ContextSensitiveGrammar`. For more details on working with grammars in Herb.jl, including useful helper functions, check out the tutorial on [Defining Grammars in Herb.jl](tutorials/defining_grammars.md).
+To see all the fields of the grammar, type `@doc` in notebook cell, or `?` from the REPL, followed by the type `ContextSensitiveGrammar`. For more details on working with grammars in Herb.jl, including useful helper functions, check out the tutorial on [Defining Grammars in Herb.jl](tutorials/defining_grammars.md).
 "
 
 # ╔═╡ 56568b5f-94b3-4780-aac7-0405735f4a5b
+@doc ContextSensitiveGrammar
 
+# ╔═╡ 51fdff46-cac6-4372-959b-fdc14e26c55f
+md"
+## HerbCore.jl
+
+TODO: Is this suitable?
+The syntactic structure of a computer program can be represented in a hierarchical tree structure, a so-called Abstract Syntax Tree (AST) where each node in the tree corresponds to a rule index in the grammar (also see the tutorial on  TODO: add link). 
+
+If you're not familiar with ASTs, this might sound a bit abstract. So let's look at a simple example.
+
+We return to the `grammar` we defined above. We want to represent the expression `1 + 2 * 3` as an AST:
+"
+
+# ╔═╡ 3622c2c1-7ed4-4e69-899c-90268a88d315
+# Diagram(:mermaid, """
+# flowchart TD
+#     id1((2)) --- id2((1))
+#     id1 --- id3((3))
+#     id3 --- id4((2))
+#     id3 --- id5((3))
+# """)
+
+# ╔═╡ 93dd198a-2956-4164-96cb-0a1b35317f70
+md"
+We can relate this AST to the derivation rules of the grammar:
+"
+
+# ╔═╡ 7a41b422-b590-4598-8e72-359a7d571a0a
+LocalResource("assets/rulenode.png")
+
+# ╔═╡ 61b93d74-a6c4-492d-8e9c-6c1261709108
+md"
+On the left, you can see that grammar rules and their corresponding indices. On the right, you can see the corresponding expression tree, with the rule index shown next to each node.
+"
+
+# ╔═╡ f25c54b0-8586-4698-adfb-4248537febab
+md"
+In Herb, a program is represented as a tree structure using the type `RuleNode`, which is defined in HerbCore.jl. Let's have a look at the documentation to learn more about this type.
+"
+
+# ╔═╡ df386704-7987-44e2-8737-d219af11e769
+@doc RuleNode
+
+# ╔═╡ e3824116-8e7e-4fce-a09a-8ecea61e80a2
+md"
+With `RuleNode`, we can represent either programs that consist of a single rule 
+without `children`, corresponding to a leaf node or terminal node in your expression tree. If we want to represent more complex programs with a nested structure, we express that via the field `children`. Each child can itself have children, allowing for an arbitrary depth of nesting.
+
+Let's go back to our grammar and use its rule indices to create the simple program `1 + 2 * 3`:
+"
+
+# ╔═╡ 79be660c-fabc-448f-99e3-9264a9b36db8
+grammar
+
+# ╔═╡ f37a297b-4069-48a4-8746-3a6f55eccc4a
+rulenode = RuleNode(6,
+           [   RuleNode(2),
+               RuleNode(8, [RuleNode(3), RuleNode(4)])
+           ])
+
+# ╔═╡ 999ddc86-7f27-48de-82cd-6fbbae21f612
+md"
+The output of the code cells shows the shorthand (TODO: check if we really call it that) notaiton of `rulenode`. This is not very human-readable and it's hard to spot if we made a mistake. Luckily, we can easily convert it into a Julia expression using the function [`HerbGrammar.rulenode2expr`](@ref) function. 
+"
+
+# ╔═╡ c4858fae-f2e6-4194-a50d-8242cef5d05d
+rulenode2expr(rulenode,  grammar)
+
+# ╔═╡ 3725a255-3fd7-41ec-906f-db928d24e0ac
+md"
+### Manipulating `RuleNode`s
+As mentioned, `RuleNode`s are tree data structures, we can manipulate them using standard tree operations. The struct `RuleNode` is mutable, hence we can directly change both the `children` vector and the grammar rule index (`ind`). 
+
+One thing to keep in mind is that `RuleNode` is specifically designed to work with a grammar. Without an associated grammar, a `RuleNode` is meaningless. 
+
+For example, if we change the value of the root index to 9, we get an error when trying to convert the modified `rulenode` to a Julia expressions - our grammar only has eight rules.
+"
+
+# ╔═╡ 4d04d9d9-0dd4-4bb2-af59-7baf6be6f2ce
+rulenode.ind = 9
+
+# ╔═╡ 684f5667-85d7-44c9-8867-8ea5ac6ea8fc
+Test.@test_throws BoundsError rulenode2expr(rulenode, grammar)
+
+# ╔═╡ 1841ab4e-ceb9-4fde-81b2-fd879db3529b
+md"
+Similarly, we get an error when we add more children than to a `RuleNode` than a corresponding rule expects, for example by adding a third child to the additon:
+"
+
+# ╔═╡ a7afc265-2f89-4150-97a4-7c5bbf257ebd
+rulenode.children =  [RuleNode(2),
+               RuleNode(8, [RuleNode(3), RuleNode(4), RuleNode(3)])]
+
+# ╔═╡ e2cfb9ba-c101-4d9f-b45c-6240b4a1fcf1
+Test.@test_throws BoundsError rulenode2expr(rulenode, grammar)
+
+# ╔═╡ 49c9bd50-1a1c-4563-b8e8-816477579d34
+md"
+### To Do: refer to useful RuleNode functionality
+
+#### Useful RuleNode functions
+Some very useful functions to know:
+ - [`HerbCoredepth`](@ref): gets the depth of the tree of the RuleNode
+ - [`Base.length`](@ref) or just `length(rulenode) gets the number of nodes in the RuleNode
+ - [`HerbGrammar.rulenode2expr`](@ref) converts a RuleNode to a grammar
+"
+
+# ╔═╡ 20a9d753-2007-484a-8ca7-58a35e1e187f
+md"
+## Iterators
+
+Like many programming languages, Julia supports the iterator pattern. In Julia, an iterator is a type that implements two methods:
+- `Base.iterator(iterator::MyIterator)`
+- `Base.iterator(iterator::MyIterator, state::MyIteratorState)`
+
+Both methods either return `nothing`, in case the iterator has finished iterating, or a tuple containing the actual value that is being iterated (e.g., a number) and the iterator state.
+"
+
+# ╔═╡ 352cd96a-d86b-4f57-a0b6-a2ed582b8ba3
+# iterator is any type that can be iterated (list,dict,etc)
+it = iterate(iterator) # same as Base.iterate(itearator)
+
+# ╔═╡ b6ff3e4a-4564-4dd6-b9fc-fdaa425303d9
+while it !== nothing   # as long as the iterator is not done
+    value, state = it      # get the value and the state
+    # do something with the value of the iterator
+    println(value) 
+    it = iterate(iterator, state)  # runs the iterator with the new state
+end 
+
+# ╔═╡ f8d30e55-092a-4da8-9f95-2e9bda0bbba7
+md"
+## TO ADD
+### 3. Iterators 
+
+
+Consider a simple Julia for loop:
+```jl
+for value in iterator
+   println(value)
+end
+```
+
+This is translated to:
+```jl
+# iterator is any type that can be iterated (list,dict,etc)
+it = iterate(iterator) # same as Base.iterate(itearator)
+while it !== nothing   # as long as the iterator is not done
+    value, state = it      # get the value and the state
+    # do something with the value of the iterator
+    println(value) 
+    it = iterate(iterator, state)  # runs the iterator with the new state
+end 
+```
+
+What Julia is doing here is that it passes the iterator _state_ to subsequent `Base.iterate` calls after each for loop iteration. This pattern turns out to be very powerful because the search algorithms can be implemented using iterators. This is also memory efficient because we do not generate all programs at one but generate them one by one. 
+
+Thus, the search algorithms (e.g., BFS, DFS, etc.) just provide an order in which they _enumerate_ the search space. 
+
+#### Build own search algorithm
+Let's try to create a new search algorithm in Herb from scratch. We will need three ingredients:
+1. A new iterator type. Let's call it `NiceCustomIterator` for now.
+2. A state that the iterator has for each iteration
+3. Implement `Base.iterate(iter::NiceCustomIterator)` and implement `Base.iterate(iter::NiceCustomIterator, state)`
+
+We are going to implement an iterator that is quite funny. It will generate random programs for a given amount of time (e.g., 2 seconds) and then just enumerates programs using the BFS iterator for some other given time (e.g., 3 seconds). After that, it will start generating random programs and the process will repeat. When using BFS the enumeration will _resume_ from the previous saved state of the BFS iterator. 
+
+We will tackle each point one by one.
+
+But before we start coding, let's create a new folder in `HerbSearch` and call it `ouriterator`. Inside that folder, let's create a Julia file `nicecustom_iterator.jl` where we are going to put our code. 
+
+1. First, we need to think about what to store in the iterator. We need to store a grammar in order to sample random programs, and we also need the two configurable timeouts: one for running the random search and one for running the BFS iterator.
+Our definition looks like this, for now.
+
+```jl
+struct NiceCustomIterator
+    grammar::AbstractGrammar
+    timer_run_random::Float64
+    timer_run_bfs::Float64
+end
+```
+
+2. Secondly, we need to know the state of the iterator. We need to keep track of the both running timers to ensure that we switch from random to BFS and vice versa at the right time. A simple way to do this would be to store the `start_time_random` of the random iterator and then in the `iterate` function check if the current_time is bigger than the `starting time + timer_run_random`. We can do the same for BFS using a field `start_time_bfs`. It would also be helpful to know which timer should we check (random or BFS). For that a boolean `is_running_random` can be used.
+
+The definition we have so far looks like this:
+```jl
+struct NiceCustomIteratorState
+    start_time_random::Float64
+    start_time_bfs::Float64
+    is_running_random::Bool # true if we are currently running random search. false if we run BFS
+end
+```
+
+3. Now we need to implement `Base.iterate(iterator)`. This function does not take the state as a parameter because is only run once. We need to return the new program and also new state.
+
+To simplify things, we will make our algorithm always start randomly.
+```jl
+function Base.iterate(iterator::NiceCustomIterator) 
+    random_program = rand(RuleNode, iterator.grammar)
+    return random_program, nothing
+end
+```
+
+
+"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 Herb = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
+Kroki = "b3565e16-c1f2-4fe9-b4ab-221c88942068"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Herb = "~0.4.1"
+Kroki = "~1.0.0"
 PlutoUI = "~0.7.61"
 """
 
@@ -139,7 +355,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "0e986eb5af5cc2c67d989b8271676c13f22e6396"
+project_hash = "0def3b8be4e0627954410fc29bf190fcdf773c3f"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -173,6 +389,17 @@ version = "2.2.0"
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
+[[deps.BitFlags]]
+git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
+uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
+version = "0.1.9"
+
+[[deps.CodecZlib]]
+deps = ["TranscodingStreams", "Zlib_jll"]
+git-tree-sha1 = "962834c22b66e32aa10f7611c08c8ca4e20749a9"
+uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
+version = "0.7.8"
+
 [[deps.ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
 git-tree-sha1 = "b10d0b65641d57b8b4d5e234446582de5047050d"
@@ -193,6 +420,12 @@ weakdeps = ["Dates", "LinearAlgebra"]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "1.1.1+0"
+
+[[deps.ConcurrentUtilities]]
+deps = ["Serialization", "Sockets"]
+git-tree-sha1 = "d9d26935a0bcffc87d2613ce14c527c99fc543fd"
+uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
+version = "2.5.0"
 
 [[deps.DataAPI]]
 git-tree-sha1 = "abe83f3a2f1b857aac70ef8b269080af17764bbe"
@@ -220,6 +453,12 @@ deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 version = "1.6.0"
 
+[[deps.ExceptionUnwrapping]]
+deps = ["Test"]
+git-tree-sha1 = "d36f682e590a83d63d1c7dbd287573764682d12a"
+uuid = "460bff9d-24e4-43bc-9d9f-a8973cb893f4"
+version = "0.1.11"
+
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
@@ -228,6 +467,12 @@ deps = ["Statistics"]
 git-tree-sha1 = "05882d6995ae5c12bb5f36dd2ed3f61c98cbb172"
 uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
 version = "0.8.5"
+
+[[deps.HTTP]]
+deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "PrecompileTools", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
+git-tree-sha1 = "c67b33b085f6e2faf8bf79a61962e7339a81129c"
+uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+version = "1.10.15"
 
 [[deps.Herb]]
 deps = ["HerbConstraints", "HerbCore", "HerbGrammar", "HerbInterpret", "HerbSearch", "HerbSpecification", "Reexport"]
@@ -298,11 +543,23 @@ git-tree-sha1 = "e2222959fbc6c19554dc15174c81bf7bf3aa691c"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
 version = "0.2.4"
 
+[[deps.JLLWrappers]]
+deps = ["Artifacts", "Preferences"]
+git-tree-sha1 = "a007feb38b422fbdab534406aeca1b86823cb4d6"
+uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
+version = "1.7.0"
+
 [[deps.JSON]]
 deps = ["Dates", "Mmap", "Parsers", "Unicode"]
 git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.4"
+
+[[deps.Kroki]]
+deps = ["Base64", "CodecZlib", "DocStringExtensions", "HTTP", "JSON", "Markdown", "Reexport"]
+git-tree-sha1 = "8ff3884b3f5613214b520d6054f8df8ce0de1396"
+uuid = "b3565e16-c1f2-4fe9-b4ab-221c88942068"
+version = "1.0.0"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -354,6 +611,12 @@ version = "0.3.29"
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
+[[deps.LoggingExtras]]
+deps = ["Dates", "Logging"]
+git-tree-sha1 = "f02b56007b064fbfddb4c9cd60161b6dd0f40df3"
+uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
+version = "1.1.0"
+
 [[deps.MIMEs]]
 git-tree-sha1 = "1833212fd6f580c20d4291da9c1b4e8a655b128e"
 uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
@@ -367,6 +630,12 @@ version = "0.4.17"
 [[deps.Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+
+[[deps.MbedTLS]]
+deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
+git-tree-sha1 = "c067a280ddc25f196b5e7df3877c6b226d390aaf"
+uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
+version = "1.1.9"
 
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -394,6 +663,18 @@ version = "1.2.0"
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
 version = "0.3.23+4"
+
+[[deps.OpenSSL]]
+deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
+git-tree-sha1 = "38cb508d080d21dc1128f7fb04f20387ed4c0af4"
+uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
+version = "1.4.3"
+
+[[deps.OpenSSL_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "a9697f1d06cc3eb3fb3ad49cc67f2cfabaac31ea"
+uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
+version = "3.0.16+0"
 
 [[deps.OrderedCollections]]
 git-tree-sha1 = "cc4054e898b852042d7b503313f7ad03de99c3dd"
@@ -458,6 +739,11 @@ version = "0.7.0"
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
+[[deps.SimpleBufferStream]]
+git-tree-sha1 = "f305871d2f381d21527c770d4788c06c097c9bc1"
+uuid = "777ac1f9-54b0-4bf8-805c-2214025038e7"
+version = "1.2.0"
+
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
@@ -508,6 +794,11 @@ version = "1.10.0"
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
+[[deps.TranscodingStreams]]
+git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
+uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
+version = "0.11.3"
+
 [[deps.Tricks]]
 git-tree-sha1 = "6cae795a5a9313bbb4f60683f7263318fc7d1505"
 uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
@@ -548,19 +839,44 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╠═4f96e98e-5611-4acc-893d-a52aaf4bb582
-# ╠═00cb9e76-ed1d-11ef-0b64-152537924f72
+# ╟─00cb9e76-ed1d-11ef-0b64-152537924f72
 # ╠═d6206c68-63e6-4600-919b-7c72a062cf7d
-# ╠═132068b4-d842-4109-9649-1140b073aefd
-# ╠═12700526-a23b-4d96-a485-5d66fe897f01
+# ╟─132068b4-d842-4109-9649-1140b073aefd
+# ╟─12700526-a23b-4d96-a485-5d66fe897f01
 # ╠═a7192eb2-2583-44ae-a176-59e58bd751c1
 # ╠═aa0fd9dd-f500-49ed-ac8a-764a6c737136
-# ╠═bf841a41-accf-40e7-b97a-06f72a7f2ce5
-# ╠═5c174c9e-6ed6-4470-84c9-c438fb0c26b6
+# ╟─bf841a41-accf-40e7-b97a-06f72a7f2ce5
+# ╟─5c174c9e-6ed6-4470-84c9-c438fb0c26b6
 # ╠═5b2f698d-1e0f-4b33-a729-6ca4cf97a409
 # ╠═8cb71b93-f63f-4616-b76d-7528aea79ee2
-# ╠═10e6c74d-6242-4fb0-8a5d-83ecd0438130
+# ╟─10e6c74d-6242-4fb0-8a5d-83ecd0438130
 # ╠═3f8ecba9-c1d1-47b5-ae7d-ce0ab78bbd2f
-# ╠═03ca4570-8719-4763-9256-9ad04f3ceb4d
+# ╟─03ca4570-8719-4763-9256-9ad04f3ceb4d
 # ╠═56568b5f-94b3-4780-aac7-0405735f4a5b
+# ╟─51fdff46-cac6-4372-959b-fdc14e26c55f
+# ╠═c8b6066a-5b93-498a-8f74-59544f635ea5
+# ╠═3622c2c1-7ed4-4e69-899c-90268a88d315
+# ╟─93dd198a-2956-4164-96cb-0a1b35317f70
+# ╟─7a41b422-b590-4598-8e72-359a7d571a0a
+# ╟─61b93d74-a6c4-492d-8e9c-6c1261709108
+# ╠═f25c54b0-8586-4698-adfb-4248537febab
+# ╠═df386704-7987-44e2-8737-d219af11e769
+# ╠═e3824116-8e7e-4fce-a09a-8ecea61e80a2
+# ╠═79be660c-fabc-448f-99e3-9264a9b36db8
+# ╠═f37a297b-4069-48a4-8746-3a6f55eccc4a
+# ╟─999ddc86-7f27-48de-82cd-6fbbae21f612
+# ╠═c4858fae-f2e6-4194-a50d-8242cef5d05d
+# ╟─3725a255-3fd7-41ec-906f-db928d24e0ac
+# ╠═4d04d9d9-0dd4-4bb2-af59-7baf6be6f2ce
+# ╠═86e43713-8e45-4ad2-9e91-46a095752293
+# ╠═684f5667-85d7-44c9-8867-8ea5ac6ea8fc
+# ╟─1841ab4e-ceb9-4fde-81b2-fd879db3529b
+# ╠═a7afc265-2f89-4150-97a4-7c5bbf257ebd
+# ╠═e2cfb9ba-c101-4d9f-b45c-6240b4a1fcf1
+# ╟─49c9bd50-1a1c-4563-b8e8-816477579d34
+# ╠═20a9d753-2007-484a-8ca7-58a35e1e187f
+# ╠═352cd96a-d86b-4f57-a0b6-a2ed582b8ba3
+# ╠═b6ff3e4a-4564-4dd6-b9fc-fdaa425303d9
+# ╠═f8d30e55-092a-4da8-9f95-2e9bda0bbba7
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
