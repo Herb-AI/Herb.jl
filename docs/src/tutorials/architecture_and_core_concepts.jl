@@ -14,7 +14,7 @@ using Herb
 using Kroki
 
 # ╔═╡ 86e43713-8e45-4ad2-9e91-46a095752293
-using Test # TODO: do I need to import this?
+using Test 
 
 # ╔═╡ 00cb9e76-ed1d-11ef-0b64-152537924f72
 md"
@@ -22,7 +22,7 @@ md"
 
 ## Overview Architecture 
 
-At its core, program synthesis is searching over a _space_ of programs in the attempt to find a program that satisfies a given specification. Often, the specification is provided in the form of input/output examples. 
+Program synthesis searches over a space of programs to find one that satisfies our specifications, typically provided as input/output examples. 
 
 This diagram shows the program synthesis process:
 
@@ -33,28 +33,34 @@ LocalResource("assets/herb_architecture.png")
 
 # ╔═╡ 132068b4-d842-4109-9649-1140b073aefd
 md"
-The basic components of the process are
-1. [Grammar](#herbgrammar)
-2. Interpreter
-3. Iterator
-4. Examples
+This tutorial breaks down the four essential components of program synthesis:
+1. Problem specification - input/output examples (missing)
+1. Grammars
+1. Programs and program interpreter
+1. Program iterator
 
-This tutorial walks you through the core components and shows
-- How each component works
-- Their implementation in Herb.jl
-- Code examples 
-
+We'll explore how each of them works, and show their implementation in Herb.jl with practical code examples. 
 By the end, you'll understand Herb.jl's core architecture and modules.
+"
+
+# ╔═╡ ea0bbd3e-6945-418e-a63d-d6a9e86e5dc3
+md"
+## Problem specification (TODO)
 "
 
 # ╔═╡ 12700526-a23b-4d96-a485-5d66fe897f01
 md"
-## HerbGrammar.jl
+## Grammars 
 
-First, we look at grammars in Herb.jl. A grammar defines a set of rules that can be used and combined to create programs. For example, you might want to define a grammar for
+A grammar defines the rules for creating syntactically valid program. The rules in the grammar can be combined to create programs.
+
+For example, we might want to define a grammar for
 - Arithmetic operation (addition, subtraction, multiplication, etc.)
 - Bit manipulation operations (shift left, shift right, etc.)
 - String manipulation operation (`concat`, `replace`, `findindex`, etc.)
+
+While grammars are traditionally defined in formats like BNF - below is an example of a grammar with arithmetic operations - Herb.jl takes a different approach.  
+
 
 Ideally, we would want to be able to define any grammar we want in Herb. 
 
@@ -73,14 +79,12 @@ One way to do this would be to have a file in a grammar format (e.g., BNF) that 
 <const> ::= integer
 ```
 
-A grammar only defines what valid programs can be created - it doesn't tell us how to run them. We need a way to evaluate these programs. Users could, in addition to the grammar, also specify how to evaluate programs. But this would basically mean creating a new programming language from scratch. 
-Herb.jl instead  leaverages the existing Julia parser and interpreter.
 
-TODO (rewrite): Julia supports _meta-programming,_ which allows us to invoke the Julia parser and Julia interpreter for our own needs. In our case, we want to use the `Julia`'s parser to _parse_ the grammar definition and use `Julia`'s interpreter to interpret the programs. The advantage of using this approach is that users can write the grammar definition inside the code. 
+A grammar only what syntactically valid programs look like - it doesn't tell us how to run them. Without a mechanism to execute programs, users would need to define both the grammar and how to evaluate programs, basically creating a new programming language from scratch.
 
-(Rather than implementing separate tools, Herb.jl treats grammar definitions as regular Julia code. This means you can write grammars directly in your code while getting all the power of Julia's native parsing and execution capabilities.)
+Instead, Herb.jl leaverages Julia's built-in capabilities. Through Julia's [meta-programming support](https://docs.julialang.org/en/v1/manual/metaprogramming/), Herb.jl uses the Julia parser to process grammar definitions and the Julia interpreter to evaluate programs. With this approach, users can wirte the grammar directly in Julia code.
 
-Let's look at a simple example.
+Let's look at an example of a simple grammar in Herb.jl.
 
 "
 
@@ -100,12 +104,7 @@ We define a grammar with six rules. When you run this code cell in a notebook, o
 Each line in the grammar has a `Symbol` on the left-hand side, and a Julia expression on the right.
 The second rule exploits the `|` symbol to define multiple rules in a single line. 
 
-You can access specific rules of the grammar by their index (remember that in Julia indices start from 1).
-"
-
-# ╔═╡ 5c174c9e-6ed6-4470-84c9-c438fb0c26b6
-md"
-We get the RHS of a grammar rule with
+We can access specific rules of the grammar by their index (remember that Julia indices start from 1). We get the RHS of a grammar rule with:
 "
 
 # ╔═╡ 5b2f698d-1e0f-4b33-a729-6ca4cf97a409
@@ -124,22 +123,27 @@ grammar.types[6]
 
 # ╔═╡ 03ca4570-8719-4763-9256-9ad04f3ceb4d
 md"
-To see all the fields of the grammar, type `@doc` in notebook cell, or `?` from the REPL, followed by the type `ContextSensitiveGrammar`. For more details on working with grammars in Herb.jl, including useful helper functions, check out the tutorial on [Defining Grammars in Herb.jl](tutorials/defining_grammars.md).
+To see all the fields of the grammar, type `@doc` in notebook cell, or `?` from the REPL, followed by the type `ContextSensitiveGrammar`. For more details on working with grammars in Herb.jl, including useful helper functions, check out the tutorial on [Defining Grammars in Herb.jl](../defining_grammars.md).
 "
 
 # ╔═╡ 56568b5f-94b3-4780-aac7-0405735f4a5b
 @doc ContextSensitiveGrammar
 
+# ╔═╡ 9e5bf840-3b01-46f0-a244-54cbc5978711
+md"
+All functionality related to grammar can be found in the module [HerbGrammar.jl] (@ref Sub-Modules/HerbGrammar.jl).
+"
+
 # ╔═╡ 51fdff46-cac6-4372-959b-fdc14e26c55f
 md"
-## HerbCore.jl
+## Programs and program interpreter 
 
-TODO: Is this suitable?
-The syntactic structure of a computer program can be represented in a hierarchical tree structure, a so-called Abstract Syntax Tree (AST) where each node in the tree corresponds to a rule index in the grammar (also see the tutorial on  TODO: add link). 
+While grammars define the rules for valid programs, we also need a way to represent and evaluate them. In this section, we explore how programs are represented in Herb.jl, how to manipulate and evaluate them.
 
-If you're not familiar with ASTs, this might sound a bit abstract. So let's look at a simple example.
+Programs can be expressed in a hierarchical tree structure, a so-called Abstract Syntax Tree (AST) where each node in the tree corresponds to a rule index in the grammar (see also the [tutorial on ASTs](@ref Abstract Syntax Trees)).
 
-We return to the `grammar` we defined above. We want to represent the expression `1 + 2 * 3` as an AST:
+If you're not familiar with ASTs, the following exmaple will help you:
+We return to the `grammar` we defined above. We want to represent the expression `1 + 2 * 3` in a tree structure:
 "
 
 # ╔═╡ 3622c2c1-7ed4-4e69-899c-90268a88d315
@@ -161,12 +165,14 @@ LocalResource("assets/rulenode.png")
 
 # ╔═╡ 61b93d74-a6c4-492d-8e9c-6c1261709108
 md"
-On the left, you can see that grammar rules and their corresponding indices. On the right, you can see the corresponding expression tree, with the rule index shown next to each node.
+On the left, you can see that grammar rules and their corresponding indices. On the right, you can see the tree for `1 + 2 * 3`, where each node contains an expression. The rule indices are shown next to each node.
 "
 
 # ╔═╡ f25c54b0-8586-4698-adfb-4248537febab
 md"
-In Herb, a program is represented as a tree structure using the type `RuleNode`, which is defined in HerbCore.jl. Let's have a look at the documentation to learn more about this type.
+### Representing programs with `RuleNode`
+
+In Herb.jl, a program is represented as such a tree structure using the type `RuleNode`, which is defined in HerbCore.jl. Let's have a look at the documentation to learn more about this type.
 "
 
 # ╔═╡ df386704-7987-44e2-8737-d219af11e769
@@ -177,11 +183,8 @@ md"
 With `RuleNode`, we can represent either programs that consist of a single rule 
 without `children`, corresponding to a leaf node or terminal node in your expression tree. If we want to represent more complex programs with a nested structure, we express that via the field `children`. Each child can itself have children, allowing for an arbitrary depth of nesting.
 
-Let's go back to our grammar and use its rule indices to create the simple program `1 + 2 * 3`:
+Let's go back to our grammar and use its rule indices to create the simple program `1 + 2 * 3` with `RuleNode`:
 "
-
-# ╔═╡ 79be660c-fabc-448f-99e3-9264a9b36db8
-grammar
 
 # ╔═╡ f37a297b-4069-48a4-8746-3a6f55eccc4a
 rulenode = RuleNode(6,
@@ -191,7 +194,7 @@ rulenode = RuleNode(6,
 
 # ╔═╡ 999ddc86-7f27-48de-82cd-6fbbae21f612
 md"
-The output of the code cells shows the shorthand (TODO: check if we really call it that) notaiton of `rulenode`. This is not very human-readable and it's hard to spot if we made a mistake. Luckily, we can easily convert it into a Julia expression using the function [`HerbGrammar.rulenode2expr`](@ref) function. 
+The output of the code cells shows the shorthand notation of `rulenode`. This is not very human-readable, and it's hard to spot if we made a mistake. Luckily, we can easily convert it into a Julia expression using the function [`HerbGrammar.rulenode2expr`](@ref). 
 "
 
 # ╔═╡ c4858fae-f2e6-4194-a50d-8242cef5d05d
@@ -225,115 +228,105 @@ rulenode.children =  [RuleNode(2),
 # ╔═╡ e2cfb9ba-c101-4d9f-b45c-6240b4a1fcf1
 Test.@test_throws BoundsError rulenode2expr(rulenode, grammar)
 
-# ╔═╡ 49c9bd50-1a1c-4563-b8e8-816477579d34
-md"
-### To Do: refer to useful RuleNode functionality
-
-#### Useful RuleNode functions
-Some very useful functions to know:
- - [`HerbCoredepth`](@ref): gets the depth of the tree of the RuleNode
- - [`Base.length`](@ref) or just `length(rulenode) gets the number of nodes in the RuleNode
- - [`HerbGrammar.rulenode2expr`](@ref) converts a RuleNode to a grammar
-"
-
 # ╔═╡ 20a9d753-2007-484a-8ca7-58a35e1e187f
 md"
-## Iterators
+## Program iterators
 
-Like many programming languages, Julia supports the iterator pattern. In Julia, an iterator is a type that implements two methods:
-- `Base.iterator(iterator::MyIterator)`
-- `Base.iterator(iterator::MyIterator, state::MyIteratorState)`
+Iterators are the core building block in Herb.jl, exploring the space of possible progrmas to disscover solutions that satisfy a given problem specification. 
 
-Both methods either return `nothing`, in case the iterator has finished iterating, or a tuple containing the actual value that is being iterated (e.g., a number) and the iterator state.
+Like many programming languages, Julia provides an [iteration interface](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-iteration). In Julia, an iterator is a type that implements two methods:
+- `Base.iterator(iterator::MyIterator)`: Returns either a tuple of the first item and initial state or `nothing` if empty.
+- `Base.iterator(iterator::MyIterator, state::MyIteratorState)`: Returns either a tuple of the next item and next state or nothing if no items remain.
 "
 
-# ╔═╡ 352cd96a-d86b-4f57-a0b6-a2ed582b8ba3
-# iterator is any type that can be iterated (list,dict,etc)
-it = iterate(iterator) # same as Base.iterate(itearator)
+# ╔═╡ 90de4099-8367-4c77-ae8a-f6bbeca5b7ed
+iter = collect(1:5) # any type that can be iterated 
 
-# ╔═╡ b6ff3e4a-4564-4dd6-b9fc-fdaa425303d9
-while it !== nothing   # as long as the iterator is not done
-    value, state = it      # get the value and the state
-    # do something with the value of the iterator
-    println(value) 
-    it = iterate(iterator, state)  # runs the iterator with the new state
-end 
-
-# ╔═╡ f8d30e55-092a-4da8-9f95-2e9bda0bbba7
+# ╔═╡ c53f10f3-496c-414b-bacb-5a6c71a98168
 md"
-## TO ADD
-### 3. Iterators 
+An object that implements `iterate` can be used in functions that rely on iteration, or, for example, in a for loop.
+"
 
-
-Consider a simple Julia for loop:
-```jl
-for value in iterator
-   println(value)
+# ╔═╡ 16826e84-63eb-4e61-b492-a58c1d4ff4ab
+for item in iter
+	# do something
+	println(item)
 end
-```
 
-This is translated to:
-```jl
-# iterator is any type that can be iterated (list,dict,etc)
-it = iterate(iterator) # same as Base.iterate(itearator)
-while it !== nothing   # as long as the iterator is not done
-    value, state = it      # get the value and the state
-    # do something with the value of the iterator
-    println(value) 
-    it = iterate(iterator, state)  # runs the iterator with the new state
-end 
-```
+# ╔═╡ 442ffa84-389d-4dac-86ed-26b97d697441
+md"
+This syntax is translated into:
+"
 
-What Julia is doing here is that it passes the iterator _state_ to subsequent `Base.iterate` calls after each for loop iteration. This pattern turns out to be very powerful because the search algorithms can be implemented using iterators. This is also memory efficient because we do not generate all programs at one but generate them one by one. 
+# ╔═╡ 92b72847-3640-4dc7-b673-e2963867706f
+md"
+After each iteration, the curren iterator state is passed to the next `Base.iterate` call. This is a very powerfule pattern for implementing search algorithms (such as the ones we want to use for program synthesis) in a memory-efficient way, as it allows to generate program one at a time rather than all at one.
 
-Thus, the search algorithms (e.g., BFS, DFS, etc.) just provide an order in which they _enumerate_ the search space. 
+The different search algorithms, such as BFS, DFS, simply provide the order in they enumerate the search space.
 
-#### Build own search algorithm
-Let's try to create a new search algorithm in Herb from scratch. We will need three ingredients:
-1. A new iterator type. Let's call it `NiceCustomIterator` for now.
-2. A state that the iterator has for each iteration
-3. Implement `Base.iterate(iter::NiceCustomIterator)` and implement `Base.iterate(iter::NiceCustomIterator, state)`
 
-We are going to implement an iterator that is quite funny. It will generate random programs for a given amount of time (e.g., 2 seconds) and then just enumerates programs using the BFS iterator for some other given time (e.g., 3 seconds). After that, it will start generating random programs and the process will repeat. When using BFS the enumeration will _resume_ from the previous saved state of the BFS iterator. 
+### Build your own search algorithm in Herb.jl (incomplete)
 
-We will tackle each point one by one.
+Let's have a go at creating a new (and quirky) search algorithm from scratch. We want the search iterator that toggles between random sampling and BFS. I.e.,
+we randomly sample programs for a given duration (for example, 2 seconds), before switching to BFS enumeration for another given duration (say 3 seconds), after which the process repeats. The BFS enumeration resumes from the previously saved state of the BFS iterator.
 
-But before we start coding, let's create a new folder in `HerbSearch` and call it `ouriterator`. Inside that folder, let's create a Julia file `nicecustom_iterator.jl` where we are going to put our code. 
+For this, we need the following three ingredients:
+1. A new iteratore type. We call it `NiceCustomIterator`.
+2. A `state` for the iterator
+3. The methods `Base.iterate(iter::NiceCustomIterator)` and `Base.iterate(iter::NiceCustomIterator, state)`
 
-1. First, we need to think about what to store in the iterator. We need to store a grammar in order to sample random programs, and we also need the two configurable timeouts: one for running the random search and one for running the BFS iterator.
-Our definition looks like this, for now.
 
-```jl
+#### 1. Custom iterator type
+
+Our `NiceCustomIterator` type needs to store:
+- A grammar for random program sampling
+- Two timeouts: one for random search, one for BFS mode
+"
+
+# ╔═╡ 2cad0843-0cec-4138-8af6-6a030e77e1ea
 struct NiceCustomIterator
     grammar::AbstractGrammar
     timer_run_random::Float64
     timer_run_bfs::Float64
 end
-```
 
-2. Secondly, we need to know the state of the iterator. We need to keep track of the both running timers to ensure that we switch from random to BFS and vice versa at the right time. A simple way to do this would be to store the `start_time_random` of the random iterator and then in the `iterate` function check if the current_time is bigger than the `starting time + timer_run_random`. We can do the same for BFS using a field `start_time_bfs`. It would also be helpful to know which timer should we check (random or BFS). For that a boolean `is_running_random` can be used.
+# ╔═╡ d3e938df-8e97-40c6-9c4f-4a93c8faeeef
+md"
+### 2. Iterator state
 
-The definition we have so far looks like this:
-```jl
+Next, we need the iterator `state` to keep track of both running timers to make sure we switch at the right time between random sampling and BFS. A very simple way to do this is by storing the `start_time_random` of the random iterator. Then we can check in `iterate()` if the `current_time` is exceeds `starting time + timer_run_random`. We can do the same for BFS with `start_time_bfs`. To know which timer to check, we use a boolean `is_running_random`.
+"
+
+# ╔═╡ 7e488c0e-c7e2-4b3d-93be-c66f8f85681e
 struct NiceCustomIteratorState
     start_time_random::Float64
     start_time_bfs::Float64
-    is_running_random::Bool # true if we are currently running random search. false if we run BFS
+    is_running_random::Bool # true while running random search, false otherwise
 end
-```
 
-3. Now we need to implement `Base.iterate(iterator)`. This function does not take the state as a parameter because is only run once. We need to return the new program and also new state.
+# ╔═╡ 5e9f5569-d906-46b1-96a4-843fd8f0b57b
+md"
+### 3. Methods `Base.iterate()`
 
-To simplify things, we will make our algorithm always start randomly.
-```jl
+Now we implement `Base.iterate(iterator)`. This function is only run once - `state` is not needed as input parameter. It returns the new program and a new state (`nothing`).
+"
+
+# ╔═╡ 21a7e6ed-76b0-4b76-8f1c-b1bc60980f95
 function Base.iterate(iterator::NiceCustomIterator) 
     random_program = rand(RuleNode, iterator.grammar)
     return random_program, nothing
 end
-```
 
+# ╔═╡ c45269bf-69fc-4254-957b-a4e7ab87461b
+next = iterate(iter)
 
-"
+# ╔═╡ 1fc9816b-1a78-4578-befd-9d3035d9a077
+while next !== nothing
+	(item, state) = next
+	# do something
+	println(item)
+	next = iterate(iter, state)
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -840,29 +833,29 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═4f96e98e-5611-4acc-893d-a52aaf4bb582
 # ╟─00cb9e76-ed1d-11ef-0b64-152537924f72
-# ╠═d6206c68-63e6-4600-919b-7c72a062cf7d
+# ╟─d6206c68-63e6-4600-919b-7c72a062cf7d
 # ╟─132068b4-d842-4109-9649-1140b073aefd
+# ╟─ea0bbd3e-6945-418e-a63d-d6a9e86e5dc3
 # ╟─12700526-a23b-4d96-a485-5d66fe897f01
 # ╠═a7192eb2-2583-44ae-a176-59e58bd751c1
 # ╠═aa0fd9dd-f500-49ed-ac8a-764a6c737136
 # ╟─bf841a41-accf-40e7-b97a-06f72a7f2ce5
-# ╟─5c174c9e-6ed6-4470-84c9-c438fb0c26b6
 # ╠═5b2f698d-1e0f-4b33-a729-6ca4cf97a409
 # ╠═8cb71b93-f63f-4616-b76d-7528aea79ee2
 # ╟─10e6c74d-6242-4fb0-8a5d-83ecd0438130
 # ╠═3f8ecba9-c1d1-47b5-ae7d-ce0ab78bbd2f
-# ╟─03ca4570-8719-4763-9256-9ad04f3ceb4d
+# ╠═03ca4570-8719-4763-9256-9ad04f3ceb4d
 # ╠═56568b5f-94b3-4780-aac7-0405735f4a5b
-# ╟─51fdff46-cac6-4372-959b-fdc14e26c55f
+# ╟─9e5bf840-3b01-46f0-a244-54cbc5978711
+# ╠═51fdff46-cac6-4372-959b-fdc14e26c55f
 # ╠═c8b6066a-5b93-498a-8f74-59544f635ea5
 # ╠═3622c2c1-7ed4-4e69-899c-90268a88d315
 # ╟─93dd198a-2956-4164-96cb-0a1b35317f70
 # ╟─7a41b422-b590-4598-8e72-359a7d571a0a
 # ╟─61b93d74-a6c4-492d-8e9c-6c1261709108
-# ╠═f25c54b0-8586-4698-adfb-4248537febab
+# ╟─f25c54b0-8586-4698-adfb-4248537febab
 # ╠═df386704-7987-44e2-8737-d219af11e769
-# ╠═e3824116-8e7e-4fce-a09a-8ecea61e80a2
-# ╠═79be660c-fabc-448f-99e3-9264a9b36db8
+# ╟─e3824116-8e7e-4fce-a09a-8ecea61e80a2
 # ╠═f37a297b-4069-48a4-8746-3a6f55eccc4a
 # ╟─999ddc86-7f27-48de-82cd-6fbbae21f612
 # ╠═c4858fae-f2e6-4194-a50d-8242cef5d05d
@@ -873,10 +866,18 @@ version = "17.4.0+2"
 # ╟─1841ab4e-ceb9-4fde-81b2-fd879db3529b
 # ╠═a7afc265-2f89-4150-97a4-7c5bbf257ebd
 # ╠═e2cfb9ba-c101-4d9f-b45c-6240b4a1fcf1
-# ╟─49c9bd50-1a1c-4563-b8e8-816477579d34
-# ╠═20a9d753-2007-484a-8ca7-58a35e1e187f
-# ╠═352cd96a-d86b-4f57-a0b6-a2ed582b8ba3
-# ╠═b6ff3e4a-4564-4dd6-b9fc-fdaa425303d9
-# ╠═f8d30e55-092a-4da8-9f95-2e9bda0bbba7
+# ╟─20a9d753-2007-484a-8ca7-58a35e1e187f
+# ╠═90de4099-8367-4c77-ae8a-f6bbeca5b7ed
+# ╟─c53f10f3-496c-414b-bacb-5a6c71a98168
+# ╠═16826e84-63eb-4e61-b492-a58c1d4ff4ab
+# ╟─442ffa84-389d-4dac-86ed-26b97d697441
+# ╠═c45269bf-69fc-4254-957b-a4e7ab87461b
+# ╠═1fc9816b-1a78-4578-befd-9d3035d9a077
+# ╟─92b72847-3640-4dc7-b673-e2963867706f
+# ╠═2cad0843-0cec-4138-8af6-6a030e77e1ea
+# ╟─d3e938df-8e97-40c6-9c4f-4a93c8faeeef
+# ╠═7e488c0e-c7e2-4b3d-93be-c66f8f85681e
+# ╟─5e9f5569-d906-46b1-96a4-843fd8f0b57b
+# ╠═21a7e6ed-76b0-4b76-8f1c-b1bc60980f95
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
