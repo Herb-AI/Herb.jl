@@ -13,7 +13,7 @@ HerbSpecification = "6d54aada-062f-46d8-85cf-a1ceaf058a06"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
-HerbConstraints = "0.2"
+HerbConstraints = "0.2, 0.3"
 HerbCore = "0.3"
 HerbGrammar = "0.5"
 HerbInterpret = "0.1.2"
