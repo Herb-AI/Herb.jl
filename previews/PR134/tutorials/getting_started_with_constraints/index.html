@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Getting started with Constraints · Herb.jl</title><meta name="title" content="Getting started with Constraints · Herb.jl"/><meta property="og:title" content="Getting started with Constraints · Herb.jl"/><meta property="twitter:title" content="Getting started with Constraints · Herb.jl"/><meta name="description" content="Documentation for Herb.jl."/><meta property="og:description" content="Documentation for Herb.jl."/><meta property="twitter:description" content="Documentation for Herb.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="Herb.jl logo"/></a><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><span class="tocitem">Basics</span><ul><li><a class="tocitem" href="../../">Herb.jl</a></li><li><a class="tocitem" href="../../install/">Installation Guide</a></li><li><a class="tocitem" href="../basic_getting_started/">Getting Started</a></li><li><a class="tocitem" href="../../concepts/">Herb Architecture and Core Concepts</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../getting_started_with_herb/">A more verbose getting started with Herb.jl</a></li><li><a class="tocitem" href="../defining_grammars/">Defining Grammars in Herb.jl</a></li><li><a class="tocitem" href="../advanced_search/">Advanced Search Procedures</a></li><li><a class="tocitem" href="../TopDown/">Top Down Iterator</a></li><li class="is-active"><a class="tocitem" href>Getting started with Constraints</a></li><li><a class="tocitem" href="../working_with_interpreters/">Working with custom interpreters</a></li><li><a class="tocitem" href="../abstract_syntax_trees/">Abstract Syntax Trees</a></li></ul></li><li><span class="tocitem">Sub-Modules</span><ul><li><a class="tocitem" href="../../HerbCore/">HerbCore.jl</a></li><li><a class="tocitem" href="../../HerbGrammar/">HerbGrammar.jl</a></li><li><a class="tocitem" href="../../HerbSpecification/">HerbSpecification.jl</a></li><li><a class="tocitem" href="../../HerbInterpret/">HerbInterpret.jl</a></li><li><a class="tocitem" href="../../HerbConstraints/">HerbConstraints.jl</a></li><li><a class="tocitem" href="../../HerbSearch/">HerbSearch.jl</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Getting started with Constraints</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Getting started with Constraints</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl/blob/main/docs/src/tutorials/getting_started_with_constraints.jl" title="View source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><style>
+    #documenter-page table {
+        display: table !important;
+        margin: 2rem auto !important;
+        border-top: 2pt solid rgba(0,0,0,0.2);
+        border-bottom: 2pt solid rgba(0,0,0,0.2);
+    }
+
+    #documenter-page pre, #documenter-page div {
+        margin-top: 1.4rem !important;
+        margin-bottom: 1.4rem !important;
+    }
+
+    .code-output {
+        padding: 0.7rem 0.5rem !important;
+    }
+
+    .admonition-body {
+        padding: 0em 1.25em !important;
+    }
+</style>
+
+<!-- PlutoStaticHTML.Begin -->
+<!--
+    # This information is used for caching.
+    [PlutoStaticHTML.State]
+    input_sha = "c414d5813d1e89547418b8875fcbab9216bfb067086cd79b127822d08dd93736"
+    julia_version = "1.11.3"
+-->
+
+<div class="markdown"><h1>Getting started with HerbConstraints</h1><p>When enumerating programs using a grammar, we will encounter many redundant programs. For example, <code>x</code>, <code>-(-x)</code> and <code>1 * x</code> are syntactically different programs, but they have the same semantics. Grammar constraints aim to speed up synthesis by eliminating such redundant programs and thereby reducing the size of the program space.</p></div>
+
+
+<div class="markdown"><h3>Setup</h3><p>For this tutorial, we need to import the following modules of the Herb.jl framework:</p><ul><li><p><code>HerbCore</code> for the necessary data structures, like <code>Hole</code>s and <code>RuleNode</code>s</p></li><li><p><code>HerbGrammar</code> to define the grammar</p></li><li><p><code>HerbConstraints</code> to define the constraints</p></li><li><p><code>HerbSearch</code> to execute a constrained enumeration</p></li></ul><p>We will also redefine the simple arithmetic grammar from the previous tutorial.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>using Herb</code></pre>
+
+
+<pre class='language-julia'><code class='language-julia'>grammar = @csgrammar begin
+    Int = 1
+    Int = x
+    Int = - Int
+    Int = Int + Int
+    Int = Int * Int
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-grammar">1: Int = 1
+2: Int = x
+3: Int = -Int
+4: Int = Int + Int
+5: Int = Int * Int
+</pre>
+
+
+<div class="markdown"><h3>Working with constraints</h3><p>To show the effects of constraints, we will first enumerate all programs without constraints (up to a maximum size of 3 AST nodes).</p><p>(To make sure the grammar doesn't have any constraints, we can clear the constraints using <code>clearconstraints!</code>. This is not needed at this point, but could come in handy if your REPL holds a reference to a constrained version of the grammar)</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    clearconstraints!(grammar)
+    iter_1 = BFSIterator(grammar, :Int, max_size=3)
+    
+    for program ∈ iter_1
+        println(rulenode2expr(program, grammar))
+    end
+    
+end</code></pre>
+
+
+
+<div class="markdown"><p>Upon inspection, we can already see some redundant programs, like <code>1 * 1</code> and <code>-(-1)</code>. To eliminate these redundant programs, we will set up some constraints that prevent these patterns from appearing. Then we will create another iterator to enumerate all programs that satisfy the defined grammar constraints.</p><p>To make the forbidden pattern constraint general, we will use a special type of rulenode: <code>VarNode(:A)</code>. This node matches with any subtree and can be used to forbid multiple forbidden patterns using a single constraint. For example, <code>Forbidden(RuleNode(minus, [RuleNode(minus, [VarNode(:A)])])))</code> forbids:</p><ul><li><p><code>-(-1)</code></p></li><li><p><code>-(-X)</code></p></li><li><p><code>-(-(1 + 1))</code></p></li><li><p><code>1 + -(-(1 + 1))</code></p></li><li><p>etc</p></li></ul></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    one = 1
+    x = 2
+    minus = 3
+    plus = 4
+    times = 5
+    
+    addconstraint!(grammar, Forbidden(RuleNode(times, [RuleNode(one), VarNode(:A)])))        # forbid 1*A
+    addconstraint!(grammar, Forbidden(RuleNode(minus, [RuleNode(minus, [VarNode(:A)])])))    # forbid -(-A)
+    
+    iter_2 = BFSIterator(grammar, :Int, max_size=3)
+    
+    for program ∈ iter_2
+        println(rulenode2expr(program, grammar))
+    end
+end</code></pre>
+
+
+
+<div class="markdown"><h3>Forbidden Constraint</h3><p>The <code>Forbidden</code> constraint forbids any subtree in the program that matches a given template tree. Such a template tree can consist of 3 node types:</p><ul><li><p><code>RuleNode(1)</code>. Matches exactly the given rule.</p></li><li><p><code>DomainRuleNode(BitVector((0, 0, 0, 1, 1)), children)</code>. Matches any rule in its bitvector domain. In this case, rule 4 and 5.</p></li><li><p><code>VarNode(:A)</code>. Matches any subtree. If another VarNode of the same name is used, the subtrees have to be the same.</p></li></ul></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    #this constraint forbids A+A and A*A
+    constraint_1 = Forbidden(DomainRuleNode(BitVector((0, 0, 0, 1, 1)), [VarNode(:A), VarNode(:A)]))
+    
+    # Without this constraint, we encounter 154 programs
+    clearconstraints!(grammar)
+    iter_3 = BFSIterator(grammar, :Int, max_size=5)
+    println(length(iter_3))
+    
+    # With this constraint, we encounter 106 programs
+    clearconstraints!(grammar)
+    addconstraint!(grammar, constraint_1)
+    iter_4 = BFSIterator(grammar, :Int, max_size=5)
+    println(length(iter_4))
+    
+end</code></pre>
+
+
+
+<div class="markdown"><h3>Contains Constraint</h3><p>The <code>Contains</code> constraint enforces that a given rule appears in the program tree at least once. </p><p>In the arithmetic grammar, this constraint can be used to ensure the input symbol <code>x</code> is used in the program. Otherwise, the program is just a constant.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    clearconstraints!(grammar)
+    addconstraint!(grammar, Contains(2)) #rule 2 should be used in the program
+    iter_5 = BFSIterator(grammar, :Int, max_size=3)
+    
+    for program ∈ iter_5
+        println(rulenode2expr(program, grammar))
+    end
+end</code></pre>
+
+
+
+<div class="markdown"><h3>Contains Subtree Constraint</h3><p>Similarly to the <code>Contains</code> constraint, the <code>ContainsSubtree</code> can be used to enforce a given template tree is used in the program at least once.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    clearconstraints!(grammar)
+    addconstraint!(grammar, ContainsSubtree(RuleNode(times, [RuleNode(x), RuleNode(x)]))) #x*x should be in the program tree
+    iter_6 = BFSIterator(grammar, :Int, max_size=4)
+    
+    for program ∈ iter_6
+        println(rulenode2expr(program, grammar))
+    end
+end</code></pre>
+
+
+
+<div class="markdown"><h3>Ordered Constraint</h3><p>The <code>Ordered</code> constraint enforces an <code>&lt;=</code> ordering on a provided list of variables. With this constraint, we can break symmetries based on commutativity. For example, <code>1+x</code> and <code>x+1</code> are semantically equivalent. By imposing an <code>Ordered</code> constraint, we can eliminate one of the symmetric variants.</p><p>To define an <code>Ordered</code> constraint, we need to provide it with a template tree including at least two differently named <code>VarNode</code>s. And additionally, an ordering of the variables in the tree.</p><p>In the upcoming example we will set up a template tree representing <code>a+b</code> and <code>a*b</code>. Then, we will impose an ordering <code>a&lt;=b</code> on all the subtrees that match the template.</p><p>The result is that our iterator skips the redundant programs <code>x+1</code> and <code>x*1</code>, as they are already represented by <code>1+x</code> and <code>1*x</code>.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    clearconstraints!(grammar)
+    
+    template_tree = DomainRuleNode(BitVector((0, 0, 0, 1, 1)), [VarNode(:a), VarNode(:b)])
+    order = [:a, :b]
+    
+    addconstraint!(grammar, Ordered(template_tree, order))
+    iter_7 = BFSIterator(grammar, :Int, max_size=3)
+    
+    for program ∈ iter_7
+        println(rulenode2expr(program, grammar))
+    end
+    
+end</code></pre>
+
+
+
+<div class="markdown"><h3>Forbidden Sequence Constraint</h3><p>The <code>ForbiddenSequence</code> constraints forbids a given sequence of rule nodes in a vertical path of the tree. </p><p>An optional second argument, <code>ignore_if</code>, can be used to overrule the constraint in case any of the rules on the <code>ignore_if</code> list are present. </p><p>Below we will define the constraint <code>ForbiddenSequence([plus, one], ignore_if=[times])</code>. It forbids an <code>1</code> after an <code>+</code> unless an <code>*</code> disrupts the sequence.</p><p>This constraint will <strong>forbid</strong> the following programs:</p><ul><li><p>x + 1</p></li><li><p>x + -1</p></li><li><p>x + -(-1)</p></li><li><p>x + (x + 1)</p></li><li><p>x * (x + 1)</p></li></ul><p>But it will <strong>allow</strong> the following program (as * disrupts the sequence):</p><ul><li><p>x + (x * 1)</p></li></ul></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    constraint_2 = ForbiddenSequence([plus, one], ignore_if=[times])
+    addconstraint!(grammar, constraint_2)
+    iter_8 = BFSIterator(grammar, :Int, max_size=3)
+    
+    for program ∈ iter_8
+        println(rulenode2expr(program, grammar))
+    end
+    
+end</code></pre>
+
+
+
+<div class="markdown"><h3>Custom Constraint</h3><p>To implement a new constraint, we need to define two structs: an <code>AbstractGrammarConstraint</code> and an <code>AbstractLocalConstraint</code>.</p><p>A <strong>grammar constraint</strong> is a high-level constraint on the grammar itself and does not refer to a location in the tree. For example, the <code>Forbidden</code> constraint is responsible for forbidding a template tree everywhere in the tree. To divide the work of constraint propagation, the grammar constraint will post several local constraints that are responsible for propagating the constraint at each particular location.</p><p>A <strong>local constraint</strong> is a rooted version of a grammar constraint. Each local constraint holds a <code>path</code> field that points to a location in the tree where this constraint applies.</p></div>
+
+
+<div class="markdown"><p>Suppose we want to implement a simple custom constraint that forbids a given <code>rule</code> twice in a row. </p><p>Each time a new AST node is added to a tree, the <code>on_new_node</code> function is called to notify that an unseen node has been added to the tree at path <code>path</code>. Our grammar constraint has the opportunity to react to this event. In this example, we will post a new local constraint at the new location using the <code>post!</code> function.</p><p>(Don't worry about the <code>HerbConstraints.</code> prefixes. Normally, constraints are defined within the HerbConstraints repository, so there is no need to specify the namespace)</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    """
+    Forbids the consecutive application of the specified rule.
+    For example, CustomConstraint(4) forbids the tree 4(1, 4(1, 1)) as it applies rule 4 twice in a row.
+    """
+    struct ForbidConsecutive &lt;: AbstractGrammarConstraint
+        rule::Int
+    end
+    
+    """
+    Post a local constraint on each new node that appears in the tree
+    """
+    function HerbConstraints.on_new_node(solver::Solver, constraint::ForbidConsecutive, path::Vector{Int})
+        HerbConstraints.post!(solver, LocalForbidConsecutive(path, constraint.rule))
+    end
+end</code></pre>
+
+
+
+<div class="markdown"><p>Next, we will define our local constraint. This constraint is responsible for propagating the constraint at a given path. The <code>propagate!</code> method can use several solver functions to manipulate the tree. The following <strong>tree manipulations</strong> can be used to remove rules from the domain of a hole at a given path:</p><ul><li><p><code>remove!(solver::Solver, path::Vector{Int}, rule_index::Int)</code></p></li><li><p><code>remove!(solver::Solver, path::Vector{Int}, rules::Vector{Int})</code></p></li><li><p><code>remove_all_but!(solver::Solver, path::Vector{Int}, new_domain::BitVector)</code></p></li><li><p><code>remove_above!(solver::Solver, path::Vector{Int}, rule_index::Int)</code></p></li><li><p><code>remove_below!(solver::Solver, path::Vector{Int}, rule_index::Int)</code></p></li><li><p><code>make_equal!(solver::Solver, node1::AbstractRuleNode, node2::AbstractRuleNode)</code> (a high level manipulation that requires <code>node1</code> and <code>node2</code> to be in the tree)</p></li></ul><p>In addition to tree manipulations, the following solver functions can be used to communicate new information to the solver:</p><ul><li><p><code>set_infeasible!(solver)</code>. If a propagator detects an inconsistency, the solver should be notified and cancel any other scheduled propagators.</p></li><li><p><code>deactivate!(solver, constraint)</code>.  If a constraint is satisfied, it should deactivate itself to prevent re-propagation.</p></li><li><p><code>post!(solver, constraint)</code>  A constraint is allowed to post new local constraints. This might be helpful if a constraint can be reduced to a smaller constraint.</p></li></ul><p>The solver manages all constraints and the program tree we propagate on. Applying tree manipulations might cause a chain reaction of other propagators, so the shape of the tree might update as we propagate. The get the latest information about the tree, we should use the following getter functions:</p><ul><li><p><code>get_tree(solver)</code> returns the root node of the current (partial) program tree</p></li><li><p><code>isfeasible(solver)</code> returns the a flag indicating if the solver is not violating any (other) constraints.</p></li><li><p><code>get_path(solver, node)</code> returns the path at which the node is located.</p></li><li><p><code>get_node_at_location(solver, path)</code> returns the node that is currently at the given path (be aware that this instance might be replaced by manipulations).</p></li><li><p><code>get_hole_at_location(solver, path)</code> same as get node at location, but asserts the node is a hole (domain size &gt;= 2).</p></li></ul><p>To get information about a node, we can use the following getter functions:</p><ul><li><p><code>isfilled(node)</code>. Returns true if the node is a <code>RuleNode</code> or has domain size 1.</p></li><li><p><code>get_rule(node)</code>. Get the rule of a filled node.</p></li><li><p><code>get_children(node)</code>. Get the children of a node.</p></li><li><p><code>node.domain[rule]</code>. Given the node is a hole, return true if <code>rule</code> is in the domain.</p></li></ul><p>Finally, another useful function for propagators is <code>pattern_match(node1, node2)</code>. This function compares two trees and returns a <code>PatternMatchResult</code> that indicates if the nodes match, and potentially indicate which holes need to be filled to complete the match.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    """
+    Forbids the consecutive application of the specified rule at path `path`.
+    """
+    struct LocalForbidConsecutive &lt;: AbstractLocalConstraint
+        path::Vector{Int}
+        rule::Int
+    end
+    
+    """
+    Propagates the constraints by preventing a consecutive application of the specified rule.
+    """
+    function HerbConstraints.propagate!(solver::Solver, constraint::LocalForbidConsecutive)
+        node = get_node_at_location(solver, constraint.path)
+        if isfilled(node)
+            if get_rule(node) == constraint.rule
+                #the specified rule is used, make sure the rule will not be used by any of the children
+                for (i, child) ∈ enumerate(get_children(node))
+                    if isfilled(child)
+                        if get_rule(child) == constraint.rule
+                            #the specified rule was used twice in a row, which is violating the constraint
+                            set_infeasible!(solver)
+                            return
+                        end
+                    elseif child.domain[constraint.rule]
+                        child_path = push!(copy(constraint.path), i)
+                        remove!(solver, child_path, constraint.rule) # remove the rule from the domain of the child
+                    end
+                end
+            end
+        elseif node.domain[constraint.rule]
+            #our node is a hole with the specified rule in its domain
+            #we will now check if any of the children already uses the specified rule
+            softfail = false
+            for (i, child) ∈ enumerate(get_children(node))
+                if isfilled(child)
+                    if get_rule(child) == constraint.rule
+                        #the child holds the specified rule, so the parent cannot have this rule
+                        remove!(solver, constraint.path, constraint.rule)
+                    end
+                elseif child.domain[constraint.rule]
+                    #the child is a hole and contains the specified node. since there are 2 holes involved, we will softfail.
+                    softfail = true
+                end
+            end
+            if softfail
+                #we cannot deactivate the constraint, because it needs to be repropagated
+                return
+            end
+        end
+    
+        #the constraint is satisfied and can be deactivated
+        HerbConstraints.deactivate!(solver, constraint)
+    end
+end</code></pre>
+
+
+
+<div class="markdown"><p>Posting a local constraint will trigger the initial propagation. To re-propagate, the constraint needs to be rescheduled for propagation.</p><p>Whenever the tree is manipulated, we will make a <code>shouldschedule</code> check to see if our constraint needs to be rescheduled for propagation based on the manipulation.</p><p>In our case, we want to repropagate if either:</p><ul><li><p>a tree manipulation occurred at the <code>constraint.path</code></p></li><li><p>a tree manipulation occurred at the child of the <code>constraint.path</code></p></li></ul></div>
+
+<pre class='language-julia'><code class='language-julia'>
+"""
+Gets called whenever an tree manipulation occurs at the given `path`.
+Returns true iff the `constraint` should be rescheduled for propagation.
+"""
+function HerbConstraints.shouldschedule(solver::Solver, constraint::LocalForbidConsecutive, path::Vector{Int})::Bool
+    return (path == constraint.path) || (path == constraint.path[1:end-1])
+end
+</code></pre>
+
+
+
+<div class="markdown"><p>With all the components implemented, we can do a constrained enumeration using our new <code>ForbidConsecutive</code> constraint.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    clearconstraints!(grammar)
+    
+    addconstraint!(grammar, ForbidConsecutive(minus))
+    addconstraint!(grammar, ForbidConsecutive(plus))
+    addconstraint!(grammar, ForbidConsecutive(times))
+    
+    iter = BFSIterator(grammar, :Int, max_size=6)
+    
+    for program ∈ iter
+        println(rulenode2expr(program, grammar))
+    end
+end</code></pre>
+
+
+<!-- PlutoStaticHTML.End --><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+    startOnLoad: true,
+    theme: "neutral"
+});
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../TopDown/">« Top Down Iterator</a><a class="docs-footer-nextpage" href="../working_with_interpreters/">Working with custom interpreters »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Tuesday 25 February 2025 13:17">Tuesday 25 February 2025</span>. Using Julia version 1.11.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
