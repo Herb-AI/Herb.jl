@@ -1,5 +1,11 @@
 using BenchmarkTools, Herb
 
+if PACKAGE_VERSION == v"0.1.0"
+    import Pkg
+    Pkg.add("HerbGrammar")
+    using HerbGrammar
+end
+
 const SUITE = BenchmarkGroup()
 
 SUITE["search"] = BenchmarkGroup()
