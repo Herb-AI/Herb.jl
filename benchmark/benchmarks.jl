@@ -1,6 +1,12 @@
 using BenchmarkTools, Herb
+using Pkg
 
 if PACKAGE_VERSION < v"0.4.1"
+    if PACKAGE_VERSION == v"0.3.0"
+        pkg"add HerbGrammar#bug/upper-compat-core HerbSearch"
+    else
+        pkg"add HerbGrammar HerbSearch"
+    end
     using HerbGrammar, HerbSearch
 end
 
