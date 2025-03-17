@@ -1,8 +1,6 @@
 using BenchmarkTools, Herb
 
 if PACKAGE_VERSION < v"0.4.1"
-    import Pkg
-    Pkg.add(["HerbGrammar", "HerbSearch"])
     using HerbGrammar, HerbSearch
 end
 
