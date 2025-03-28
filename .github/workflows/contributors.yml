@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
           
       - name: Run contributor action
-        uses: reubenj/contributors@v1.4.4
+        uses: github/contributors@v1.5.5
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           START_DATE: ""
