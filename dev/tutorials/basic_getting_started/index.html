@@ -26,7 +26,7 @@
     # This information is used for caching.
     [PlutoStaticHTML.State]
     input_sha = "d9b048146047e81a9a691abca98393a59bdf982bd36bb103f218ab321d17078a"
-    julia_version = "1.11.3"
+    julia_version = "1.11.4"
 -->
 
 <div class="markdown"><h1>Getting Started</h1><p>You can either paste this code into the Julia REPL or into a separate file, e.g. <code>get_started.jl</code>. If using a separate file you can execute using <code>julia get_started.jl</code> or <code>julia --project=. get_started.jl</code> depending on whether you installed Herb.jl globally or in a project.</p><p>To begin, we need to import <code>Herb</code>.</p></div>
@@ -65,16 +65,16 @@ end</code></pre>
 3: Number = x
 4: Number = Number + Number
 5: Number = Number * Number
-, SolverState(hole[Bool[1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 5))</pre>
+, SolverState(Hole[Bool[1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 5))</pre>
 
 <pre class='language-julia'><code class='language-julia'>solution, flag = synth(problem, iterator)</code></pre>
-<pre class="code-output documenter-example-output" id="var-flag">(4{3,4{1,3}}, optimal_program)</pre>
+<pre class="code-output documenter-example-output" id="var-flag">(4{4{1,3},3}, optimal_program)</pre>
 
 
 <div class="markdown"><p>There are various ways to adapt the search technique to your needs. Please have a look at the <a href="@ref"><code>synth</code></a> documentation.</p><p>Eventually, we want to test our solution on some other inputs using <code>HerbInterpret</code>. We transform our grammar <code>g</code> to a Julia expression with <code>grammar2symboltable(g)</code>, add our solution and the input, assigning the value <code>6</code> to the variable <code>x</code>.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>program = rulenode2expr(solution, g)</code></pre>
-<pre class="code-output documenter-example-output" id="var-program">:(x + (1 + x))</pre>
+<pre class="code-output documenter-example-output" id="var-program">:((1 + x) + x)</pre>
 
 <pre class='language-julia'><code class='language-julia'>output = execute_on_input(grammar2symboltable(g), program, Dict(:x =&gt; 6))  # should yield 2*6+1</code></pre>
 <pre class="code-output documenter-example-output" id="var-output">13</pre>
@@ -105,9 +105,9 @@ output = execute_on_input(grammar2symboltable(g), program, Dict(:x =&gt; 6))
 println(output)
 </code></pre></div>
 
-<!-- PlutoStaticHTML.End --><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+<!-- PlutoStaticHTML.End --><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 mermaid.initialize({
     startOnLoad: true,
     theme: "neutral"
 });
-</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../install/">« Installation Guide</a><a class="docs-footer-nextpage" href="../../concepts/">Herb Architecture and Core Concepts »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Thursday 27 February 2025 15:07">Thursday 27 February 2025</span>. Using Julia version 1.11.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../install/">« Installation Guide</a><a class="docs-footer-nextpage" href="../../concepts/">Herb Architecture and Core Concepts »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.9.0 on <span class="colophon-date" title="Friday 28 March 2025 15:11">Friday 28 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
