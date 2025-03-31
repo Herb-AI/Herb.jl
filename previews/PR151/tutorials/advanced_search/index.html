@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Advanced Search Procedures · Herb.jl</title><meta name="title" content="Advanced Search Procedures · Herb.jl"/><meta property="og:title" content="Advanced Search Procedures · Herb.jl"/><meta property="twitter:title" content="Advanced Search Procedures · Herb.jl"/><meta name="description" content="Documentation for Herb.jl."/><meta property="og:description" content="Documentation for Herb.jl."/><meta property="twitter:description" content="Documentation for Herb.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="Herb.jl logo"/></a><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><span class="tocitem">Basics</span><ul><li><a class="tocitem" href="../../">Herb.jl</a></li><li><a class="tocitem" href="../../install/">Installation Guide</a></li><li><a class="tocitem" href="../basic_getting_started/">Getting Started</a></li><li><a class="tocitem" href="../../concepts/">Herb Architecture and Core Concepts</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../getting_started_with_herb/">A more verbose getting started with Herb.jl</a></li><li><a class="tocitem" href="../defining_grammars/">Defining Grammars in Herb.jl</a></li><li class="is-active"><a class="tocitem" href>Advanced Search Procedures</a><ul class="internal"><li><a class="tocitem" href="#Parameters"><span>Parameters</span></a></li><li><a class="tocitem" href="#Top-down-search"><span>Top-down search</span></a></li><li><a class="tocitem" href="#Stochastic-search"><span>Stochastic search</span></a></li><li><a class="tocitem" href="#Genetic-Search"><span>Genetic Search</span></a></li></ul></li><li><a class="tocitem" href="../TopDown/">Top Down Iterator</a></li><li><a class="tocitem" href="../getting_started_with_constraints/">Getting started with Constraints</a></li><li><a class="tocitem" href="../working_with_interpreters/">Working with custom interpreters</a></li><li><a class="tocitem" href="../abstract_syntax_trees/">Abstract Syntax Trees</a></li></ul></li><li><span class="tocitem">Sub-Modules</span><ul><li><a class="tocitem" href="../../HerbCore/">HerbCore.jl</a></li><li><a class="tocitem" href="../../HerbGrammar/">HerbGrammar.jl</a></li><li><a class="tocitem" href="../../HerbSpecification/">HerbSpecification.jl</a></li><li><a class="tocitem" href="../../HerbInterpret/">HerbInterpret.jl</a></li><li><a class="tocitem" href="../../HerbConstraints/">HerbConstraints.jl</a></li><li><a class="tocitem" href="../../HerbSearch/">HerbSearch.jl</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Advanced Search Procedures</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Advanced Search Procedures</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl/blob/main/docs/src/tutorials/advanced_search.jl" title="View source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><style>
+    #documenter-page table {
+        display: table !important;
+        margin: 2rem auto !important;
+        border-top: 2pt solid rgba(0,0,0,0.2);
+        border-bottom: 2pt solid rgba(0,0,0,0.2);
+    }
+
+    #documenter-page pre, #documenter-page div {
+        margin-top: 1.4rem !important;
+        margin-bottom: 1.4rem !important;
+    }
+
+    .code-output {
+        padding: 0.7rem 0.5rem !important;
+    }
+
+    .admonition-body {
+        padding: 0em 1.25em !important;
+    }
+</style>
+
+<!-- PlutoStaticHTML.Begin -->
+<!--
+    # This information is used for caching.
+    [PlutoStaticHTML.State]
+    input_sha = "fb140a0cd458551110904e688cae9caaa711d1b7ac33fc6a3a54009e89dffff2"
+    julia_version = "1.11.4"
+-->
+
+<div class="markdown"><h1>Advanced Search Procedures in Herb.jl</h1><p><a href="">A more verbose getting started with Herb.jl</a> described the concept of a program space and showed how to search it with Herb.jl, using a simple breadth-first-search (BFS) iterator for the search.  This tutorial takes a closer look at advanced search procedures hat can be employed to find a solution program to a program synthesis problem. </p><p>More specifically, you will learn about</p><ul><li><p><strong>Parameters</strong> that can be specified and their effect on the search procedure.  </p></li><li><p><strong>Deterministic search methods</strong> BFS and DFS.</p></li><li><p><strong>Stochastic search methods</strong>, which introduce randomness to search the program space. We will look at Metropolis-Hastings, Very Large Scale Neighbourhood Search, Simulated Annealing and Genetic Search.</p></li></ul></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="markdown"><p>Let's import all the Herb modules that we will use throughout the tutorial.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>using Herb</code></pre>
+
+
+
+<div class="markdown"><p>We start with a simple grammar:.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>g_1 = @csgrammar begin
+    Number = |(1:2)
+    Number = x
+    Number = Number + Number
+    Number = Number * Number
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g_1">1: Number = 1
+2: Number = 2
+3: Number = x
+4: Number = Number + Number
+5: Number = Number * Number
+</pre>
+
+
+<div class="markdown"><p>Let's use the simple program <code>2x+1</code> as our problem and generate some input-output examples for the problem specification.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>problem_1 = Problem([IOExample(Dict(:x =&gt; x), 2x+1) for x ∈ 1:5])</code></pre>
+<pre class="code-output documenter-example-output" id="var-problem_1">Problem{Vector{IOExample{Int64, Int64}}}("", IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 3), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 7), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 9), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 11)])</pre>
+
+<h2 id="Parameters"><a class="docs-heading-anchor" href="#Parameters">Parameters</a><a id="Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Parameters" title="Permalink"></a></h2><div class="markdown">
+<p>Search procedures typically have some hyperparameters that you can configure.</p><h3><code>max_depth</code></h3><p><code>max_depth</code> controls the maximum depth of the program trees that are explored during the search, effectively limiting the size and complexity of the synthesized program. The parameter is configured as part of the iterator.</p><p>In the following example, we consider two different values for <code>max_depth</code>.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>iterator_1 = BFSIterator(g_1, :Number, max_depth=3)</code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_1">BFSIterator(GenericSolver(1: Number = 1
+2: Number = 2
+3: Number = x
+4: Number = Number + Number
+5: Number = Number * Number
+, SolverState(Hole[Bool[1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 3))</pre>
+
+<pre class='language-julia'><code class='language-julia'>iterator_2 = BFSIterator(g_1, :Number, max_depth=6)</code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_2">BFSIterator(GenericSolver(1: Number = 1
+2: Number = 2
+3: Number = x
+4: Number = Number + Number
+5: Number = Number * Number
+, SolverState(Hole[Bool[1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 6))</pre>
+
+
+<div class="markdown"><p>To see the effect <code>max_depth</code> has on the number of memory allocations made during the program synthesis process, we use the <code>@time</code> macro.  </p></div>
+
+
+<div class="markdown"><p>Solution for max_depth = 3:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>solution_1 = @time synth(problem_1, iterator_1)</code></pre>
+<pre class="code-output documenter-example-output" id="var-solution_1">(4{1,4{3,3}}, optimal_program)</pre>
+
+<pre class='language-julia'><code class='language-julia'>rulenode2expr(solution_1[1], g_1)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash195477">:(1 + (x + x))</pre>
+
+
+<div class="markdown"><p>Solution for max_depth = 6:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    solution_2 = @time synth(problem_1, iterator_2)
+    rulenode2expr(solution_2[1], g_1)
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-solution_2">:((1 + x) + x)</pre>
+
+
+<div class="markdown"><p>While increasing <code>max_depth</code> allows us to explore more complex and deeper program trees, which may lead to a better solution, it also requires more memory allocation and can increase the execution time. </p></div>
+
+
+<div class="markdown"><h3><code>max_enumerations</code></h3><p><code>max_enumerations</code> defines the maximum number of candidate programs that can be evaluated before the search is terminated. </p><p>Let's explore how many enumerations are necessary to solve our simple problem.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    solutions = []
+    times = []
+    nodes = []
+    iterations = []
+    for i in range(1, 50)
+        iterator = BFSIterator(g_1, :Number, max_depth=i)
+        solution = @timed synth(problem_1, iterator)
+        push!(times, solution.time)
+        push!(nodes, solution[1][1])
+        push!(solutions, rulenode2expr(solution[1][1], g_1))
+        push!(iterations, i)
+    end
+    pretty_table(HTML, [iterations nodes solutions times], header=["Iteration", "RuleNode", "Program", "Duration"])
+end</code></pre>
+<table><thead><tr class="header headerLastRow"><th style="text-align: right;">Iteration</th><th style="text-align: right;">RuleNode</th><th style="text-align: right;">Program</th><th style="text-align: right;">Duration</th></tr></thead><tbody><tr><td style="text-align: right;">1</td><td style="text-align: right;">3</td><td style="text-align: right;">x</td><td style="text-align: right;">0.00319977</td></tr><tr><td style="text-align: right;">2</td><td style="text-align: right;">4{3,2}</td><td style="text-align: right;">x + 2</td><td style="text-align: right;">0.000162683</td></tr><tr><td style="text-align: right;">3</td><td style="text-align: right;">4{1,4{3,3}}</td><td style="text-align: right;">1 + (x + x)</td><td style="text-align: right;">0.000333811</td></tr><tr><td style="text-align: right;">4</td><td style="text-align: right;">4{1,4{3,3}}</td><td style="text-align: right;">1 + (x + x)</td><td style="text-align: right;">0.000489291</td></tr><tr><td style="text-align: right;">5</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000551788</td></tr><tr><td style="text-align: right;">6</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000615927</td></tr><tr><td style="text-align: right;">7</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000603034</td></tr><tr><td style="text-align: right;">8</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000613903</td></tr><tr><td style="text-align: right;">9</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000611399</td></tr><tr><td style="text-align: right;">10</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000600699</td></tr><tr><td style="text-align: right;">11</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000623441</td></tr><tr><td style="text-align: right;">12</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000597683</td></tr><tr><td style="text-align: right;">13</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000608734</td></tr><tr><td style="text-align: right;">14</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000619073</td></tr><tr><td style="text-align: right;">15</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000606259</td></tr><tr><td style="text-align: right;">16</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000606911</td></tr><tr><td style="text-align: right;">17</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000604376</td></tr><tr><td style="text-align: right;">18</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.00059602</td></tr><tr><td style="text-align: right;">19</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000610718</td></tr><tr><td style="text-align: right;">20</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000597193</td></tr><tr><td style="text-align: right;">21</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000614115</td></tr><tr><td style="text-align: right;">22</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000607432</td></tr><tr><td style="text-align: right;">23</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.00059581</td></tr><tr><td style="text-align: right;">24</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000599597</td></tr><tr><td style="text-align: right;">25</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000597123</td></tr><tr><td style="text-align: right;">26</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000613553</td></tr><tr><td style="text-align: right;">27</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000613212</td></tr><tr><td style="text-align: right;">28</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000600799</td></tr><tr><td style="text-align: right;">29</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000602433</td></tr><tr><td style="text-align: right;">30</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000583988</td></tr><tr><td style="text-align: right;">31</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000610778</td></tr><tr><td style="text-align: right;">32</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000610097</td></tr><tr><td style="text-align: right;">33</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000598385</td></tr><tr><td style="text-align: right;">34</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000614575</td></tr><tr><td style="text-align: right;">35</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000589448</td></tr><tr><td style="text-align: right;">36</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000620356</td></tr><tr><td style="text-align: right;">37</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000605768</td></tr><tr><td style="text-align: right;">38</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000603394</td></tr><tr><td style="text-align: right;">39</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000612852</td></tr><tr><td style="text-align: right;">40</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000615387</td></tr><tr><td style="text-align: right;">41</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.00059589</td></tr><tr><td style="text-align: right;">42</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.00060661</td></tr><tr><td style="text-align: right;">43</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000599497</td></tr><tr><td style="text-align: right;">44</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000610908</td></tr><tr><td style="text-align: right;">45</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000611309</td></tr><tr><td style="text-align: right;">46</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.00059569</td></tr><tr><td style="text-align: right;">47</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000621008</td></tr><tr><td style="text-align: right;">48</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000612281</td></tr><tr><td style="text-align: right;">49</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000610668</td></tr><tr><td style="text-align: right;">50</td><td style="text-align: right;">4{4{1,3},3}</td><td style="text-align: right;">(1 + x) + x</td><td style="text-align: right;">0.000616729</td></tr></tbody></table>
+
+
+<div class="markdown"><p>At <code>i = 3</code>, we observe that an optimal program is found. Increasing the number of enumerations beyond that does not affect the solution or the number of memory allocations. </p></div>
+
+
+<div class="markdown"><h3><code>allow_evaluation_errors</code></h3><p>A final parameter we consider here is <code>allow_evaluation_errors</code>, which is <code>false</code> by default. When <code>true</code>, the search continues even if an exception occurs during the evaluation of a candidate program. This allows the search process to handle faulty candidate programs and explore other ones, instead of throwing an error and terminating prematurely.</p><p>We will use a new example to see the effect of <code>allow_evaluation_errors</code>. We begin defining a new simple grammar. We then create some input-output examples to specify the problem we want to solve. This time, we choose a problem that we cannot solve with the provided grammar. </p></div>
+
+<pre class='language-julia'><code class='language-julia'>g_2 = @csgrammar begin
+    Number = 1
+    List = []
+    Index = List[Number]
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g_2">1: Number = 1
+2: List = []
+3: Index = List[Number]
+</pre>
+
+<pre class='language-julia'><code class='language-julia'>problem_2 = Problem([IOExample(Dict{Symbol,Any}(), x) for x ∈ 1:5])</code></pre>
+<pre class="code-output documenter-example-output" id="var-problem_2">Problem{Vector{IOExample{Any, Int64}}}("", IOExample{Any, Int64}[IOExample{Any, Int64}(Dict{Symbol, Any}(), 1), IOExample{Any, Int64}(Dict{Symbol, Any}(), 2), IOExample{Any, Int64}(Dict{Symbol, Any}(), 3), IOExample{Any, Int64}(Dict{Symbol, Any}(), 4), IOExample{Any, Int64}(Dict{Symbol, Any}(), 5)])</pre>
+
+<pre class='language-julia'><code class='language-julia'>iterator_3 = BFSIterator(g_2, :Index, max_depth=2)</code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_3">BFSIterator(GenericSolver(1: Number = 1
+2: List = []
+3: Index = List[Number]
+, SolverState(3{2,1}, Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 2))</pre>
+
+<pre class='language-julia'><code class='language-julia'>Test.@test_throws HerbSearch.EvaluationError synth(problem_2, iterator_3)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash467858">Test Passed
+      Thrown: HerbSearch.EvaluationError</pre>
+
+
+<div class="markdown"><p>As expected, an exception occurs during the synthesis process. Now we try the same again, with <code>allow_evaluation_errors=true</code>.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>solution_4 = synth(problem_2, iterator_3, allow_evaluation_errors=true)</code></pre>
+<pre class="code-output documenter-example-output" id="var-solution_4">(3{2,1}, suboptimal_program)</pre>
+
+
+<div class="markdown"><p>"This time we find a solution, although a suboptimal one.</p></div>
+
+<h2 id="Top-down-search"><a class="docs-heading-anchor" href="#Top-down-search">Top-down search</a><a id="Top-down-search-1"></a><a class="docs-heading-anchor-permalink" href="#Top-down-search" title="Permalink"></a></h2><div class="markdown">
+<p>Herb.jl provides already implemented, ready-to-use search methods. The core building block of the search is the program iterator, which represents a walk through the program space. All program iterators share the top-level abstract type <code>ProgramIterator</code>. For more information on iterators and how to customize them, see <a href="https://herb-ai.github.io/Herb.jl/dev/tutorials/TopDown/">this tutorial</a>.</p><p>First, we explore two fundamental deterministic top-down search algorithms: <strong>breadth-first search (BFS)</strong> and <strong>depth-first search (DFS)</strong>. Both algorithms are implemented using the abstract type <code>TopDownIterator</code>, which can be customized through the functions </p><ul><li><p><code>priority_function</code></p></li><li><p><code>derivation_heuristic</code></p></li><li><p><code>hole_heuristic</code></p></li></ul></div>
+
+
+<div class="markdown"><p>First, we explore two fundamental deterministic top-down search algorithms: <strong>breadth-first search (BFS)</strong> and <strong>depth-first search (DFS)</strong>. Both algorithms are implemented using the abstract type <code>TopDownIterator</code>, which can be customized through the functions priority<em>function, derivation</em>heuristic, and hole_heuristic.</p><h3>Breadth-First Search</h3><p>The <code>BFSIterator</code> enumerates all possible programs at a given depth before progressing to the next level, ensuring that trees are explored in increasing order of size. This guarantees that smaller programs are evaluated first, and larger, more complex ones are considered only after all smaller ones have been processed.</p><p>To explore <code>BFSIterator</code>, we define another very simple grammar.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>g_3 = @csgrammar begin
+        Real = 1 | 2
+        Real = Real * Real
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g_3">1: Real = 1
+2: Real = 2
+3: Real = Real * Real
+</pre>
+
+
+<div class="markdown"><p>Next, we define a <code>BFSIterator</code> with a <code>max_depth</code> of 2 and a <code>max_size</code> of infinite (which we approximate with the maximum value of <code>Int</code>), and a starting symbol of type <code>Real</code>. By default, <code>BFSIterator</code> uses the heuristic 'left-most first', i.e., the left-most child in the tree is always explored first.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>iterator_bfs = BFSIterator(g_3, :Real, max_depth=2, max_size=typemax(Int))</code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_bfs">BFSIterator(GenericSolver(1: Real = 1
+2: Real = 2
+3: Real = Real * Real
+, SolverState(Hole[Bool[1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 2))</pre>
+
+
+<div class="markdown"><p>To see all possible solution programs the iterator explores, we use <code>collect</code>. It returs a list of the programs, ordered by increasing size and depth. </p></div>
+
+<pre class='language-julia'><code class='language-julia'>programs_bfs = collect(iterator_bfs)</code></pre>
+<pre class="code-output documenter-example-output" id="var-programs_bfs">6-element Vector{RuleNode}:
+ 1
+ 2
+ 3{1,1}
+ 3{1,2}
+ 3{2,1}
+ 3{2,2}</pre>
+
+
+<div class="markdown"><p>Let's verify that the iterator returns the programs we expect (keep in mind we use a leftmost-first heuristic).</p></div>
+
+<pre class='language-julia'><code class='language-julia'>answer_programs = [
+    RuleNode(1),
+    RuleNode(2),
+    RuleNode(3, [RuleNode(1), RuleNode(1)]),
+    RuleNode(3, [RuleNode(1), RuleNode(2)]),
+    RuleNode(3, [RuleNode(2), RuleNode(1)]),
+    RuleNode(3, [RuleNode(2), RuleNode(2)])
+]</code></pre>
+<pre class="code-output documenter-example-output" id="var-answer_programs">6-element Vector{RuleNode}:
+ 1
+ 2
+ 3{1,1}
+ 3{1,2}
+ 3{2,1}
+ 3{2,2}</pre>
+
+<pre class='language-julia'><code class='language-julia'>rulenode_programs = [rulenode2expr(r, g_3) for r in answer_programs]</code></pre>
+<pre class="code-output documenter-example-output" id="var-rulenode_programs">6-element Vector{Any}:
+ 1
+ 2
+  :(1 * 1)
+  :(1 * 2)
+  :(2 * 1)
+  :(2 * 2)</pre>
+
+<pre class='language-julia'><code class='language-julia'>found_all_programs = all(p ∈ programs_bfs for p ∈ answer_programs)</code></pre>
+<pre class="code-output documenter-example-output" id="var-found_all_programs">true</pre>
+
+
+<div class="markdown"><h3>Depth-First Search</h3><p>The <code>DFSIterator</code> explores one branch of the search tree at a time, fully traversing it unitl a correct program is found or the specified <code>max_depth</code> is reached. Only after completing the current branch, it proceeds to the next branch.</p><p>As before, we <code>collect</code> the candidate programs using the same grammar, but a <code>DFSIterator</code>. </p></div>
+
+<pre class='language-julia'><code class='language-julia'>iterator_dfs = DFSIterator(g_3, :Real, max_depth=2, max_size=typemax(Int))</code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_dfs">DFSIterator(GenericSolver(1: Real = 1
+2: Real = 2
+3: Real = Real * Real
+, SolverState(Hole[Bool[1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 2))</pre>
+
+<pre class='language-julia'><code class='language-julia'>programs_dfs = collect(iterator_dfs)</code></pre>
+<pre class="code-output documenter-example-output" id="var-programs_dfs">6-element Vector{RuleNode}:
+ 1
+ 3{1,1}
+ 3{1,2}
+ 3{2,1}
+ 3{2,2}
+ 2</pre>
+
+
+<div class="markdown"><p><code>DFSIterator</code> also uses by default a <strong>leftmost-first</strong> heuristic. If we want to use a <strong>rightmost-first</strong> heuristic instead, we can create our own iterator <code>DFSIteratorRightmost</code> as a sub-type of <code>TopDownIterator</code>, using the <code>@programiterator</code> macro. Then we implement the functions <code>priority_function</code> and <code>hole_heuristic</code>. Also see the tutorial <a href="https://herb-ai.github.io/Herb.jl/dev/tutorials/TopDown/">Top Down Iterator</a> for how to build iterators is Herb.jl. </p></div>
+
+<pre class='language-julia'><code class='language-julia'>@programiterator DFSIteratorRightmost() &lt;: TopDownIterator</code></pre>
+<pre class="code-output documenter-example-output" id="var-DFSIteratorRightmost">DFSIteratorRightmost</pre>
+
+
+<div class="markdown"><p>By default, <code>priority_function</code> for a <code>TopDownIterator</code> is that of a BFS iterator. Hence, we need to provide a new implementation. </p></div>
+
+<pre class='language-julia'><code class='language-julia'>function priority_function(
+    ::DFSIteratorRightmost, 
+    ::AbstractGrammar, 
+    ::AbstractRuleNode, 
+    parent_value::Union{Real, Tuple{Vararg{Real}}},
+    isrequeued::Bool
+)
+    if isrequeued
+        return parent_value;
+    end
+    return parent_value - 1;
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-priority_function">priority_function (generic function with 1 method)</pre>
+
+
+<div class="markdown"><p>Next, we need to implement the <code>hole_heuristic</code> to be rightmost-first.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>function hole_heuristic(::DFSIteratorRightmost, node::AbstractRuleNode, max_depth::Int)::Union{ExpandFailureReason, HoleReference}
+    return heuristic_rightmost(node, max_depth);
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-hole_heuristic">hole_heuristic (generic function with 1 method)</pre>
+
+<pre class='language-julia'><code class='language-julia'>iteratordfs_rightmost = DFSIteratorRightmost(g_3, :Real, max_depth=2, max_size=typemax(Int))</code></pre>
+<pre class="code-output documenter-example-output" id="var-iteratordfs_rightmost">DFSIteratorRightmost(GenericSolver(1: Real = 1
+2: Real = 2
+3: Real = Real * Real
+, SolverState(Hole[Bool[1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 2))</pre>
+
+<pre class='language-julia'><code class='language-julia'>programs_dfs_rightmost = collect(iteratordfs_rightmost)</code></pre>
+<pre class="code-output documenter-example-output" id="var-programs_dfs_rightmost">6-element Vector{RuleNode}:
+ 1
+ 2
+ 3{1,1}
+ 3{1,2}
+ 3{2,1}
+ 3{2,2}</pre>
+
+
+<div class="markdown"><p>We observe that the order of programs has changed. We can also test if both DFS iterators return the same programs:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>Set(programs_dfs)==Set(programs_dfs_rightmost)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash121764">true</pre>
+
+<h2 id="Stochastic-search"><a class="docs-heading-anchor" href="#Stochastic-search">Stochastic search</a><a id="Stochastic-search-1"></a><a class="docs-heading-anchor-permalink" href="#Stochastic-search" title="Permalink"></a></h2><div class="markdown">
+<p>While deterministic search methods explore the search space in a predictable way, stochastic ones introduce randomness to allow for more flexibility.</p><p>In this section, we will look at the stochastic search algorithms: Metropolis-Hastings (MH), Very Large Scale Neighbourhood Search (VLSNS), and Simulated Annealing (SA). In Herb.jl, all of these search methodsthe share a common supertype <code>StochasticSearchIterator</code>, which defines the following fields</p><ul><li><p><code>examples</code></p></li><li><p><code>cost_function</code></p></li><li><p><code>initial_temperature</code></p></li><li><p><code>evaluation_function</code>.</p></li></ul><p>They are customized by overriding the functions <code>neighbourhood</code>, <code>propose</code>, <code>accept</code> and <code>temperature</code> as required.</p><p>We start with a simple grammar and a helper function to create the input-output examples for the problem we want to solve.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>g_4 = @csgrammar begin
+    X = |(1:5)
+    X = X * X
+    X = X + X
+    X = X - X
+    X = x
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g_4">1: X = 1
+2: X = 2
+3: X = 3
+4: X = 4
+5: X = 5
+6: X = X * X
+7: X = X + X
+8: X = X - X
+9: X = x
+</pre>
+
+<pre class='language-julia'><code class='language-julia'>function create_problem(f, range=20)
+    examples = [IOExample(Dict(:x =&gt; x), f(x)) for x ∈ 1:range]
+    return Problem(examples), examples
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-create_problem">create_problem (generic function with 2 methods)</pre>
+
+
+<div class="markdown"><p>Throughout the stochastic search examples, we will use mean-squared-error as cost function. The cost function helps to guide the search by evaluating how well a candidate program solves the given task. This is used to decide whether a proposed program should be accepted or rejected.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>cost_function = mean_squared_error</code></pre>
+<pre class="code-output documenter-example-output" id="var-cost_function">mean_squared_error (generic function with 1 method)</pre>
+
+
+<div class="markdown"><h3>Metropolis-Hastings</h3><p>Metropolis-Hastings (MH) is a method to produce samples from a distribution that may otherwise be difficult to sample. In the context of program synthesis, we sample from a distribution of programs defined by the grammar. </p><p>For more information on MH, see for example <a href="https://stephens999.github.io/fiveMinuteStats/MH_intro.html">this webpage</a>.</p><p>To illustrate MH, we use a simple arithmetic example.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>e_mh = x -&gt; x * x + 4</code></pre>
+<pre class="code-output documenter-example-output" id="var-e_mh">#9 (generic function with 1 method)</pre>
+
+<pre class='language-julia'><code class='language-julia'>problem_mh, examples_mh = create_problem(e_mh)</code></pre>
+<pre class="code-output documenter-example-output" id="var-examples_mh">(Problem{Vector{IOExample{Int64, Int64}}}("", IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 8), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 13), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 20), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 29), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 40), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 53), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 68), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 85), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 104), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 125), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 148), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 173), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 200), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 229), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 260), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 293), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 328), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 365), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 404)]), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 8), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 13), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 20), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 29), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 40), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 53), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 68), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 85), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 104), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 125), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 148), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 173), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 200), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 229), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 260), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 293), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 328), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 365), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 404)])</pre>
+
+
+<div class="markdown"><p>Run the following code block to define the iterator and perform the program synthesis multiple times. Since the search process is stochastic, you will likely see different solution programs with each run.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    rules = []
+    programs = []
+    iters = []
+    for i in range(1, 3)
+        iterator_mh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth=3) 
+        program_mh = synth(problem_mh, iterator_mh)
+        push!(rules, program_mh[1])
+        push!(programs, rulenode2expr(program_mh[1], g_4))
+        push!(iters, i)
+    end
+    pretty_table(HTML, [iters rules programs], header=["Run", "RuleNode", "Program"])
+end</code></pre>
+<table><thead><tr class="header headerLastRow"><th style="text-align: right;">Run</th><th style="text-align: right;">RuleNode</th><th style="text-align: right;">Program</th></tr></thead><tbody><tr><td style="text-align: right;">1</td><td style="text-align: right;">7{6{2,2},6{9,9}}</td><td style="text-align: right;">2 * 2 + x * x</td></tr><tr><td style="text-align: right;">2</td><td style="text-align: right;">8{6{9,9},8{1,5}}</td><td style="text-align: right;">x * x - (1 - 5)</td></tr><tr><td style="text-align: right;">3</td><td style="text-align: right;">8{6{9,9},8{1,5}}</td><td style="text-align: right;">x * x - (1 - 5)</td></tr></tbody></table>
+
+
+<div class="markdown"><h3>Very Large Scale Neighbourhood Search</h3><p>The second stochastic search method we consider is Very Large Scale Neighbourhood Search (VLSN). In each iteration, the algorithm searches the neighbourhood of the current candidate program for a local optimum, aiming to find a better candidate solution.</p><p>For more information, see <a href="https://backend.orbit.dtu.dk/ws/portalfiles/portal/5293785/Pisinger.pdf">this article</a>.</p><p>Given the same grammar as before, we can try it with some simple examples.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>e_vlsn = x -&gt; 10</code></pre>
+<pre class="code-output documenter-example-output" id="var-e_vlsn">#11 (generic function with 1 method)</pre>
+
+<pre class='language-julia'><code class='language-julia'>problem_vlsn1, examples_vlsn1 = create_problem(e_vlsn)</code></pre>
+<pre class="code-output documenter-example-output" id="var-examples_vlsn1">(Problem{Vector{IOExample{Int64, Int64}}}("", IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 10)]), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 10)])</pre>
+
+<pre class='language-julia'><code class='language-julia'>iterator_vlsn1 = VLSNSearchIterator(g_4, :X, examples_vlsn1, cost_function, max_depth=2) </code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_vlsn1">VLSNSearchIterator(GenericSolver(1: X = 1
+2: X = 2
+3: X = 3
+4: X = 4
+5: X = 5
+6: X = X * X
+7: X = X + X
+8: X = X - X
+9: X = x
+, SolverState(Hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 2), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 10)], mean_squared_error, 2, 1, execute_on_input)</pre>
+
+<pre class='language-julia'><code class='language-julia'>program_vlsn1 = synth(problem_vlsn1, iterator_vlsn1)</code></pre>
+<pre class="code-output documenter-example-output" id="var-program_vlsn1">(6{2,5}, optimal_program)</pre>
+
+<pre class='language-julia'><code class='language-julia'>e_vlsn2 = x -&gt; x</code></pre>
+<pre class="code-output documenter-example-output" id="var-e_vlsn2">#13 (generic function with 1 method)</pre>
+
+<pre class='language-julia'><code class='language-julia'>problem_vlsn2, examples_vlsn2 = create_problem(e_vlsn2)</code></pre>
+<pre class="code-output documenter-example-output" id="var-examples_vlsn2">(Problem{Vector{IOExample{Int64, Int64}}}("", IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 1), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 2), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 3), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 4), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 6), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 7), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 8), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 9), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 11), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 12), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 13), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 14), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 15), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 16), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 17), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 18), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 19), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 20)]), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 1), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 2), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 3), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 4), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 6), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 7), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 8), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 9), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 11), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 12), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 13), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 14), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 15), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 16), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 17), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 18), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 19), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 20)])</pre>
+
+<pre class='language-julia'><code class='language-julia'>iterator_vlsn2 = VLSNSearchIterator(g_4, :X, examples_vlsn2, cost_function, max_depth=1) </code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_vlsn2">VLSNSearchIterator(GenericSolver(1: X = 1
+2: X = 2
+3: X = 3
+4: X = 4
+5: X = 5
+6: X = X * X
+7: X = X + X
+8: X = X - X
+9: X = x
+, SolverState(Hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 1), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 1), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 2), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 3), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 4), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 6), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 7), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 8), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 9), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 10), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 11), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 12), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 13), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 14), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 15), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 16), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 17), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 18), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 19), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 20)], mean_squared_error, 2, 1, execute_on_input)</pre>
+
+<pre class='language-julia'><code class='language-julia'>program_vlsn2 = synth(problem_vlsn2, iterator_vlsn2)</code></pre>
+<pre class="code-output documenter-example-output" id="var-program_vlsn2">(9, optimal_program)</pre>
+
+
+<div class="markdown"><h3>Simulated Annealing</h3><p>Simulated Annealing (SA) explores smaller, incremental changes to the candidate program in each iteration, gradually refining the solution. It is a variation of the hill-climbing algorithm: Instead of always selecting the best move, SA picks a random move. If the move improves the solution (i.e., the candidate program), it is accepted.</p><p>Occasionally, SA will accept a move that worsens the solution. This allows the algorithm to escape local optima and explore more of the solution space. However, this strategy follows a cooling (annealing) schedule: at the beginning (high temperature), the algorithm explores more broadly and is more likely to accept worse solutions. As the temperature decreases, it becomes more selective, accepting worse solutions less often.</p><p>For more information, see <a href="https://www.cs.cmu.edu/afs/cs.cmu.edu/project/learn-43/lib/photoz/.g/web/glossary/anneal.html">this page</a>.</p></div>
+
+
+<div class="markdown"><p>We use the same example as for MH. SA additionally has the option to specify the <code>initial_temperature</code> for the annealing (default <code>initial_temperature=1</code>). Let's see what effect changing the temperature from 1 to 2 has on the solution program.   </p></div>
+
+<pre class='language-julia'><code class='language-julia'>problem_sa, examples_sa = create_problem(e_mh)</code></pre>
+<pre class="code-output documenter-example-output" id="var-examples_sa">(Problem{Vector{IOExample{Int64, Int64}}}("", IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 8), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 13), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 20), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 29), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 40), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 53), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 68), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 85), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 104), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 125), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 148), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 173), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 200), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 229), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 260), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 293), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 328), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 365), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 404)]), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 8), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 13), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 20), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 29), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 40), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 53), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 68), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 85), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 104), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 125), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 148), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 173), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 200), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 229), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 260), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 293), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 328), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 365), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 404)])</pre>
+
+<pre class='language-julia'><code class='language-julia'>initial_temperature1 = 1</code></pre>
+<pre class="code-output documenter-example-output" id="var-initial_temperature1">1</pre>
+
+<pre class='language-julia'><code class='language-julia'>iterator_sa1 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature1) </code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_sa1">SASearchIterator(GenericSolver(1: X = 1
+2: X = 2
+3: X = 3
+4: X = 4
+5: X = 5
+6: X = X * X
+7: X = X + X
+8: X = X - X
+9: X = x
+, SolverState(Hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 3), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 8), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 13), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 20), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 29), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 40), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 53), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 68), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 85), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 104), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 125), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 148), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 173), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 200), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 229), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 260), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 293), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 328), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 365), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 404)], mean_squared_error, 1, 0.99, execute_on_input)</pre>
+
+<pre class='language-julia'><code class='language-julia'>program_sa1 = synth(problem_sa, iterator_sa1)</code></pre>
+<pre class="code-output documenter-example-output" id="var-program_sa1">(7{6{9,9},4}, optimal_program)</pre>
+
+<pre class='language-julia'><code class='language-julia'>initial_temperature2 = 2</code></pre>
+<pre class="code-output documenter-example-output" id="var-initial_temperature2">2</pre>
+
+<pre class='language-julia'><code class='language-julia'>iterator_sa2 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature2) </code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_sa2">SASearchIterator(GenericSolver(1: X = 1
+2: X = 2
+3: X = 3
+4: X = 4
+5: X = 5
+6: X = X * X
+7: X = X + X
+8: X = X - X
+9: X = x
+, SolverState(Hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 3), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 8), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 13), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 20), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 29), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 40), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 53), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 68), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 85), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 104), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 125), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 148), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 173), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 200), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 229), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 260), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 293), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 328), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 365), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 404)], mean_squared_error, 2, 0.99, execute_on_input)</pre>
+
+<h2 id="Genetic-Search"><a class="docs-heading-anchor" href="#Genetic-Search">Genetic Search</a><a id="Genetic-Search-1"></a><a class="docs-heading-anchor-permalink" href="#Genetic-Search" title="Permalink"></a></h2><div class="markdown">
+<p>Genetic search is a type of evolutionary algorithm, which simulates the process of natural selection. It evolves a population of candidate programs through operations like mutation, crossover (recombination), and selection. Then, the fitness of each program is assessed (i.e., how well it satisfies the given specifications). Only the 'fittest' programs are selected for the next generation, thus gradually refining the population of candidate programs.</p><p>For more information, see <a href="https://www.geeksforgeeks.org/genetic-algorithms/">here</a>.</p><p>We show the example of finding a lambda function. Try varying the parameters of the genetic search to see what happens.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>e_gs = x -&gt; 3 * x * x + (x + 2)</code></pre>
+<pre class="code-output documenter-example-output" id="var-e_gs">#15 (generic function with 1 method)</pre>
+
+<pre class='language-julia'><code class='language-julia'>problem_gs, examples_gs = create_problem(e_gs)</code></pre>
+<pre class="code-output documenter-example-output" id="var-examples_gs">(Problem{Vector{IOExample{Int64, Int64}}}("", IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 6), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 16), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 32), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 54), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 82), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 116), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 156), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 202), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 254), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 312), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 376), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 446), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 522), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 604), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 692), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 786), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 886), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 992), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 1104), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 1222)]), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 6), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 16), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 32), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 54), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 82), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 116), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 156), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 202), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 254), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 312), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 376), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 446), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 522), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 604), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 692), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 786), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 886), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 992), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 1104), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 1222)])</pre>
+
+<pre class='language-julia'><code class='language-julia'>iterator_gs = GeneticSearchIterator(g_4, :X, examples_gs, population_size = 10, mutation_probability = 0.8, maximum_initial_population_depth = 3) </code></pre>
+<pre class="code-output documenter-example-output" id="var-iterator_gs">GeneticSearchIterator(GenericSolver(1: X = 1
+2: X = 2
+3: X = 3
+4: X = 4
+5: X = 5
+6: X = X * X
+7: X = X + X
+8: X = X - X
+9: X = x
+, SolverState(Hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 9223372036854775807), IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 6), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 16), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 32), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 54), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 82), IOExample{Int64, Int64}(Dict(:x =&gt; 6), 116), IOExample{Int64, Int64}(Dict(:x =&gt; 7), 156), IOExample{Int64, Int64}(Dict(:x =&gt; 8), 202), IOExample{Int64, Int64}(Dict(:x =&gt; 9), 254), IOExample{Int64, Int64}(Dict(:x =&gt; 10), 312), IOExample{Int64, Int64}(Dict(:x =&gt; 11), 376), IOExample{Int64, Int64}(Dict(:x =&gt; 12), 446), IOExample{Int64, Int64}(Dict(:x =&gt; 13), 522), IOExample{Int64, Int64}(Dict(:x =&gt; 14), 604), IOExample{Int64, Int64}(Dict(:x =&gt; 15), 692), IOExample{Int64, Int64}(Dict(:x =&gt; 16), 786), IOExample{Int64, Int64}(Dict(:x =&gt; 17), 886), IOExample{Int64, Int64}(Dict(:x =&gt; 18), 992), IOExample{Int64, Int64}(Dict(:x =&gt; 19), 1104), IOExample{Int64, Int64}(Dict(:x =&gt; 20), 1222)], execute_on_input, 10, 0.8, 3)</pre>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    program_gs, error_gs = synth(problem_gs, iterator_gs)
+    rulenode2expr(program_gs, g_4)
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-program_gs">:(((x + ((4 - 3) * 2 + x * x)) + x * x) + 1 * (x * x))</pre>
+
+<!-- PlutoStaticHTML.End --><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+    startOnLoad: true,
+    theme: "neutral"
+});
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../defining_grammars/">« Defining Grammars in Herb.jl</a><a class="docs-footer-nextpage" href="../TopDown/">Top Down Iterator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.10.0 on <span class="colophon-date" title="Monday 31 March 2025 07:52">Monday 31 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
