@@ -14,7 +14,7 @@ If you want to run the documentation locally run `julia --project=. make.jl` fro
 Once built successfully, the documentation is generated in the directory `docs/build`. You can preview it by either opening `docs/build/index.html` in a browser,
 or by using `LiveServer`:
 ```
-julia --project=. -e 'using LiveServer; serve(dir="build")'  
+julia --project=. -e 'using Pkg; Pkg.add("LiveServer"); using LiveServer; serve(dir="build")'  
 ```
 The documentation will be available at http://localhost:8000.
 
