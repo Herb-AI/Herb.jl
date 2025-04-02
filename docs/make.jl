@@ -56,7 +56,7 @@ makedocs(
 
 deploydocs(;
 	repo = "github.com/Herb-AI/Herb.jl.git",
-	devbranch = "documentation",
+	devbranch = "master",
 	# devurl="dev",
 	push_preview = true,
 )
