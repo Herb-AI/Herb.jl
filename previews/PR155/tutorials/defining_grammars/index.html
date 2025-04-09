@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Defining Grammars in Herb.jl · Herb.jl</title><meta name="title" content="Defining Grammars in Herb.jl · Herb.jl"/><meta property="og:title" content="Defining Grammars in Herb.jl · Herb.jl"/><meta property="twitter:title" content="Defining Grammars in Herb.jl · Herb.jl"/><meta name="description" content="Documentation for Herb.jl."/><meta property="og:description" content="Documentation for Herb.jl."/><meta property="twitter:description" content="Documentation for Herb.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><span class="tocitem">Basics</span><ul><li><a class="tocitem" href="../../">Herb.jl</a></li><li><a class="tocitem" href="../../install/">Installation Guide</a></li><li><a class="tocitem" href="../../get_started/">Getting Started</a></li><li><a class="tocitem" href="../architecture_and_core_concepts/">Architecture and core concepts</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../getting_started_with_herb/">A more verbose getting started with Herb.jl</a></li><li class="is-active"><a class="tocitem" href>Defining Grammars in Herb.jl</a><ul class="internal"><li><a class="tocitem" href="#Context-sensitive-grammars"><span>Context-sensitive grammars</span></a></li><li><a class="tocitem" href="#File-writing"><span>File writing</span></a></li></ul></li><li><a class="tocitem" href="../advanced_search/">Advanced Search Procedures</a></li><li><a class="tocitem" href="../TopDown/">Top Down Iterator</a></li><li><a class="tocitem" href="../getting_started_with_constraints/">Getting started with Constraints</a></li><li><a class="tocitem" href="../working_with_interpreters/">Working with custom interpreters</a></li><li><a class="tocitem" href="../abstract_syntax_trees/">Abstract Syntax Trees</a></li></ul></li><li><span class="tocitem">Sub-Modules</span><ul><li><a class="tocitem" href="../../HerbCore/">HerbCore.jl</a></li><li><a class="tocitem" href="../../HerbGrammar/">HerbGrammar.jl</a></li><li><a class="tocitem" href="../../HerbSpecification/">HerbSpecification.jl</a></li><li><a class="tocitem" href="../../HerbInterpret/">HerbInterpret.jl</a></li><li><a class="tocitem" href="../../HerbConstraints/">HerbConstraints.jl</a></li><li><a class="tocitem" href="../../HerbSearch/">HerbSearch.jl</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Defining Grammars in Herb.jl</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Defining Grammars in Herb.jl</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl/blob/main/docs/src/tutorials/defining_grammars.jl" title="View source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><style>
+    #documenter-page table {
+        display: table !important;
+        margin: 2rem auto !important;
+        border-top: 2pt solid rgba(0,0,0,0.2);
+        border-bottom: 2pt solid rgba(0,0,0,0.2);
+    }
+
+    #documenter-page pre, #documenter-page div {
+        margin-top: 1.4rem !important;
+        margin-bottom: 1.4rem !important;
+    }
+
+    .code-output {
+        padding: 0.7rem 0.5rem !important;
+    }
+
+    .admonition-body {
+        padding: 0em 1.25em !important;
+    }
+</style>
+
+<!-- PlutoStaticHTML.Begin -->
+<!--
+    # This information is used for caching.
+    [PlutoStaticHTML.State]
+    input_sha = "7868f2c26b2d38ca9f3625fd86875833093e76d5168054358b9c7a41993c9e14"
+    julia_version = "1.11.4"
+-->
+
+<div class="markdown"><h1>Defining Grammars in Herb.jl using HerbGrammar</h1><p>The program space in Herb.jl is defined using a grammar.  This notebook demonstrates how such a grammar can be created.  There are multiple kinds of grammars, but they can all be defined in a very similar way.</p></div>
+
+
+<div class="markdown"><h3>Setup</h3><p>First, we import the necessary Herb packages.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>using Herb</code></pre>
+
+
+
+<div class="markdown"><h3>Creating a simple grammar</h3><p>This cell contains a very simple arithmetic grammar.  The grammar is defined using the <code>@csgrammar</code> macro.  This macro converts the grammar definition in the form of a Julia expression into Herb's internal grammar representation.  Macro's are executed during compilation. If you want to load a grammar during execution, have a look at the <code>HerbGrammar.expr2csgrammar</code> function.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>g₁ = HerbGrammar.@csgrammar begin
+    Int = 1
+    Int = 2
+    Int = 3
+    Int = Int * Int
+    Int = Int + Int
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g₁">1: Int = 1
+2: Int = 2
+3: Int = 3
+4: Int = Int * Int
+5: Int = Int + Int
+</pre>
+
+
+<div class="markdown"><p>Defining every integer one-by-one can be quite tedious. Therefore, it is also possible to use the following syntax that makes use of a Julia iterator:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>g₂ = HerbGrammar.@csgrammar begin
+    Int = |(0:9)
+    Int = Int * Int
+    Int = Int + Int
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g₂">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int * Int
+12: Int = Int + Int
+</pre>
+
+
+<div class="markdown"><p>You can do the same with lists:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>g₃ = HerbGrammar.@csgrammar begin
+    Int = |([0, 2, 4, 6, 8])
+    Int = Int * Int
+    Int = Int + Int
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g₃">1: Int = 0
+2: Int = 2
+3: Int = 4
+4: Int = 6
+5: Int = 8
+6: Int = Int * Int
+7: Int = Int + Int
+</pre>
+
+
+<div class="markdown"><p>Variables can also be added to the grammar by just using the variable name:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>g₄ = HerbGrammar.@csgrammar begin
+    Int = |(0:9)
+    Int = Int * Int
+    Int = Int + Int
+    Int = x
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g₄">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int * Int
+12: Int = Int + Int
+13: Int = x
+</pre>
+
+
+<div class="markdown"><p>Grammars can also work with functions.  After all, <code>+</code> and <code>*</code> are just infix operators for Julia's identically-named functions. You can use functions that are provided by Julia, or functions that you wrote yourself:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    f(a) = a + 1
+    
+    g₅ = HerbGrammar.@csgrammar begin
+        Int = |(0:9)
+        Int = Int * Int
+        Int = Int + Int
+        Int = f(Int)
+        Int = x
+    end
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-f">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int * Int
+12: Int = Int + Int
+13: Int = f(Int)
+14: Int = x
+</pre>
+
+
+<div class="markdown"><p>Similarly, we can also define the operator times (x) manually.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    ×(a, b) = a * b
+    
+    g₆ = HerbGrammar.@csgrammar begin
+        Int = |(0:9)
+        Int = a
+        Int = Int + Int
+        Int = Int × Int
+    end
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g₆">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = a
+12: Int = Int + Int
+13: Int = Int × Int
+</pre>
+
+
+<div class="markdown"><h3>Working with grammars</h3><p>If you want to implement something using these grammars, it is useful to know about the functions that you can use to manipulate grammars and extract information.  This section is not complete, but it aims to give an overview of the most important functions. </p><p>It is recommended to also read up on <a href="https://docs.julialang.org/en/v1/manual/metaprogramming/">Julia metaprogramming</a> if you are not already familiar with the concept.</p><p>One of the most important things about grammars is that each rule has an index associated with it:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    g₇ = HerbGrammar.@csgrammar begin
+        Int = |(0:9)
+        Int = Int + Int
+        Int = Int * Int
+        Int = x
+    end
+    
+    collect(enumerate(g₇.rules))
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g₇">13-element Vector{Tuple{Int64, Any}}:
+ (1, 0)
+ (2, 1)
+ (3, 2)
+ (4, 3)
+ (5, 4)
+ (6, 5)
+ (7, 6)
+ (8, 7)
+ (9, 8)
+ (10, 9)
+ (11, :(Int + Int))
+ (12, :(Int * Int))
+ (13, :x)</pre>
+
+
+<div class="markdown"><p>We can use this index to extract information from the grammar.</p></div>
+
+
+<div class="markdown"><h3>isterminal</h3><p><code>isterminal</code> returns <code>true</code> if a rule is terminal, i.e. it cannot be expanded. For example, rule 1 is terminal, but rule 11 is not, since it contains the non-terminal symbol <code>:Int</code>. </p></div>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.isterminal(g₇, 1)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash594982">true</pre>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.isterminal(g₇, 11)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash518469">false</pre>
+
+
+<div class="markdown"><h3>return_type</h3><p>This function is rather obvious; it returns the non-terminal symbol that corresponds to a certain rule. The return type for all rules in our grammar is <code>:Int</code>.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.return_type(g₇, 11)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash167108">:Int</pre>
+
+
+<div class="markdown"><h3>child_types</h3><p><code>child_types</code> returns the types of the nonterminal children of a rule in a vector. If you just want to know how many children a rule has, and not necessarily which types they have, you can use <code>nchildren</code></p></div>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.child_types(g₇, 11)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash141241">2-element Vector{Symbol}:
+ :Int
+ :Int</pre>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.nchildren(g₇, 11)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash151878">2</pre>
+
+
+<div class="markdown"><h3>nonterminals</h3><p>The <code>nonterminals</code> function can be used to obtain a list of all nonterminals in the grammar.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.nonterminals(g₇)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash115023">1-element Vector{Symbol}:
+ :Int</pre>
+
+
+<div class="markdown"><h3>Adding rules</h3><p>It is also possible to add rules to a grammar during execution. This can be done using the <code>add_rule!</code> function. The exclamation mark is a Julia convention and is appended to name if a function modifies its arguments (in our example the grammar).</p><p>A rule can be provided in the same syntax as is used in the grammar definition. The rule should be of the <code>Expr</code> type, which is a built-in type for representing expressions.  An easy way of creating <code>Expr</code> values in Julia is to encapsulate it in brackets and use a colon as prefix:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.add_rule!(g₇, :(Int = Int - Int))</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash700556">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int + Int
+12: Int = Int * Int
+13: Int = x
+14: Int = Int - Int
+</pre>
+
+
+<div class="markdown"><h3>Removing rules</h3><p>It is also possible to remove rules in Herb.jl, however, this is a bit more involved.  As said before, rules have an index associated with them.  The internal representation of programs that are defined by the grammar makes use of those indices for efficiency. Blindly removing a rule would shift the indices of other rules, and this could mean that existing programs get a different meaning or become invalid. </p><p>Therefore, there are two functions for removing rules:</p><ul><li><p><code>remove_rule!</code> removes a rule from the grammar, but fills its place with a placeholder. Therefore, the indices stay the same, and only programs that use the removed rule become invalid.</p></li><li><p><code>cleanup_removed_rules!</code> removes all placeholders and shifts the indices of the other rules.</p></li></ul></div>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.remove_rule!(g₇, 11)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash501182">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: nothing = nothing
+12: Int = Int * Int
+13: Int = x
+14: Int = Int - Int
+</pre>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.cleanup_removed_rules!(g₇)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash168833">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int * Int
+12: Int = x
+13: Int = Int - Int
+</pre>
+
+<h2 id="Context-sensitive-grammars"><a class="docs-heading-anchor" href="#Context-sensitive-grammars">Context-sensitive grammars</a><a id="Context-sensitive-grammars-1"></a><a class="docs-heading-anchor-permalink" href="#Context-sensitive-grammars" title="Permalink"></a></h2><div class="markdown">
+<p>Context-sensitive grammars introduce additional constraints compared to context-free grammars (like the simple grammar examples above). As before, we use the <code>@csgrammar</code> macro:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>g₈ = HerbGrammar.@csgrammar begin
+    Int = |(0:9)
+    Int = Int + Int
+    Int = Int * Int
+    Int = x
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-g₈">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int + Int
+12: Int = Int * Int
+13: Int = x
+</pre>
+
+
+<div class="markdown"><p>Constraints can be added using the <code>addconstraint!</code> function, which takes a context-sensitive grammar and a constraint and adds the constraint to the grammar.</p><p>For example, we can add a `<code>constraint to enforce that the input symbol</code>x` (rule 13) appears at least once in the program, to avoid programs that are just a constant.  </p></div>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.addconstraint!(g₈, Contains(13))</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash105069">1-element Vector{AbstractConstraint}:
+ Contains(13)</pre>
+
+
+<div class="markdown"><p>There is a dedicated tutorial for constraints in Herb.jl and how to work with them.</p></div>
+
+
+<div class="markdown"><h3>Probabilistic grammars</h3><p>Herb.jl also supports probabilistic grammars.  These grammars allow the user to assign a probability to each rule in the grammar. A probabilistic grammar can be defined in a very similar way to a standard grammar, but has some slightly different syntax:</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    g₉ = HerbGrammar.@pcsgrammar begin
+        0.4 : Int = |(0:9)
+        0.2 : Int = Int + Int
+        0.1 : Int = Int * Int
+        0.3 : Int = x
+    end
+    
+    for r ∈ 1:length(g₃.rules)
+        p = HerbGrammar.probability(g₈, r)
+    
+        println("$p : $r")
+    end
+end</code></pre>
+
+
+
+<div class="markdown"><p>The numbers before each rule represent the probability assigned to that rule. The total probability for each return type should add up to 1.0. If this isn't the case, Herb.jl will normalize the probabilities.</p><p>If a single line in the grammar definition represents multiple rules, such as <code>0.4 : Int = |(0:9)</code>, the probability will be evenly divided over all these rules.</p></div>
+
+<h2 id="File-writing"><a class="docs-heading-anchor" href="#File-writing">File writing</a><a id="File-writing-1"></a><a class="docs-heading-anchor-permalink" href="#File-writing" title="Permalink"></a></h2><div class="markdown">
+<h3>Saving &amp; loading context-free grammars</h3><p>If you want to store a grammar on the disk, you can use the <code>store_csg</code>, <code>read_csg</code> and functions to store and read grammars respectively.  The <code>store_csg</code> grammar can also be used to store probabilistic grammars. To read probabilistic grammars, use <code>read_pcsg</code>. The stored grammar files can also be opened using a text editor to be modified, as long as the contents of the file doesn't violate the syntax for defining grammars.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.store_csg(g₇, "demo.txt")</code></pre>
+
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.read_csg("demo.txt")</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash174505">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int * Int
+12: Int = x
+13: Int = Int - Int
+</pre>
+
+
+<div class="markdown"><h3>Saving &amp; loading context-sensitive grammars</h3><p>Saving and loading context-sensitive grammars is very similar to how it is done with context-free grammars. The only difference is that an additional file is created for the constraints.  The file that contains the grammars can be edited and can also be read using the reader for context-free grammars. The file that contains the constraints cannot be edited.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>HerbGrammar.store_csg( g₈, "demo.grammar", "demo.constraints")</code></pre>
+
+
+<pre class='language-julia'><code class='language-julia'>g₈, g₈.constraints</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash136301">(1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int + Int
+12: Int = Int * Int
+13: Int = x
+, AbstractConstraint[Contains(13)])</pre>
+
+<pre class='language-julia'><code class='language-julia'>g₁₀  = HerbGrammar.read_csg("demo.grammar", "demo.constraints")</code></pre>
+<pre class="code-output documenter-example-output" id="var-g₁₀">1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int + Int
+12: Int = Int * Int
+13: Int = x
+</pre>
+
+<pre class='language-julia'><code class='language-julia'>g₁₀, g₁₀.constraints</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash688383">(1: Int = 0
+2: Int = 1
+3: Int = 2
+4: Int = 3
+5: Int = 4
+6: Int = 5
+7: Int = 6
+8: Int = 7
+9: Int = 8
+10: Int = 9
+11: Int = Int + Int
+12: Int = Int * Int
+13: Int = x
+, AbstractConstraint[Contains(13)])</pre>
+
+<!-- PlutoStaticHTML.End --><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+    startOnLoad: true,
+    theme: "neutral"
+});
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../getting_started_with_herb/">« A more verbose getting started with Herb.jl</a><a class="docs-footer-nextpage" href="../advanced_search/">Advanced Search Procedures »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.10.1 on <span class="colophon-date" title="Wednesday 9 April 2025 14:01">Wednesday 9 April 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
