@@ -1,8 +1,11 @@
 ### A Pluto.jl notebook ###
-# v0.20.4
+# v0.20.5
 
 using Markdown
 using InteractiveUtils
+
+# ╔═╡ c5cb3782-c9af-4cf5-9e28-e1892c6442a2
+using Herb
 
 # ╔═╡ c5509a19-43bc-44d3-baa9-9af83717b6e6
 md"""
@@ -24,9 +27,6 @@ For this tutorial, we need to import the following modules of the Herb.jl framew
 
 We will also redefine the simple arithmetic grammar from the previous tutorial.
 """
-
-# ╔═╡ c5cb3782-c9af-4cf5-9e28-e1892c6442a2
-using Herb
 
 # ╔═╡ aacedef3-08d6-4bc0-a2c3-dd9a9aac340d
 grammar = @csgrammar begin
@@ -394,6 +394,30 @@ begin
 	end
 end
 
+# ╔═╡ bb9d6664-b494-4aff-ba65-9c7ac2bf1116
+md"""
+### Uniform Solver
+
+When the solver state of a Generic Solver becomes uniform (i.e., the tree structure is fixed and will not change further), it is converted into a Uniform Solver. The Uniform Solver is then used to explore all possible domain values that the uniform tree can take.
+
+In contrast to the Generic Solver, the Uniform Solver does not generate additional SolverStates to add to the priority queue. Instead, it uses a specialized structure called SparseStateSet to define and manage the domains within its tree. This structure efficiently tracks domain changes and supports backtracking to previous states.
+
+Additionally, when a Generic Solver transitions to a Uniform Solver, all constraints are regenerated specifically for the Uniform Solver. This means that any values previously stored in your constraints will not be copied over.
+
+
+#### Propagation
+
+The propagation process is identical between the Uniform Solver and the Generic Solver. However, since the Uniform Solver only operates on uniform nodes, it can infer more precise information about the tree.
+
+Moreover, because each Uniform Solver maintains its own set of constraints, it can safely store information about the tree without conflicts with other tree structures, such as a node no longer existing at a specific path.
+
+
+
+"""
+
+# ╔═╡ b1f5a1fd-69a2-4d23-868f-96b551ea0236
+
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -708,5 +732,7 @@ version = "5.11.0+0"
 # ╠═4e0989a8-7e63-45eb-80c9-a3a2f97c357c
 # ╟─ce9ae2a2-f3e3-4693-9e6d-60e91128de34
 # ╠═89c165c6-3e04-4887-924f-364b25b21bcd
+# ╟─bb9d6664-b494-4aff-ba65-9c7ac2bf1116
+# ╠═b1f5a1fd-69a2-4d23-868f-96b551ea0236
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
