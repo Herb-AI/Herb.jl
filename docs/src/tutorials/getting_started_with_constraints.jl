@@ -241,6 +241,24 @@ Each time a new AST node is added to a tree, the `on_new_node` function is calle
 (Don't worry about the `HerbConstraints.` prefixes. Normally, constraints are defined within the HerbConstraints repository, so there is no need to specify the namespace)
 """
 
+# ╔═╡ b00b039b-63ee-40d0-8f4b-d25539e596d5
+begin
+	"""
+	Forbids the consecutive application of the specified rule.
+	For example, CustomConstraint(4) forbids the tree 4(1, 4(1, 1)) as it applies rule 4 twice in a row.
+	"""
+	struct ForbidConsecutive <: AbstractGrammarConstraint
+	    rule::Int
+	end
+	
+	"""
+	Post a local constraint on each new node that appears in the tree
+	"""
+	function HerbConstraints.on_new_node(solver::Solver, constraint::ForbidConsecutive, path::Vector{Int})
+	    HerbConstraints.post!(solver, LocalForbidConsecutive(path, constraint.rule))
+	end
+end
+
 # ╔═╡ bacc917b-2706-412d-9b85-deb4b6685323
 md"""
 Next, we will define our local constraint. This constraint is responsible for propagating the constraint at a given path. The `propagate!` method can use several solver functions to manipulate the tree. The following **tree manipulations** can be used to remove rules from the domain of a hole at a given path:
@@ -334,24 +352,6 @@ begin
 	end
 end
 
-# ╔═╡ b00b039b-63ee-40d0-8f4b-d25539e596d5
-begin
-	"""
-	Forbids the consecutive application of the specified rule.
-	For example, CustomConstraint(4) forbids the tree 4(1, 4(1, 1)) as it applies rule 4 twice in a row.
-	"""
-	struct ForbidConsecutive <: AbstractGrammarConstraint
-	    rule::Int
-	end
-	
-	"""
-	Post a local constraint on each new node that appears in the tree
-	"""
-	function HerbConstraints.on_new_node(solver::Solver, constraint::ForbidConsecutive, path::Vector{Int})
-	    HerbConstraints.post!(solver, LocalForbidConsecutive(path, constraint.rule))
-	end
-end
-
 # ╔═╡ e40e09fc-c697-4c83-90eb-2b758254128e
 md"""
 Posting a local constraint will trigger the initial propagation. To re-propagate, the constraint needs to be rescheduled for propagation.
@@ -400,7 +400,7 @@ md"""
 
 Now that we have defined constraints and have seen how they are used, we will look into the different types of solvers in Herb that use these constraints to find feasible programs. A solver maintains the state of the search tree within the search, propagates the constraints and applies tree manipulations. Solvers are used by program iterators for creating and changing states of a valid tree while enforcing the grammar and local defined constraints. 
 
-There are currently two types of Solvers defined in Herb: GenericSolver and UniformSolver.
+There are currently two types of Solvers defined in Herb: `GenericSolver` and `UniformSolver`.
 
 """
 
@@ -408,19 +408,43 @@ There are currently two types of Solvers defined in Herb: GenericSolver and Unif
 md"""
 ### Generic Solver
 
-The generic solver can be initialized with a grammar and either a starting symbol or an initial node, in case of the starting symbol an initial node is created by initializing a hole using the domain of the starting symbol. This initial node is then defined as the first state of the solver from which new states can be generated. This is done by calling the `new_state!(solver, initial_node)` function.
+The Generic Solver can be initialized with a grammar and either a starting symbol or an initial node, in case of the starting symbol an initial node is created by initializing a hole using the domain of the starting symbol. This initial node is then defined as the first state of the solver from which new states can be generated. This is done by calling the `new_state!(solver, initial_node)` function.
 
-The `new_state!(solver::GenericSolver, tree::AbstractRuleNode)` is main function for progating a new tree in the solver and generating a new state. It completely overwrites the current state and evaluates the tree in a DFS manner. If you want to be able to save and/or retrieve old states, you can use `save_state!(solver::GenericSolver)` and `load_state!(solver::GenericSolver, state::SolverState)` respectively. The `load_state!` function does not propagate the state again and will just overwrite the current state with an already evaluated `SolverState`. Though the `GenericSolver` uses states to define the current propagated program, it is still a stateless solver and therefor doesn't have any backtracking options on its own. This means stateful constraints (e.g. `ContainsSubtree`) cannot be propagated by the `GenericSolver`. This can only be done by the `UniformSolver`.
+The `new_state!(solver::GenericSolver, tree::AbstractRuleNode)` is main function for progating a new tree in the solver and generating a new state. It completely overwrites the current state and evaluates the tree in a DFS manner. If you want to be able to save and/or retrieve old states, you can use `save_state!(solver::GenericSolver)` and `load_state!(solver::GenericSolver, state::SolverState)` respectively. The `load_state!` function does not propagate the state again and will just overwrite the current state with an already evaluated `SolverState`. Though the Generic Solver uses states to define the current propagated program, it is still a stateless solver and therefor doesn't have any backtracking options on its own. This means stateful constraints (e.g. `ContainsSubtree`) cannot be propagated by the Generic Solver. This can only be done by the Uniform Solver.
 
 #### State Initialization
-Once `new_state!` is called, the `GenericSolver` walks through the tree in a DFS order and tries to simplify all existing holes, then assign local constraints to all applicable nodes for every grammar constraint and propagate all local constraints to determine feasibility of the program. If any constraint cannot be satisfied, the `isfeasible` field of the state will be set to false.\
-The `simplify_hole!(solver::GenericSolver, path::Vector{Int})` method will try to transform any `Hole` or `UniformHole` into a `UniformHole` or `RuleNode`. This can result in a tighter bound on types within the program and if every hole is uniform, the state can be given to a `UniformSolver` to more efficiently search for new states.\
+Once `new_state!` is called, the Generic Solver walks through the tree in a DFS order and tries to simplify all existing holes, then assign local constraints to all applicable nodes for every grammar constraint and propagate all local constraints to determine feasibility of the program. If any constraint cannot be satisfied, the `isfeasible` field of the state will be set to false.\
+The `simplify_hole!(solver::GenericSolver, path::Vector{Int})` method will try to transform any `Hole` or `UniformHole` into a `UniformHole` or `RuleNode`. This can result in a tighter bound on types within the program and if every hole is uniform, the state can be given to a Uniform Solver to more efficiently search for new states.\
 When the state is simplified, the function `notify_new_nodes(solver::GenericSolver, node::AbstractRuleNode, path::Vector{Int})` will run the function `on_new_node(solver::Solver, c::AbstractGrammarConstraint, path::Vector{Int})` for every constraint in the grammar for every node in the state, generating the corresponding `AbstractLocalConstraint` when it is applicable for that node. Every local constraint will then be propagated and then the state will either be an infeasible program or a valid program, at least accepted by all constraints but it could still contain holes, that can be used by an iterator for further use.
 
 #### Constraint Propagation
 The `post!(solver::GenericSolver, constraint::AbstractLocalConstraint)` function imposes a local constraint on the solver and directly propagates the constraint via the `propagate!(solver::Solver, c::AbstractLocalConstraints)` function which should be defined by every local constraint. The propagation of a constraint will result in either turning the state infeasible as the constraint cannot be satisfied, changing the domain through tree manipulations, deactivating the constraint as it is already satisfied or softfail as the constraint is still dependent on a hole.\
 If a constraint propagation uses any of the tree manipulations to impose some domain or property change of a node, the `notify_tree_manipulation(solver::GenericSolver, event_path::Vector{Int})` is called to signal a change in the state which triggers the `propagate!` function of constraints which are linked to the node identified by the `event_path` variable. These propagation tasks are added to the `solver.schedule` queue by `schedule!(solver::Solver, constraint::AbstractLocalConstraint)` and the queue is then cleared by `fix_point!(solver::Solver)`. The `fix_point!` function is called at the end of every tree manipulation and at the end of the `new_state!` function to ensure full propagation of all local constraints. This way the size of schedule is kept small and constraints impacted by the state change are the first to be propagated again.
 """
+
+# ╔═╡ bb9d6664-b494-4aff-ba65-9c7ac2bf1116
+md"""
+### Uniform Solver
+
+When the solver state of a Generic Solver becomes uniform (i.e., the tree structure is fixed and will not change further), it is converted into a Uniform Solver. The Uniform Solver is then used to explore all possible domain values that the uniform tree can take.
+
+In contrast to the Generic Solver, the Uniform Solver does not generate a singular SolverState. Instead, it uses a specialized structure called SparseStateSet to define and manage the domains within its tree. This structure efficiently tracks domain changes and supports backtracking to previous states. The different states are stored in by the `StateManager`.
+
+Additionally, when a Generic Solver transitions to a Uniform Solver, all constraints are regenerated specifically for the Uniform Solver. This means that any values previously stored in your constraints will not be copied over.
+
+
+#### Propagation
+
+The propagation process is identical between the Uniform Solver and the Generic Solver. However, since the Uniform Solver only operates on uniform nodes, it can infer more precise information about the tree.
+
+Moreover, because each Uniform Solver maintains its own set of constraints, it can safely store information about the tree without conflicts with other tree structures, such as a node no longer existing at a specific path.
+
+
+
+"""
+
+# ╔═╡ b1f5a1fd-69a2-4d23-868f-96b551ea0236
+
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -748,7 +772,9 @@ version = "5.11.0+0"
 # ╠═4e0989a8-7e63-45eb-80c9-a3a2f97c357c
 # ╟─ce9ae2a2-f3e3-4693-9e6d-60e91128de34
 # ╠═89c165c6-3e04-4887-924f-364b25b21bcd
-# ╠═b68d4135-af6e-44db-82d3-4bcd2c94efd8
-# ╠═968166a5-21d3-41b6-b9eb-010b094282ab
+# ╟─b68d4135-af6e-44db-82d3-4bcd2c94efd8
+# ╟─968166a5-21d3-41b6-b9eb-010b094282ab
+# ╟─bb9d6664-b494-4aff-ba65-9c7ac2bf1116
+# ╠═b1f5a1fd-69a2-4d23-868f-96b551ea0236
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
