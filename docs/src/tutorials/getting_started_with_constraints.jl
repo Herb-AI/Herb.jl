@@ -4,6 +4,9 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ c5cb3782-c9af-4cf5-9e28-e1892c6442a2
+using Herb
+
 # ╔═╡ c5509a19-43bc-44d3-baa9-9af83717b6e6
 md"""
 # Getting started with HerbConstraints
@@ -24,9 +27,6 @@ For this tutorial, we need to import the following modules of the Herb.jl framew
 
 We will also redefine the simple arithmetic grammar from the previous tutorial.
 """
-
-# ╔═╡ c5cb3782-c9af-4cf5-9e28-e1892c6442a2
-using Herb
 
 # ╔═╡ aacedef3-08d6-4bc0-a2c3-dd9a9aac340d
 grammar = @csgrammar begin
@@ -394,28 +394,74 @@ begin
 	end
 end
 
+# ╔═╡ b68d4135-af6e-44db-82d3-4bcd2c94efd8
+md"""
+## Solvers
+
+Now that we have defined constraints and have seen how they are used, we will look into the different types of solvers in Herb that use these constraints to find feasible programs. A solver maintains the state of the search tree within the search, propagates the constraints and applies tree manipulations. Solvers are used by program iterators for creating and changing states of a valid tree while enforcing the grammar and local defined constraints. 
+
+There are currently two types of Solvers defined in Herb: `GenericSolver` and `UniformSolver`.
+
+"""
+
+# ╔═╡ 968166a5-21d3-41b6-b9eb-010b094282ab
+md"""
+### Generic Solver
+
+The Generic Solver can be initialized with a grammar and either a starting symbol or an initial node, in case of the starting symbol an initial node is created by initializing a hole using the domain of the starting symbol. This initial node is then defined as the first state of the solver from which new states can be generated. This is done by calling the `new_state!(solver, initial_node)` function.
+
+The `new_state!(solver::GenericSolver, tree::AbstractRuleNode)` is main function for progating a new tree in the solver and generating a new state. It completely overwrites the current state and evaluates the tree in a DFS manner. If you want to be able to save and/or retrieve old states, you can use `save_state!(solver::GenericSolver)` and `load_state!(solver::GenericSolver, state::SolverState)` respectively. The `load_state!` function does not propagate the state again and will just overwrite the current state with an already evaluated `SolverState`. Though the Generic Solver uses states to define the current propagated program, it is still a stateless solver and therefor doesn't have any backtracking options on its own. This means stateful constraints (e.g. `ContainsSubtree`) cannot be propagated by the Generic Solver. This can only be done by the Uniform Solver.
+
+#### State Initialization
+Once `new_state!` is called, the Generic Solver walks through the tree in a DFS order and tries to simplify all existing holes, then assign local constraints to all applicable nodes for every grammar constraint and propagate all local constraints to determine feasibility of the program. If any constraint cannot be satisfied, the `isfeasible` field of the state will be set to false.\
+The `simplify_hole!(solver::GenericSolver, path::Vector{Int})` method will try to transform any `Hole` or `UniformHole` into a `UniformHole` or `RuleNode`. This can result in a tighter bound on types within the program and if every hole is uniform, the state can be given to a Uniform Solver to more efficiently search for new states.\
+When the state is simplified, the function `notify_new_nodes(solver::GenericSolver, node::AbstractRuleNode, path::Vector{Int})` will run the function `on_new_node(solver::Solver, c::AbstractGrammarConstraint, path::Vector{Int})` for every constraint in the grammar for every node in the state, generating the corresponding `AbstractLocalConstraint` when it is applicable for that node. Every local constraint will then be propagated and then the state will either be an infeasible program or a valid program, at least accepted by all constraints but it could still contain holes, that can be used by an iterator for further use.
+
+#### Constraint Propagation
+The `post!(solver::GenericSolver, constraint::AbstractLocalConstraint)` function imposes a local constraint on the solver and directly propagates the constraint via the `propagate!(solver::Solver, c::AbstractLocalConstraints)` function which should be defined by every local constraint. The propagation of a constraint will result in either turning the state infeasible as the constraint cannot be satisfied, changing the domain through tree manipulations, deactivating the constraint as it is already satisfied or softfail as the constraint is still dependent on a hole.\
+If a constraint propagation uses any of the tree manipulations to impose some domain or property change of a node, the `notify_tree_manipulation(solver::GenericSolver, event_path::Vector{Int})` is called to signal a change in the state which triggers the `propagate!` function of constraints which are linked to the node identified by the `event_path` variable. These propagation tasks are added to the `solver.schedule` queue by `schedule!(solver::Solver, constraint::AbstractLocalConstraint)` and the queue is then cleared by `fix_point!(solver::Solver)`. The `fix_point!` function is called at the end of every tree manipulation and at the end of the `new_state!` function to ensure full propagation of all local constraints. This way the size of schedule is kept small and constraints impacted by the state change are the first to be propagated again.
+"""
+
+# ╔═╡ bb9d6664-b494-4aff-ba65-9c7ac2bf1116
+md"""
+### Uniform Solver
+
+When the solver state of a Generic Solver becomes uniform (i.e., the tree structure is fixed and will not change further), it is converted into a Uniform Solver. The Uniform Solver is then used to explore all possible domain values that the uniform tree can take.
+
+In contrast to the Generic Solver, the Uniform Solver does not generate a singular SolverState. Instead, it uses a specialized structure called SparseStateSet to define and manage the domains within its tree. This structure efficiently tracks domain changes and supports backtracking to previous states. The different states are stored in by the `StateManager`.
+
+Additionally, when a Generic Solver transitions to a Uniform Solver, all constraints are regenerated specifically for the Uniform Solver. This means that any values previously stored in your constraints will not be copied over.
+
+
+#### Propagation
+
+The propagation process is identical between the Uniform Solver and the Generic Solver. However, since the Uniform Solver only operates on uniform nodes, it can infer more precise information about the tree.
+
+Moreover, because each Uniform Solver maintains its own set of constraints, it can safely store information about the tree without conflicts with other tree structures, such as a node no longer existing at a specific path.
+
+
+
+"""
+
+# ╔═╡ b1f5a1fd-69a2-4d23-868f-96b551ea0236
+
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-HerbConstraints = "1fa96474-3206-4513-b4fa-23913f296dfc"
-HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
-HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
-HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
+Herb = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
 
 [compat]
-HerbConstraints = "~0.2.4"
-HerbCore = "~0.3.0"
-HerbGrammar = "~0.5.0"
-HerbSearch = "~0.4.1"
+Herb = "~0.5.2"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.2"
+julia_version = "1.11.4"
 manifest_format = "2.0"
-project_hash = "2cb4333ec6c631795a776e5362ad7f7eae695dd8"
+project_hash = "70bfaf41413f787d67261739e711edfc1debaf53"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -463,9 +509,9 @@ version = "1.16.0"
 
 [[deps.DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
-git-tree-sha1 = "1d0a14036acb104d9e89698bd408f63ab58cdc82"
+git-tree-sha1 = "4e1fe97fdaed23e9dc21d4d664bea76b65fc50a0"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.18.20"
+version = "0.18.22"
 
 [[deps.Dates]]
 deps = ["Printf"]
@@ -473,46 +519,62 @@ uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 version = "1.11.0"
 
 [[deps.DocStringExtensions]]
-deps = ["LibGit2"]
-git-tree-sha1 = "2fb1e02f2b635d0845df5d7c167fec4dd739b00d"
+git-tree-sha1 = "e7b7e6f178525d17c720ab9c081e4ef04429f860"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
-version = "0.9.3"
+version = "0.9.4"
+
+[[deps.ExprTools]]
+git-tree-sha1 = "27415f162e6028e81c72b82ef756bf321213b6ec"
+uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
+version = "0.1.10"
+
+[[deps.Herb]]
+deps = ["HerbConstraints", "HerbCore", "HerbGrammar", "HerbInterpret", "HerbSearch", "HerbSpecification", "Reexport"]
+git-tree-sha1 = "fea4a29ad6fbccb0d63e5bdad09bc5be8055a40e"
+uuid = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
+version = "0.5.2"
 
 [[deps.HerbConstraints]]
-deps = ["DataStructures", "HerbCore", "HerbGrammar", "MLStyle"]
-git-tree-sha1 = "a89c7d2ef3283b8feb846822505722a0a0c50a91"
+deps = ["DataStructures", "HerbCore", "HerbGrammar", "MLStyle", "TimerOutputs"]
+git-tree-sha1 = "10274ed9e270209546f1620c4285d67547f57b9a"
 uuid = "1fa96474-3206-4513-b4fa-23913f296dfc"
-version = "0.2.4"
+version = "0.4.0"
 
 [[deps.HerbCore]]
-deps = ["AbstractTrees"]
-git-tree-sha1 = "7af906201c6d701957b9d061c58940a28bfa4b83"
+deps = ["AbstractTrees", "MacroTools", "StyledStrings"]
+git-tree-sha1 = "b0c0468d549e79eddd79b2cc51b49289b5854a15"
 uuid = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
-version = "0.3.4"
+version = "0.3.9"
 
 [[deps.HerbGrammar]]
 deps = ["HerbCore", "Serialization"]
-git-tree-sha1 = "3c667987e8a27d9b697993fab68dfc602b3a18e6"
+git-tree-sha1 = "b79740118413e5450a40948afe34df0642146ee5"
 uuid = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
-version = "0.5.0"
+version = "0.5.2"
 
 [[deps.HerbInterpret]]
 deps = ["HerbCore", "HerbGrammar", "HerbSpecification"]
-git-tree-sha1 = "6dd2913b88e0cbd0bc5ed78e67d4d406df61ddda"
+git-tree-sha1 = "baf4cda9f2e68d7141da4d4cdb2ed41e004ab36c"
 uuid = "5bbddadd-02c5-4713-84b8-97364418cca7"
-version = "0.1.6"
+version = "0.1.7"
 
 [[deps.HerbSearch]]
-deps = ["DataStructures", "HerbConstraints", "HerbCore", "HerbGrammar", "HerbInterpret", "HerbSpecification", "MLStyle", "Random", "StatsBase"]
-git-tree-sha1 = "95a5c1e87cd61b14cf9785f293e5633b39a69fc5"
+deps = ["DataStructures", "DocStringExtensions", "HerbConstraints", "HerbCore", "HerbGrammar", "HerbInterpret", "HerbSpecification", "MLStyle", "Random", "StatsBase", "TimerOutputs"]
+git-tree-sha1 = "1acc4dca513dee46115ccdcad2a6002f664c3af6"
 uuid = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
-version = "0.4.1"
+version = "0.4.6"
+
+    [deps.HerbSearch.extensions]
+    DivideAndConquerExt = "DecisionTree"
+
+    [deps.HerbSearch.weakdeps]
+    DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 
 [[deps.HerbSpecification]]
 deps = ["AutoHashEquals"]
-git-tree-sha1 = "4a153a24694d4d91cf811d63581c9115087f06fc"
+git-tree-sha1 = "835853c205b55b1e841410d3022395812fdec0d7"
 uuid = "6d54aada-062f-46d8-85cf-a1ceaf058a06"
-version = "0.2.0"
+version = "0.2.1"
 
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
@@ -520,24 +582,9 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 version = "1.11.0"
 
 [[deps.IrrationalConstants]]
-git-tree-sha1 = "630b497eafcc20001bba38a4651b327dcfc491d2"
+git-tree-sha1 = "e2222959fbc6c19554dc15174c81bf7bf3aa691c"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
-version = "0.2.2"
-
-[[deps.LibGit2]]
-deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
-uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
-version = "1.11.0"
-
-[[deps.LibGit2_jll]]
-deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
-uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
-version = "1.7.2+0"
-
-[[deps.LibSSH2_jll]]
-deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
-uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
-version = "1.11.0+1"
+version = "0.2.4"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -569,24 +616,20 @@ git-tree-sha1 = "bc38dff0548128765760c79eb7388a4b37fae2c8"
 uuid = "d8e11817-5142-5d16-987a-aa16d5891078"
 version = "0.4.17"
 
+[[deps.MacroTools]]
+git-tree-sha1 = "72aebe0b5051e5143a079a4685a46da330a40472"
+uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+version = "0.5.15"
+
 [[deps.Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
 
-[[deps.MbedTLS_jll]]
-deps = ["Artifacts", "Libdl"]
-uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
-version = "2.28.6+0"
-
 [[deps.Missings]]
 deps = ["DataAPI"]
 git-tree-sha1 = "ec4f7fbeab05d7747bdf98eb74d130a2a2ed298d"
 uuid = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
-version = "1.2.0"
-
-[[deps.NetworkOptions]]
-uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 version = "1.2.0"
 
 [[deps.OpenBLAS_jll]]
@@ -595,9 +638,9 @@ uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
 version = "0.3.27+1"
 
 [[deps.OrderedCollections]]
-git-tree-sha1 = "12f1439c4f986bb868acda6ea33ebc78e19b95ad"
+git-tree-sha1 = "cc4054e898b852042d7b503313f7ad03de99c3dd"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.7.0"
+version = "1.8.0"
 
 [[deps.Printf]]
 deps = ["Unicode"]
@@ -613,6 +656,11 @@ version = "1.3.0"
 deps = ["SHA"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 version = "1.11.0"
+
+[[deps.Reexport]]
+git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
+uuid = "189a3867-3050-52da-a836-e630ba90ab69"
+version = "1.2.2"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -655,6 +703,10 @@ git-tree-sha1 = "29321314c920c26684834965ec2ce0dacc9cf8e5"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 version = "0.34.4"
 
+[[deps.StyledStrings]]
+uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+version = "1.11.0"
+
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
@@ -664,6 +716,18 @@ version = "7.7.0+0"
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 version = "1.0.3"
+
+[[deps.TimerOutputs]]
+deps = ["ExprTools", "Printf"]
+git-tree-sha1 = "f57facfd1be61c42321765d3551b3df50f7e09f6"
+uuid = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
+version = "0.5.28"
+
+    [deps.TimerOutputs.extensions]
+    FlameGraphsExt = "FlameGraphs"
+
+    [deps.TimerOutputs.weakdeps]
+    FlameGraphs = "08572546-2f56-4bcf-ba4e-bab62c3a3f89"
 
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
@@ -699,7 +763,7 @@ version = "5.11.0+0"
 # ╠═4e76bb87-c429-4547-accc-e304d4220f2d
 # ╟─00f62b26-a15d-4525-bef0-857d37bb0d85
 # ╠═19d0a61b-46a3-4d53-b1d2-2b0e2650b56a
-# ╟─2bea7a99-c46a-4200-9ba8-1227a5806f2f
+# ╠═2bea7a99-c46a-4200-9ba8-1227a5806f2f
 # ╟─f4c15b60-5d45-4b75-9100-a7be2969d7ca
 # ╠═b00b039b-63ee-40d0-8f4b-d25539e596d5
 # ╟─bacc917b-2706-412d-9b85-deb4b6685323
@@ -708,5 +772,9 @@ version = "5.11.0+0"
 # ╠═4e0989a8-7e63-45eb-80c9-a3a2f97c357c
 # ╟─ce9ae2a2-f3e3-4693-9e6d-60e91128de34
 # ╠═89c165c6-3e04-4887-924f-364b25b21bcd
+# ╟─b68d4135-af6e-44db-82d3-4bcd2c94efd8
+# ╟─968166a5-21d3-41b6-b9eb-010b094282ab
+# ╟─bb9d6664-b494-4aff-ba65-9c7ac2bf1116
+# ╠═b1f5a1fd-69a2-4d23-868f-96b551ea0236
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
