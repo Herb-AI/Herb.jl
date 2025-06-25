@@ -12,10 +12,12 @@ authors:
     family-names: Hinnerichs
     email: t.r.hinnerichs@tudelft.nl
     affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0003-4155-0239'
   - given-names: Reuben
     family-names: Gardos Reid
     email: r.j.gardosreid@tudelft.nl
     affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0002-3491-9686'
   - given-names: Jaap
     name-particle: de
     family-names: Jong
@@ -29,6 +31,7 @@ authors:
     family-names: Wochner
     email: p.wochner@tudelft.nl
     affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0003-4066-8614'
   - given-names: Nicolae
     family-names: Filat
     email: n.filat@student.tudelft.nl
@@ -41,10 +44,12 @@ authors:
     family-names: Hanou
     email: i.k.hanou@tudelft.nl
     affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0001-5873-5139'
   - given-names: Sebastijan
     family-names: Dumancic
     email: s.dumancic@tudelft.nl
     affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0003-0915-8034'
 repository-code: 'https://github.com/Herb-AI/Herb.jl'
 url: 'https://herb-ai.github.io/'
 keywords:
