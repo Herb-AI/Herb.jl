@@ -1,0 +1,56 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Herb.jl
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Tilman
+    family-names: Hinnerichs
+    email: t.r.hinnerichs@tudelft.nl
+    affiliation: TU Delft
+  - given-names: Reuben
+    family-names: Gardos Reid
+    email: r.j.gardosreid@tudelft.nl
+    affiliation: TU Delft
+  - given-names: Jaap
+    name-particle: de
+    family-names: Jong
+    email: j.dejong-18@student.tudelft.nl
+    affiliation: TU Delft
+  - given-names: Bart
+    family-names: Swinkels
+    email: b.j.a.swinkels@student.tudelft.nl
+    affiliation: TU Delft
+  - given-names: Pamela
+    family-names: Wochner
+    email: p.wochner@tudelft.nl
+    affiliation: TU Delft
+  - given-names: Nicolae
+    family-names: Filat
+    email: n.filat@student.tudelft.nl
+    affiliation: TU Delft
+  - given-names: Tudor
+    family-names: Magurescu
+    email: magirescu@student.tudelft.nl
+    affiliation: TU Delft
+  - given-names: Issa
+    family-names: Hanou
+    email: i.k.hanou@tudelft.nl
+    affiliation: TU Delft
+  - given-names: Sebastijan
+    family-names: Dumancic
+    email: s.dumancic@tudelft.nl
+    affiliation: TU Delft
+repository-code: 'https://github.com/Herb-AI/Herb.jl'
+url: 'https://herb-ai.github.io/'
+keywords:
+  - Program Synthesis
+  - Collaborative Science
+  - Reproducible Research
+  - Neuro-Symbolic AI
+  - Julia
+license: MIT
