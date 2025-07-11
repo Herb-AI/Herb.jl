@@ -1,0 +1,68 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Herb.jl
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Tilman
+    family-names: Hinnerichs
+    email: t.r.hinnerichs@tudelft.nl
+    affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0003-4155-0239'
+  - given-names: Reuben
+    family-names: Gardos Reid
+    email: r.j.gardosreid@tudelft.nl
+    affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0002-3491-9686'
+  - given-names: Jaap
+    name-particle: de
+    family-names: Jong
+    email: j.dejong-18@student.tudelft.nl
+    affiliation: TU Delft
+  - given-names: Bart
+    family-names: Swinkels
+    email: b.j.a.swinkels@student.tudelft.nl
+    affiliation: TU Delft
+  - given-names: Pamela
+    family-names: Wochner
+    email: p.wochner@tudelft.nl
+    affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0003-4066-8614'
+  - given-names: Nicolae
+    family-names: Filat
+    email: n.filat@student.tudelft.nl
+    affiliation: TU Delft
+  - given-names: Tudor
+    family-names: Magurescu
+    email: magirescu@student.tudelft.nl
+    affiliation: TU Delft
+  - given-names: Issa
+    family-names: Hanou
+    email: i.k.hanou@tudelft.nl
+    affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0001-5873-5139'
+  - given-names: Sebastijan
+    family-names: Dumancic
+    email: s.dumancic@tudelft.nl
+    affiliation: TU Delft
+    orcid: 'https://orcid.org/0000-0003-0915-8034'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.15746952
+    description: Latest version of Herb.jl
+  - type: swh
+    value: 'swh:1:dir:e77a8fcc376baf6db3f78eeb0011a1a5d68ace93'
+    description: Latest version of Herb.jl
+repository-code: 'https://github.com/Herb-AI/Herb.jl'
+url: 'https://herb-ai.github.io/'
+keywords:
+  - Program Synthesis
+  - Collaborative Science
+  - Reproducible Research
+  - Neuro-Symbolic AI
+  - Julia
+license: MIT
