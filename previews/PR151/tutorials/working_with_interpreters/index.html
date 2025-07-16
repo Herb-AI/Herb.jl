@@ -25,9 +25,16 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "13ec7a0f085d12f6a4dd4cbd3e681f3ea7bf61c56b3233492183d7d565cc6584"
+    input_sha = "218530def4f9e027e96bd6810373fc3fb77e8c466ac48646cbeaae4df53430d6"
     julia_version = "1.11.6"
 -->
+<pre class='language-julia'><code class='language-julia'>begin
+    import Pkg
+    Pkg.activate(Base.current_project())
+    Pkg.instantiate()
+end</code></pre>
+
+
 <pre class='language-julia'><code class='language-julia'>using Herb</code></pre>
 
 
@@ -50,7 +57,7 @@ end</code></pre>
 
 <div class="markdown"><p>Let's construct a program <code>x+3</code>, which would correspond to the following <code>RuleNode</code> representation</p></div>
 
-<pre class='language-julia'><code class='language-julia'>myprog = RuleNode(4, [RuleNode(3), RuleNode(1)])</code></pre>
+<pre class='language-julia'><code class='language-julia'>myprog = @rulenode 4{3,1}</code></pre>
 <pre class="code-output documenter-example-output" id="var-myprog">4{3,1}</pre>
 
 
@@ -130,4 +137,4 @@ mermaid.initialize({
     startOnLoad: true,
     theme: "neutral"
 });
-</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../getting_started_with_constraints/">« Getting started with Constraints</a><a class="docs-footer-nextpage" href="../abstract_syntax_trees/">Abstract Syntax Trees »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 14 July 2025 12:58">Monday 14 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../getting_started_with_constraints/">« Getting started with Constraints</a><a class="docs-footer-nextpage" href="../abstract_syntax_trees/">Abstract Syntax Trees »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 16 July 2025 15:50">Wednesday 16 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -25,11 +25,18 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "d9b048146047e81a9a691abca98393a59bdf982bd36bb103f218ab321d17078a"
+    input_sha = "406f81b8558a679de7c841e3c95ebe3d77b84863050d0d227a51e4c1fdd3c08d"
     julia_version = "1.11.6"
 -->
 
 <div class="markdown"><h1 id="Getting-Started">Getting Started</h1><p>You can either paste this code into the Julia REPL or into a separate file, e.g. <code>get_started.jl</code>. If using a separate file you can execute using <code>julia get_started.jl</code> or <code>julia --project=. get_started.jl</code> depending on whether you installed Herb.jl globally or in a project.</p><p>To begin, we need to import <code>Herb</code>.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    import Pkg
+    Pkg.activate(Base.current_project())
+    Pkg.instantiate()
+end</code></pre>
+
 
 <pre class='language-julia'><code class='language-julia'>using Herb</code></pre>
 
@@ -110,4 +117,4 @@ mermaid.initialize({
     startOnLoad: true,
     theme: "neutral"
 });
-</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../install/">« Installation Guide</a><a class="docs-footer-nextpage" href="../../concepts/">Herb Architecture and Core Concepts »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 14 July 2025 12:58">Monday 14 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../install/">« Installation Guide</a><a class="docs-footer-nextpage" href="../../concepts/">Herb Architecture and Core Concepts »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 16 July 2025 15:50">Wednesday 16 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
