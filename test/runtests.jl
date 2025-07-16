@@ -1,8 +1,8 @@
 using Aqua
 using Herb
 using Test
+
 include(joinpath(@__DIR__, "..", "docs", "build_notebooks.jl"))
-import Pkg
 
 @testset "Herb" begin
     @testset "Aqua.jl" begin
