@@ -21,14 +21,14 @@ From the Julia REPL run
 add Herb
 ```
 
-or instead running
+or 
 
 ```julia
 import Pkg
 Pkg.add("Herb")
 ```
 
-`which` will both install all dependencies automatically.
+to install all dependencies automatically.
 
 For later convenience we can also add the respective dependencies to our project, so that we do not have to write `Herb.HerbGrammar` every time.
 ```julia
