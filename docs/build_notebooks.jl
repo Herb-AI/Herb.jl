@@ -1,5 +1,10 @@
 using PlutoStaticHTML
 
+"""
+Builds the Pluto notebooks in the specified directory. 
+As part of the build, all notebooks are executed to make sure there is no 
+deprecated code. 
+"""
 function build(tutorials_dir)
     @info "Building notebooks in $tutorials_dir"
     use_distributed = false
