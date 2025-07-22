@@ -1,8 +1,15 @@
 ### A Pluto.jl notebook ###
-# v0.20.4
+# v0.20.13
 
 using Markdown
 using InteractiveUtils
+
+# ╔═╡ b03a81b5-36f5-4e1a-a07f-1206e13d6769
+begin
+	import Pkg
+	Pkg.activate(Base.current_project())
+	Pkg.instantiate()
+end
 
 # ╔═╡ e0a7076c-9345-40ef-a26e-99e8bad31463
 using Herb
@@ -29,7 +36,7 @@ Let's construct a program `x+3`, which would correspond to the following `RuleNo
 "
 
 # ╔═╡ 1e15898e-568c-4211-ba00-27de61806aeb
-myprog = RuleNode(4, [RuleNode(3), RuleNode(1)])
+myprog = @rulenode 4{3,1}
 
 # ╔═╡ d43a2094-b215-4d6c-b6d8-8d32fe8898d6
 md"
@@ -110,65 +117,8 @@ The idea behind this programming language is that the program specifies a set of
 md"
 The remaining functions follow a similar idea. (You can see the full implementation of this interpreter [here](https://github.com/Herb-AI/HerbBenchmarks.jl/blob/new-robots/src/data/Robots_2020/robots_primitives.jl))."
 
-# ╔═╡ 00000000-0000-0000-0000-000000000001
-PLUTO_PROJECT_TOML_CONTENTS = """
-[deps]
-HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
-HerbInterpret = "5bbddadd-02c5-4713-84b8-97364418cca7"
-
-[compat]
-HerbGrammar = "~0.5.0"
-HerbInterpret = "~0.1.6"
-"""
-
-# ╔═╡ 00000000-0000-0000-0000-000000000002
-PLUTO_MANIFEST_TOML_CONTENTS = """
-# This file is machine-generated - editing it directly is not advised
-
-julia_version = "1.11.2"
-manifest_format = "2.0"
-project_hash = "d028e4e441d418989f64ba766e46ee0ffefd7742"
-
-[[deps.AbstractTrees]]
-git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
-uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
-version = "0.4.5"
-
-[[deps.AutoHashEquals]]
-git-tree-sha1 = "4ec6b48702dacc5994a835c1189831755e4e76ef"
-uuid = "15f4f7f2-30c1-5605-9d31-71845cf9641f"
-version = "2.2.0"
-
-[[deps.HerbCore]]
-deps = ["AbstractTrees"]
-git-tree-sha1 = "7af906201c6d701957b9d061c58940a28bfa4b83"
-uuid = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
-version = "0.3.4"
-
-[[deps.HerbGrammar]]
-deps = ["HerbCore", "Serialization"]
-git-tree-sha1 = "3c667987e8a27d9b697993fab68dfc602b3a18e6"
-uuid = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
-version = "0.5.0"
-
-[[deps.HerbInterpret]]
-deps = ["HerbCore", "HerbGrammar", "HerbSpecification"]
-git-tree-sha1 = "6dd2913b88e0cbd0bc5ed78e67d4d406df61ddda"
-uuid = "5bbddadd-02c5-4713-84b8-97364418cca7"
-version = "0.1.6"
-
-[[deps.HerbSpecification]]
-deps = ["AutoHashEquals"]
-git-tree-sha1 = "4a153a24694d4d91cf811d63581c9115087f06fc"
-uuid = "6d54aada-062f-46d8-85cf-a1ceaf058a06"
-version = "0.2.0"
-
-[[deps.Serialization]]
-uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
-version = "1.11.0"
-"""
-
 # ╔═╡ Cell order:
+# ╠═b03a81b5-36f5-4e1a-a07f-1206e13d6769
 # ╠═e0a7076c-9345-40ef-a26e-99e8bad31463
 # ╟─55719688-3940-11ef-1f29-f51dea064ff3
 # ╠═39eaa982-ba88-49b9-ad52-076a169d0439
@@ -185,5 +135,3 @@ version = "1.11.0"
 # ╠═1b251d0f-3a77-494f-a359-d8dc33ad5d44
 # ╟─aff77be9-365f-4672-bbd4-07f23528e32e
 # ╠═1f700607-3cdf-43bf-91f2-72de3c9abc85
-# ╟─00000000-0000-0000-0000-000000000001
-# ╟─00000000-0000-0000-0000-000000000002
