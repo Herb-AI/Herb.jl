@@ -1,8 +1,18 @@
 ### A Pluto.jl notebook ###
-# v0.20.4
+# v0.20.13
 
 using Markdown
 using InteractiveUtils
+
+# ╔═╡ e31d8fd3-132a-448d-8a60-8069ce0f6b7a
+begin
+	import Pkg
+	Pkg.activate(Base.current_project())
+	Pkg.instantiate()
+end
+
+# ╔═╡ 84549502-876a-4ffc-8069-1ffc17622f9a
+using Herb
 
 # ╔═╡ 93b96839-9676-477b-aebb-e50d733a6719
 md"""
@@ -18,9 +28,6 @@ md"""
 ### Setup
 First, we import the necessary Herb packages.
 """
-
-# ╔═╡ 84549502-876a-4ffc-8069-1ffc17622f9a
-using Herb
 
 # ╔═╡ 751e1119-fe59-41dc-8785-a3ed0a9cacb9
 md"""
@@ -332,132 +339,10 @@ g₁₀  = HerbGrammar.read_csg("demo.grammar", "demo.constraints")
 # ╔═╡ ad351cf6-8f2b-4cd0-b207-1ecb53eb2e38
 g₁₀, g₁₀.constraints
 
-# ╔═╡ 00000000-0000-0000-0000-000000000001
-PLUTO_PROJECT_TOML_CONTENTS = """
-[deps]
-HerbConstraints = "1fa96474-3206-4513-b4fa-23913f296dfc"
-HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
-
-[compat]
-HerbConstraints = "~0.2.4"
-HerbGrammar = "~0.5.0"
-"""
-
-# ╔═╡ 00000000-0000-0000-0000-000000000002
-PLUTO_MANIFEST_TOML_CONTENTS = """
-# This file is machine-generated - editing it directly is not advised
-
-julia_version = "1.11.2"
-manifest_format = "2.0"
-project_hash = "9de8bf1f46b443ee9eabd7d66473cb29d9736653"
-
-[[deps.AbstractTrees]]
-git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
-uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
-version = "0.4.5"
-
-[[deps.Base64]]
-uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
-version = "1.11.0"
-
-[[deps.Compat]]
-deps = ["TOML", "UUIDs"]
-git-tree-sha1 = "8ae8d32e09f0dcf42a36b90d4e17f5dd2e4c4215"
-uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "4.16.0"
-
-    [deps.Compat.extensions]
-    CompatLinearAlgebraExt = "LinearAlgebra"
-
-    [deps.Compat.weakdeps]
-    Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
-    LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-
-[[deps.DataStructures]]
-deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
-git-tree-sha1 = "1d0a14036acb104d9e89698bd408f63ab58cdc82"
-uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.18.20"
-
-[[deps.Dates]]
-deps = ["Printf"]
-uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
-version = "1.11.0"
-
-[[deps.HerbConstraints]]
-deps = ["DataStructures", "HerbCore", "HerbGrammar", "MLStyle"]
-git-tree-sha1 = "a89c7d2ef3283b8feb846822505722a0a0c50a91"
-uuid = "1fa96474-3206-4513-b4fa-23913f296dfc"
-version = "0.2.4"
-
-[[deps.HerbCore]]
-deps = ["AbstractTrees"]
-git-tree-sha1 = "7af906201c6d701957b9d061c58940a28bfa4b83"
-uuid = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
-version = "0.3.4"
-
-[[deps.HerbGrammar]]
-deps = ["HerbCore", "Serialization"]
-git-tree-sha1 = "3c667987e8a27d9b697993fab68dfc602b3a18e6"
-uuid = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
-version = "0.5.0"
-
-[[deps.InteractiveUtils]]
-deps = ["Markdown"]
-uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
-version = "1.11.0"
-
-[[deps.MLStyle]]
-git-tree-sha1 = "bc38dff0548128765760c79eb7388a4b37fae2c8"
-uuid = "d8e11817-5142-5d16-987a-aa16d5891078"
-version = "0.4.17"
-
-[[deps.Markdown]]
-deps = ["Base64"]
-uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
-version = "1.11.0"
-
-[[deps.OrderedCollections]]
-git-tree-sha1 = "12f1439c4f986bb868acda6ea33ebc78e19b95ad"
-uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.7.0"
-
-[[deps.Printf]]
-deps = ["Unicode"]
-uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-version = "1.11.0"
-
-[[deps.Random]]
-deps = ["SHA"]
-uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-version = "1.11.0"
-
-[[deps.SHA]]
-uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
-version = "0.7.0"
-
-[[deps.Serialization]]
-uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
-version = "1.11.0"
-
-[[deps.TOML]]
-deps = ["Dates"]
-uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
-version = "1.0.3"
-
-[[deps.UUIDs]]
-deps = ["Random", "SHA"]
-uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
-version = "1.11.0"
-
-[[deps.Unicode]]
-uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
-version = "1.11.0"
-"""
-
 # ╔═╡ Cell order:
 # ╟─93b96839-9676-477b-aebb-e50d733a6719
 # ╟─d863795b-5fea-4b69-8f63-e04352bb970a
+# ╠═e31d8fd3-132a-448d-8a60-8069ce0f6b7a
 # ╠═84549502-876a-4ffc-8069-1ffc17622f9a
 # ╟─751e1119-fe59-41dc-8785-a3ed0a9cacb9
 # ╠═1030a96d-b739-4232-820b-f21826512251
@@ -505,5 +390,3 @@ version = "1.11.0"
 # ╠═c21e2aa6-55ba-4068-b127-d7b53c17eb45
 # ╠═407f8c03-a0ec-4b23-ba2c-22de526becc8
 # ╠═ad351cf6-8f2b-4cd0-b207-1ecb53eb2e38
-# ╟─00000000-0000-0000-0000-000000000001
-# ╟─00000000-0000-0000-0000-000000000002
