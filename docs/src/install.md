@@ -192,7 +192,7 @@ println("This program should be equiavalent to the function 2x + 1")
 
 # here we can evaluate our program on with input x = 6
 input = 6
-output = execute_on_input(SymbolTable(g), program, Dict(:x => input)) 
+output = execute_on_input(grammar2symboltable(g), program, Dict(:x => input)) 
 ```
 
 To run either click on the _Run_ button in the top right side of the screen and choose `Julia: Execute Active file in REPL` or press `ALT+Enter`
