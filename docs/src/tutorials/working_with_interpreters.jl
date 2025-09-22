@@ -115,7 +115,7 @@ The idea behind this programming language is that the program specifies a set of
 
 # ╔═╡ 1f700607-3cdf-43bf-91f2-72de3c9abc85
 md"
-The remaining functions follow a similar idea. (You can see the full implementation of this interpreter [here](https://github.com/Herb-AI/HerbBenchmarks.jl/blob/new-robots/src/data/Robots_2020/robots_primitives.jl))."
+The remaining functions follow a similar idea. (You can see the full implementation of this interpreter [here](https://github.com/Herb-AI/HerbBenchmarks.jl/blob/master/src/data/Robots_2020/robots_primitives.jl))."
 
 # ╔═╡ Cell order:
 # ╠═b03a81b5-36f5-4e1a-a07f-1206e13d6769
