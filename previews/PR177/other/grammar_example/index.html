@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>- · Herb.jl</title><meta name="title" content="- · Herb.jl"/><meta property="og:title" content="- · Herb.jl"/><meta property="twitter:title" content="- · Herb.jl"/><meta name="description" content="Documentation for Herb.jl."/><meta property="og:description" content="Documentation for Herb.jl."/><meta property="twitter:description" content="Documentation for Herb.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="Herb.jl logo"/></a><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><span class="tocitem">Basics</span><ul><li><a class="tocitem" href="../../">Herb.jl</a></li><li><a class="tocitem" href="../../install/">Installation Guide</a></li><li><a class="tocitem" href="../../tutorials/basic_getting_started/">Getting Started</a></li><li><a class="tocitem" href="../../concepts/">Herb Architecture and Core Concepts</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../../tutorials/getting_started_with_herb/">A more verbose getting started with Herb.jl</a></li><li><a class="tocitem" href="../../tutorials/defining_grammars/">Defining Grammars in Herb.jl</a></li><li><a class="tocitem" href="../../tutorials/advanced_search/">Advanced Search Procedures</a></li><li><a class="tocitem" href="../../tutorials/TopDown/">Top Down Iterator</a></li><li><a class="tocitem" href="../../tutorials/getting_started_with_constraints/">Getting started with Constraints</a></li><li><a class="tocitem" href="../../tutorials/working_with_interpreters/">Working with custom interpreters</a></li><li><a class="tocitem" href="../../tutorials/abstract_syntax_trees/">Abstract Syntax Trees</a></li></ul></li><li><span class="tocitem">Sub-Modules</span><ul><li><a class="tocitem" href="../../HerbCore/">HerbCore.jl</a></li><li><a class="tocitem" href="../../HerbGrammar/">HerbGrammar.jl</a></li><li><a class="tocitem" href="../../HerbSpecification/">HerbSpecification.jl</a></li><li><a class="tocitem" href="../../HerbInterpret/">HerbInterpret.jl</a></li><li><a class="tocitem" href="../../HerbConstraints/">HerbConstraints.jl</a></li><li><a class="tocitem" href="../../HerbSearch/">HerbSearch.jl</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>-</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>-</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl/blob/master/docs/src/other/grammar_example.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h2 id="Defining-complex-grammars"><a class="docs-heading-anchor" href="#Defining-complex-grammars">Defining complex grammars</a><a id="Defining-complex-grammars-1"></a><a class="docs-heading-anchor-permalink" href="#Defining-complex-grammars" title="Permalink"></a></h2><p>The <code>Julia</code> meta programming should allow for arbitrary complex grammars. Let&#39;s look at an example where we define while loops, conditionals and use user-defined functions in our programs.</p><p>The whole code is below</p><pre><code class="language-jl hljs">using HerbGrammar 
+using HerbSearch # only used to sample random programs from the grammar
+
+# define a custom function 
+function customfunction(x,y)
+    return x * x + y * y
+end
+
+complex_grammar = @csgrammar begin
+    # the starting symbol (does not necessary have be at the top of the grammar)
+    StartExpression = begin 
+        x = Constant # initialize x to a constant
+        Expression   # run expression with x
+    end
+    # Number definition
+    Number = Constant
+    Constant = 1 | 2 | 3
+    Number = x
+    Number = Number + Number
+    Number = Number * Number
+
+    # Expression definition
+    Expression = Number 
+    Expression = customfunction(Number, Number)
+    Expression = println(Number) # use Julia&#39;s print function
+    Condition = BoolExpression | (BoolExpression &amp;&amp; Condition) | (BoolExpression || Condition)
+    BoolExpression = (Number &lt; Number) | (Number &gt; Number) | (Number == Number)
+
+    # if condition
+    Expression = 
+        if Condition 
+            Expression
+        end 
+    # if then else
+    Expression = 
+        if Condition 
+            Expression
+        else 
+            Expression
+        end
+
+    Expression = WhileLoop
+    WhileLoop = while Condition 
+                    Expression 
+                end
+
+end
+
+
+# generate some random programs to see if they look good
+using Random
+Random.seed!(42)
+for _ in 1:10
+    rulenode_program = rand(RuleNode, complex_grammar, :StartExpression)
+    # print program tree
+    println(&quot;Rulenode program: &quot;, rulenode_program)
+    # convert prorgam tree to an expression
+    expression_program = rulenode2expr(rulenode_program, complex_grammar)
+    println(&quot;Program: &quot;,  expression_program)
+    # WARNING: some programs will loop forever and you may need to stop julia
+    # println(&quot;Eval program: &quot;, eval(expression)) 
+end</code></pre><p>The code is quite long and complex, but it shows that this way of defining grammars can be powerful. It is very <strong>important</strong> to note that everything on the right-hand side of the rule <strong>must</strong> be a valid Julia expression that can be parsed. This is the limitation that we are imposed when defining grammars like this. </p><p>One example where one might encounter this limitation, is when trying to define boolean expressions as below.</p><pre><code class="language-jl hljs">g = @csgrammar begin 
+    number = 1  
+    boolexpr = number operator number 
+    operator = &lt; | &gt; | ==
+end</code></pre><p>This might be a valid approach in a BNF grammar for instance, but it will not work in Julia. Why?</p><p>Julia can&#39;t parse the expression <code>number operator number</code>. Since we are using the Julia&#39;s parser to implement our grammars, we have to comply to the parsing rules Julia has. Usually there is always a work around that will allow you to do what you want.</p><p>For instance, this will work</p><pre><code class="language-jl hljs">g = @csgrammar begin 
+    number = 1  
+    boolexpr = number &lt; number | number &gt; number | number == number
+end</code></pre><p>You should also always check that the operator precedence that Julia uses matches your intent. You do not want to debug a grammar that does not work because Julia parses the expression on the right-hand side the way you do not want it to do. That&#39;s why it is good practice to add parenthesis <code>()</code> around your expressions when not sure about operator precedence.</p><p>What I usually do is to <em>sample</em> from the grammar many expressions and check by looking at them to see if they are parsed properly.</p><p>&lt;details&gt; &lt;summary&gt; Bonus question about grammars&lt;/summary&gt; &lt;br&gt;</p><p>Are you up for a challenge? Well, since you opened the dropdown I assume you are :wink: </p><p>Below is an incorrect grammar definition taken from some code written in Herb some time ago (it is slightly simplified).</p><p>Try to find the spot the bug :lady_beetle:. Good luck :+1: </p><p>You can check the hints below if you get stuck.</p><pre><code class="language-jl hljs">grammar_string = @cfgrammar begin
+    Start = (state = Init; Sequence; Return)
+    Init = initState(_arg_1)
+    Return = getString(state)
+
+    Sequence = Operation 
+    Sequence = Operation; Sequence
+    Operation = Transformation 
+    Operation = ControlStatement
+
+    Transformation = moveRight(state) | moveLeft(state) | makeUppercase(state) | makeLowercase(state) | drop(state)
+    ControlStatement = (Condition ? Sequence : Sequence) | (while Condition; Sequence; end)
+
+    Condition = atEnd(state) | notAtEnd(state) 
+end</code></pre><p>&lt;details&gt; &lt;summary&gt;Hint 1&lt;/summary&gt; &lt;br&gt; Try to paste the grammar definition in a Julia REPL. Do you notice anything unusual? &lt;/details&gt;</p><p>&lt;details&gt; &lt;summary&gt;Hint 2&lt;/summary&gt; &lt;br&gt; Look at this grammar rule <code>Sequence = Operation; Sequence</code> and try to find it in the output. &lt;/details&gt;</p><p>&lt;details&gt; &lt;summary&gt;Solution&lt;/summary&gt; &lt;br&gt; The expression <code>Operation; Sequence</code> is not parsed as we want by Julia. Checking the output we can see that there are two identical rules.</p><pre><code class="language-jl hljs">1: Start = begin
+    state = Init
+    Sequence
+    Return
+end
+2: Init = initState(_arg_1)
+3: Return = getString(state)
+4: Sequence = Operation
+5: Sequence = Operation  # is the same as the one on top
+6: Operation = Transformation
+// other rules
+13: ControlStatement = if Condition
+    Sequence
+else
+    Sequence
+end</code></pre><p>Adding parentheses around <code>Operation; Sequence</code> fixes the issue. Thus, <code>Sequence = (Operation; Sequence)</code> this is the correct way of writing the grammar. You can check by changing the grammar and looking at the output of the REPL.</p><p>Also if you ask Julia to parse <code>Sequence; Operation</code> vs <code>(Sequence; Operation)</code> you will notice different results:</p><pre><code class="language-sh hljs">julia&gt; Meta.parse(&quot;Operation; Sequence&quot;)
+:($(Expr(:toplevel, :Operation, :Sequence))) # &lt;- I have no idea what :toplevel means but it is not what we want most probably
+
+julia&gt; Meta.parse(&quot;(Operation; Sequence)&quot;)
+quote                    # this output looks good. It has one operation followed by another operation.
+    Operation
+    #= none:1 =# 
+    Sequence
+end</code></pre><p><a href="@ref"><code>Meta.parse</code></a> is a function is Julia that allows you to see how a raw string is parsed as an expression. </p><p>Meta-programming is hard in general. Hopefully you will be able to easily debug this kindof issues that you might encounter from now on.</p><p>&lt;/details&gt;</p><p>&lt;/details&gt;</p><h2 id="Sum"><a class="docs-heading-anchor" href="#Sum">Sum</a><a id="Sum-1"></a><a class="docs-heading-anchor-permalink" href="#Sum" title="Permalink"></a></h2><p>We have seen how to define grammars in Herb by use of the <a href="../../HerbGrammar/#HerbGrammar.@csgrammar-Tuple{Any}"><code>@csgrammar</code></a> macro. The general syntax for a rule is <code>RuleName -&gt; some_julia_expr</code>. The <code>RuleName</code> does not necessarily need to start with a capital case, it can be any identifier like expression (e.g., <code>rule1</code>, <code>rule_with_underscore</code>, etc.). However, it is nice to keep the convention that non-terminal rules start with capital rule (e.g. <code>Number</code>, <code>Start</code>) and terminal rules start with a lower case letter (e.g. <code>x</code>).</p><p>The <code>HerbGrammar</code> package also allows for the creation of <em>constraints</em> that can be enforced in the grammar. I am not knowledgeable enough to talk about them. I will leave to other contributors to better explain these concepts. </p><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+    startOnLoad: true,
+    theme: "neutral"
+});
+</script></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 1 October 2025 10:13">Wednesday 1 October 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
