@@ -135,7 +135,7 @@ begin
 		push!(solutions, rulenode2expr(solution[1][1], g_1))
 		push!(iterations, i)
 	end
-	pretty_table(HTML, [iterations nodes solutions times], header=["Iteration", "RuleNode", "Program", "Duration"])
+       pretty_table(HTML, [iterations nodes solutions times], column_labels=[["Iteration", "RuleNode", "Program", "Duration"]])
 end
 
 # ╔═╡ 9892e91b-9115-4520-9637-f8d7c8905825
@@ -386,7 +386,7 @@ begin
 		push!(programs, rulenode2expr(program_mh[1], g_4))
 		push!(iters, i)
 	end
-	pretty_table(HTML, [iters rules programs], header=["Run", "RuleNode", "Program"])
+       pretty_table(HTML, [iters rules programs], column_labels=[["Run", "RuleNode", "Program"]])
 end
 
 # ╔═╡ 700270ea-90bd-474b-91d9-0e5ed329776a
