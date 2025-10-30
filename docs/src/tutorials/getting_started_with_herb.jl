@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.13
+# v0.20.18
 
 using Markdown
 using InteractiveUtils
@@ -88,6 +88,19 @@ For now, this is irrelevant, and you can give the program any name you like.
 # ╔═╡ 059306d1-a45a-4727-ab01-1b5b80187999
 problem_1 = HerbSpecification.Problem("example", examples)
 
+# ╔═╡ e3204b9a-a97b-4f73-b6d3-d276b07cdd00
+md"""
+### Connecting grammar and problem specification
+
+For the search to produce programs that use the input examples, we need to make sure the grammar can handle them. The grammar needs a rule that matches the input definition of the problem specification. 
+In our case, the input is defined like this: 
+`IOExample(Dict(:x => x))`.
+Our grammar has already a corresponding rule (`6: Number = x`) that can handle the input. If such a rule doesn't exist yet, it needs to be added (see the tutorial on [Defining Grammars in Herb.jl](.defining_grammars.md) to learn how to add rules). 
+"""
+
+# ╔═╡ 273f3607-e6c7-4092-a849-c8d450084cfd
+
+
 # ╔═╡ 0f090666-9007-417e-a801-8231fffa19f3
 md"""
 ### Searching
@@ -169,6 +182,8 @@ end
 # ╠═8bf48b7a-0ff5-4015-81d3-ed2eeeceff1c
 # ╟─2baa7f33-c86d-40e2-9253-720ec19e4c43
 # ╠═059306d1-a45a-4727-ab01-1b5b80187999
+# ╟─e3204b9a-a97b-4f73-b6d3-d276b07cdd00
+# ╠═273f3607-e6c7-4092-a849-c8d450084cfd
 # ╟─0f090666-9007-417e-a801-8231fffa19f3
 # ╠═d553f37b-bc8a-4426-a98b-fb195ed994d9
 # ╠═e1910236-9783-4989-a014-c3f7ccdf33d3
