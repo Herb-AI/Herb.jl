@@ -50,17 +50,12 @@ Second, the problem specification can be provided using e.g. input/output exampl
 problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 
 # ╔═╡ 08cc1274-3ea2-4e21-891b-e4cca9281eeb
-md"
+md"""
 For the search to produce programs that use the input examples, we need to ensure that there is a rule where the right-hand side matches the symbol used in the input to the `IOExample`.
-In our case, the input is defined like this: 
-`IOExample(Dict(:x => x))`.
-Our grammar has already a corresponding rule (`Number = x`) that can handle the input. 
+For an example like `IOExample(Dict(:x => 1), 2)`, there must be some rule like `Number = x`--the `x`'s must match, otherwise the input value will never be used in any of the programs. If you have multiple input arguments, like `IOExample(Dict(:x => 1, :name => "Alice", "1. Alice"))`, then you need two rules, such as `Number = x` and `String = name`, to construct programs that use both inputs.
 
 The problem is given now, let us search for a solution with `HerbSearch`. For now, we will just use the default parameters searching for a satisfying program over the grammar, given the problem and a starting symbol using
-"
-
-# ╔═╡ 30b431b2-e5a2-451d-a553-328111249515
-
+"""
 
 # ╔═╡ 2732bd85-4076-4530-99bf-9076a8811329
 iterator = BFSIterator(g, :Number, max_depth=5)
@@ -130,8 +125,7 @@ println(output)
 # ╠═eec315e4-ae65-4d97-ac9e-8b31a6d3ad0e
 # ╟─b55c696a-a421-462a-abfd-b8f2c652d4f0
 # ╠═dc8926aa-91c1-4a04-ab8d-6820edc6db2b
-# ╠═08cc1274-3ea2-4e21-891b-e4cca9281eeb
-# ╠═30b431b2-e5a2-451d-a553-328111249515
+# ╟─08cc1274-3ea2-4e21-891b-e4cca9281eeb
 # ╠═2732bd85-4076-4530-99bf-9076a8811329
 # ╠═01ce2ad4-ad00-41cf-afe3-757ae62ac4c6
 # ╟─a94e49d4-a348-4af9-8236-f18dcbe7ef5c
