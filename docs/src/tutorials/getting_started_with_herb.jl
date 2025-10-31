@@ -91,11 +91,9 @@ problem_1 = HerbSpecification.Problem("example", examples)
 # ╔═╡ e3204b9a-a97b-4f73-b6d3-d276b07cdd00
 md"""
 ### Connecting grammar and problem specification
-
-For the search to produce programs that use the input examples, we need to make sure the grammar can handle them. The grammar needs a rule that matches the input definition of the problem specification. 
-In our case, the input is defined like this: 
-`IOExample(Dict(:x => x))`.
-Our grammar has already a corresponding rule (`Number = x`) that can handle the input. If such a rule doesn't exist yet, it needs to be added (see the tutorial on [Defining Grammars in Herb.jl](.defining_grammars.md) to learn how to add rules). 
+For the search to produce programs that use the input examples, we need to ensure that there is a rule where the right-hand side matches the symbol used in the input to the `IOExample`.
+For an example like `IOExample(Dict(:x => 1), 2)`, there must be some rule like `Number = x`--the `x`'s must match, otherwise the input value will never be used in any of the programs. If you have multiple input arguments, like `IOExample(Dict(:x => 1, :name => "Alice", "1. Alice"))`, then you need two rules, such as `Number = x` and `String = name`, to construct programs that use both inputs.
+If these rules don't exist yet, they need to be added (see the tutorial on [Defining Grammars in Herb.jl](.defining_grammars.md) to learn how to add rules). 
 """
 
 # ╔═╡ 273f3607-e6c7-4092-a849-c8d450084cfd
