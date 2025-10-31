@@ -6,9 +6,9 @@ using InteractiveUtils
 
 # ╔═╡ 1212cbc3-bb49-46cb-b9a3-475815d59f2d
 begin
-	import Pkg
-	Pkg.activate(Base.current_project())
-	Pkg.instantiate()
+    import Pkg
+    Pkg.activate(Base.current_project())
+    Pkg.instantiate()
 end
 
 # ╔═╡ 1defafc5-ce65-42f0-90cd-de9e8895ec90
@@ -49,7 +49,7 @@ If you run this cell, you can see all the rules rolled out.
 
 # ╔═╡ 763b378b-66f9-481e-a3da-ca37825eb255
 g = HerbGrammar.@csgrammar begin
-    Number = 0|2|4|6|8
+    Number = 0 | 2 | 4 | 6 | 8
     Number = x
     Number = Number + Number
     Number = Number - Number
@@ -95,7 +95,7 @@ md"""
 For the search to produce programs that use the input examples, we need to make sure the grammar can handle them. The grammar needs a rule that matches the input definition of the problem specification. 
 In our case, the input is defined like this: 
 `IOExample(Dict(:x => x))`.
-Our grammar has already a corresponding rule (`6: Number = x`) that can handle the input. If such a rule doesn't exist yet, it needs to be added (see the tutorial on [Defining Grammars in Herb.jl](.defining_grammars.md) to learn how to add rules). 
+Our grammar has already a corresponding rule (`Number = x`) that can handle the input. If such a rule doesn't exist yet, it needs to be added (see the tutorial on [Defining Grammars in Herb.jl](.defining_grammars.md) to learn how to add rules). 
 """
 
 # ╔═╡ 273f3607-e6c7-4092-a849-c8d450084cfd

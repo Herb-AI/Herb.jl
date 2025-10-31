@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.13
+# v0.20.18
 
 using Markdown
 using InteractiveUtils
@@ -51,8 +51,16 @@ problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 
 # ╔═╡ 08cc1274-3ea2-4e21-891b-e4cca9281eeb
 md"
+For the search to produce programs that use the input examples, we need to make sure the grammar can handle them. The grammar needs a rule that matches the input definition of the problem specification. 
+In our case, the input is defined like this: 
+`IOExample(Dict(:x => x))`.
+Our grammar has already a corresponding rule (`Number = x`) that can handle the input. 
+
 The problem is given now, let us search for a solution with `HerbSearch`. For now, we will just use the default parameters searching for a satisfying program over the grammar, given the problem and a starting symbol using
 "
+
+# ╔═╡ 30b431b2-e5a2-451d-a553-328111249515
+
 
 # ╔═╡ 2732bd85-4076-4530-99bf-9076a8811329
 iterator = BFSIterator(g, :Number, max_depth=5)
@@ -122,7 +130,8 @@ println(output)
 # ╠═eec315e4-ae65-4d97-ac9e-8b31a6d3ad0e
 # ╟─b55c696a-a421-462a-abfd-b8f2c652d4f0
 # ╠═dc8926aa-91c1-4a04-ab8d-6820edc6db2b
-# ╟─08cc1274-3ea2-4e21-891b-e4cca9281eeb
+# ╠═08cc1274-3ea2-4e21-891b-e4cca9281eeb
+# ╠═30b431b2-e5a2-451d-a553-328111249515
 # ╠═2732bd85-4076-4530-99bf-9076a8811329
 # ╠═01ce2ad4-ad00-41cf-afe3-757ae62ac4c6
 # ╟─a94e49d4-a348-4af9-8236-f18dcbe7ef5c
