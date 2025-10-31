@@ -51,7 +51,7 @@ problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 
 # ╔═╡ 08cc1274-3ea2-4e21-891b-e4cca9281eeb
 md"
-For the search to produce programs that use the input examples, we need to make sure the grammar can handle them. The grammar needs a rule that matches the input definition of the problem specification. 
+For the search to produce programs that use the input examples, we need to ensure that there is a rule where the right-hand side matches the symbol used in the input to the `IOExample`.
 In our case, the input is defined like this: 
 `IOExample(Dict(:x => x))`.
 Our grammar has already a corresponding rule (`Number = x`) that can handle the input. 
