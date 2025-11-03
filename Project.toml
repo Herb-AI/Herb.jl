@@ -3,6 +3,20 @@ uuid = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
 authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Tilman Hinnerichs <t.r.hinnerichs@tudelft.nl>", "Sebastijan Dumancic <s.dumancic@tudelft.nl>"]
 version = "0.6.1"
 
+[workspace]
+projects = [
+    "test",
+    "docs",
+    "Benchmarks",
+    "Garden",
+    "herbs/HerbConstraints",
+    "herbs/HerbCore",
+    "herbs/HerbGrammar",
+    "herbs/HerbInterpret",
+    "herbs/HerbSearch",
+    "herbs/HerbSpecification",
+]
+
 [deps]
 HerbConstraints = "1fa96474-3206-4513-b4fa-23913f296dfc"
 HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
@@ -11,6 +25,16 @@ HerbInterpret = "5bbddadd-02c5-4713-84b8-97364418cca7"
 HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
 HerbSpecification = "6d54aada-062f-46d8-85cf-a1ceaf058a06"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+
+[sources]
+Garden = {path = "Garden"}
+Benchmarks = {path = "Benchmarks"}
+HerbConstraints = {path = "herbs/HerbConstraints"}
+HerbCore = {path = "herbs/HerbCore"}
+HerbGrammar = {path = "herbs/HerbGrammar"}
+HerbInterpret = {path = "herbs/HerbInterpret"}
+HerbSearch = {path = "herbs/HerbSearch"}
+HerbSpecification = {path = "herbs/HerbSpecification"}
 
 [compat]
 HerbConstraints = "0.4"
