@@ -1,0 +1,18 @@
+[submodule "herbs/HerbCore"]
+	path = herbs/HerbCore
+	url = git@github.com:Herb-AI/HerbCore.jl
+[submodule "herbs/HerbGrammar"]
+	path = herbs/HerbGrammar
+	url = git@github.com:Herb-AI/HerbGrammar.jl
+[submodule "herbs/HerbSpecification"]
+	path = herbs/HerbSpecification
+	url = git@github.com:Herb-AI/HerbSpecification.jl
+[submodule "herbs/HerbInterpret"]
+	path = herbs/HerbInterpret
+	url = git@github.com:Herb-AI/HerbInterpret.jl
+[submodule "herbs/HerbConstraints"]
+	path = herbs/HerbConstraints
+	url = git@github.com:Herb-AI/HerbConstraints.jl
+[submodule "herbs/HerbSearch"]
+	path = herbs/HerbSearch
+	url = git@github.com:Herb-AI/HerbSearch.jl
