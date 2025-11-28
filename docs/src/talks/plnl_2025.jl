@@ -386,12 +386,12 @@ htl"<small>Besides the fact that <i>everything</i> is program synthesis</small>"
 # ╔═╡ 3d84373c-2e59-47a0-a89c-7d8a6ce602df
 Columns(
 htl"""
-<img style="border-radius: 300px" src="https://sebdumancic.github.io/assets/img/people/Tilman-Hinnerichs3.jpg" height="80"/><br /><br />
+<img style="border-radius: 2px" src="https://sebdumancic.github.io/assets/img/people/Tilman-Hinnerichs3.jpg" height="80"/><br /><br />
 	
 Tilman (<i>T.R.Hinnerichs@tudelft.nl</i>)
 """,
 htl"""
-<img style="border-radius: 300px" src="https://sebdumancic.github.io/assets/img/people/Reuben-Gardos-Reid3.jpg" height="80"/><br /><br />
+<img style="border-radius: 2px" src="https://sebdumancic.github.io/assets/img/people/Reuben-Gardos-Reid3.jpg" height="80"/><br /><br />
 
 Reuben Gardos Reid (<i>R.J.GardosReid@tudelft.nl</i>)
 """)
@@ -410,7 +410,7 @@ htl"""
 
 <br />
 
-<img style="border-radius: 100px" src="https://sebdumancic.github.io/assets/img/people/Reuben-Gardos-Reid3.jpg" height="80"/>
+<img style="border-radius: 2px" src="https://sebdumancic.github.io/assets/img/people/Reuben-Gardos-Reid3.jpg" height="80"/>
 
 <p><b>Reuben Gardos Reid</b>, Tilman Hinnerichs</p>
 
@@ -1873,7 +1873,7 @@ version = "1.9.2+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─aebd1723-2eb7-4b38-9725-292a407ac0da
+# ╠═aebd1723-2eb7-4b38-9725-292a407ac0da
 # ╟─029e4be9-00df-4a37-aaaa-b7fb5132d8ad
 # ╟─5e2a8464-03f8-4030-bc4a-6f8bf0fe227d
 # ╟─06ac4f83-ed94-4195-85ea-1a9bc370466b
