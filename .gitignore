@@ -24,6 +24,5 @@ docs/Manifest.toml
 # environment.
 Manifest.toml
 
-# Herb modules
-HerbBenchmarks.jl
-HerbLearn.jl
+# AirspeedVelocity benchmarking results
+results*.json*
