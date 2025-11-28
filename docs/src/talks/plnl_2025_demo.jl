@@ -34,33 +34,6 @@ using GraphRecipes
 # ╔═╡ 453c0464-d66f-40ae-84eb-e6aee05b5fed
 using Tables
 
-# ╔═╡ 029e4be9-00df-4a37-aaaa-b7fb5132d8ad
-md"""
-## What is Program Synthesis?
-
-- Given
-  - Specification
-  - Grammar
-- Search for
-  - Program using given grammar with specified behavior
-"""
-
-# ╔═╡ 5e2a8464-03f8-4030-bc4a-6f8bf0fe227d
-md"""
-## What is Program Synthesis?
-
-- Given
-  - Specification → `f(2) = 4, f(4) = 16`
-  - Grammar → `+`, `*`, `1`, `2`, `x`
-- Search for
-  - Program using given grammar with specified behavior → `x * x`
-"""
-
-# ╔═╡ 06ac4f83-ed94-4195-85ea-1a9bc370466b
-md"""
-Why might this be relevant for PL?
-"""
-
 # ╔═╡ d1185051-31e4-488a-b604-8588f2d18a0f
 md"""
 ## What is Program Synthesis?
@@ -94,20 +67,6 @@ Current PS implementations are
 - difficult to compare
 
 How are we addressing these shortcomings?
-"""
-
-# ╔═╡ e6331f11-d7b1-4bc8-ae10-fe8282b072d8
-md"""
-## Herb provides the ingredients
-
-For synthesis, we need
-
-- A tree structure
-- Grammar to give syntax to the tree
-- Constraints to further shape the solution
-- Generate/enumerate/search over trees
-- A way to interpret the tree
-- A way to specify whether the interpreted behavior is desirable
 """
 
 # ╔═╡ 665cecdb-92e4-4011-bac2-9a2e37073434
@@ -167,11 +126,6 @@ Not so fast...
 - `x ÷ 1`
 """, g)
 
-# ╔═╡ 05a1d5c6-bfd6-4fab-9945-1ea39761166d
-md"""
-## Constraints
-"""
-
 # ╔═╡ 34a8eee7-86f3-47ee-a9af-8838dd8e2086
 Columns(md"*Enforce an order on the `+` rule, with any children `a` and `b`*", g, widths=[66, 33])
 
@@ -186,11 +140,6 @@ md"""
 # ╔═╡ 926b378c-1c0c-4267-a06b-aee5aa12408a
 order = Ordered(plus_rule_any_children, [:a, :b]);
 
-# ╔═╡ c89ab903-c928-4c48-8385-71456ff514be
-md"""
-## Constraints
-"""
-
 # ╔═╡ 77e46419-d508-4efe-90e7-eee5c8f31551
 Columns(md"""
 *Forbid any expression that matches the patterns*
@@ -204,12 +153,6 @@ plus_minus = DomainRuleNode(g, [1, 2], [VarNode(:a), RuleNode(4)]);
 # ╔═╡ 8e00c935-270d-4b7c-a0ce-443a269f9478
 forbid_zero = Forbidden(plus_minus);
 
-# ╔═╡ 1339dead-f0c1-4948-a0b6-fd1b3be87472
-md"""
-## Constraints
-
-"""
-
 # ╔═╡ da07fbe0-5f63-47c3-a896-986ac69a0f5a
 Columns(md"""
 *Forbid any expression that matches the pattern `⍰ ÷ 1`*
@@ -221,22 +164,12 @@ div_by_one = DomainRuleNode(g, [3], [VarNode(:a), RuleNode(5)]);
 # ╔═╡ 1eb441fb-210f-4cce-bd1e-438cfbf20dfd
 forbid_one = Forbidden(div_by_one);
 
-# ╔═╡ 43f4a295-c886-4425-8434-3d43c42df6a4
-md"""
-## Constraints
-"""
-
 # ╔═╡ 3ac5cc41-d55e-4e15-9900-974135bec71d
 Columns(md"*Force the program to contain the input, `x`*
 ", g, widths=[70, 30])
 
 # ╔═╡ 512b342e-b613-4101-b108-3de703430b3e
 contains_input = Contains(8);
-
-# ╔═╡ d6020710-ce87-4239-abdf-993020a3d6cb
-md"""
-## Constraints
-"""
 
 # ╔═╡ b12ac464-8b45-4aa0-b264-bb5748a2d358
 Columns(
@@ -258,9 +191,6 @@ let
 	apply
 	g.constraints
 end
-
-# ╔═╡ 23d9b01a-e48c-44b9-bde9-2c37c8151361
-synth(problem, BFSIterator(g, :Int; max_depth=3));
 
 # ╔═╡ 720daabe-33a2-4082-aa8f-e79a9471a2ff
 md"""
@@ -327,25 +257,10 @@ md"""
 ## Thank you!
 """
 
-# ╔═╡ c091fb87-ecf6-4e14-ade1-0b7d140c2ba5
-PlutoUI.br
-
 # ╔═╡ b65c93f0-d226-4c9a-8df7-ff3b97c79ca5
-Columns(md"""
-ℹ️ Tutorials, docs: [herb-ai.github.io](https://herb-ai.github.io/)
-""", md"""
-📓 Live notebook: [https://pluto.land/n/l2q17dx1](https://pluto.land/n/l2q17dx1)
-""")
-
-# ╔═╡ d054f1af-57d8-426b-95c0-fca38d1323a8
-Columns(
-	# br,
-	PlutoUI.LocalResource(joinpath(@__DIR__, "Herb_at_PLNL2025_QR.png")),
-	br,
-	PlutoUI.LocalResource(joinpath(@__DIR__, "Herb_website_QR.png")),
-	br,
-	widths=[20, 30, 20, 30]
-)
+md"""
+- ℹ️ Tutorials, docs: [herb-ai.github.io](https://herb-ai.github.io/)
+"""
 
 # ╔═╡ bbe8a2f1-0c16-4f88-8e48-7b0c1b8c895e
 md"""
@@ -372,11 +287,6 @@ import HypertextLiteral: @htl, @htl_str
 
 # ╔═╡ 44dfbd7f-1089-48f2-9e37-f1047cc158a6
 htl"<small>Besides the fact that <i>everything</i> is program synthesis</small>"
-
-# ╔═╡ 9ff8d3d4-c0bd-4ed9-9b9d-e7e702ec2237
-@htl"""
-<h2><i><span style="color: #389826">We're ready:</span></i> Let's synthesize</h2>
-"""
 
 # ╔═╡ 14987487-1494-490e-92d7-e0dcaa7cfb8e
 @htl"""
@@ -1874,15 +1784,11 @@ version = "1.9.2+0"
 
 # ╔═╡ Cell order:
 # ╟─aebd1723-2eb7-4b38-9725-292a407ac0da
-# ╟─029e4be9-00df-4a37-aaaa-b7fb5132d8ad
-# ╟─5e2a8464-03f8-4030-bc4a-6f8bf0fe227d
-# ╟─06ac4f83-ed94-4195-85ea-1a9bc370466b
 # ╟─d1185051-31e4-488a-b604-8588f2d18a0f
 # ╟─46f7f59c-c99b-45a7-b5f4-c211b265b414
 # ╟─44dfbd7f-1089-48f2-9e37-f1047cc158a6
 # ╟─04a32286-3b67-4b43-906b-bbaec32ac128
 # ╟─c69e4f06-d0f5-4913-b64d-1e4ec43933be
-# ╟─e6331f11-d7b1-4bc8-ae10-fe8282b072d8
 # ╟─665cecdb-92e4-4011-bac2-9a2e37073434
 # ╟─187fe631-0eab-49d7-b417-25b58b173644
 # ╠═d0f0768f-07fc-4b3d-b3f9-4acc5a064623
@@ -1893,28 +1799,21 @@ version = "1.9.2+0"
 # ╟─aaff0ce9-7d24-461a-addc-f46f545d4cba
 # ╟─9cc146c4-9e4e-41bf-a1e4-64fe928eec0f
 # ╟─0b77dcc6-5b3e-4305-86c1-61c0b9dee38d
-# ╟─05a1d5c6-bfd6-4fab-9945-1ea39761166d
 # ╟─34a8eee7-86f3-47ee-a9af-8838dd8e2086
 # ╠═2c99e374-2b71-4eb1-a145-154ae829d77b
 # ╟─8ae05f28-e901-4a87-9d06-7c854172003b
 # ╠═926b378c-1c0c-4267-a06b-aee5aa12408a
-# ╟─c89ab903-c928-4c48-8385-71456ff514be
 # ╟─77e46419-d508-4efe-90e7-eee5c8f31551
 # ╠═74f19e4a-9e3d-49b7-b95c-977fd313165b
 # ╠═8e00c935-270d-4b7c-a0ce-443a269f9478
-# ╟─1339dead-f0c1-4948-a0b6-fd1b3be87472
 # ╟─da07fbe0-5f63-47c3-a896-986ac69a0f5a
 # ╠═ddef4e20-7587-4f3e-b545-c71ddd9df32d
 # ╠═1eb441fb-210f-4cce-bd1e-438cfbf20dfd
-# ╟─43f4a295-c886-4425-8434-3d43c42df6a4
 # ╟─3ac5cc41-d55e-4e15-9900-974135bec71d
 # ╠═512b342e-b613-4101-b108-3de703430b3e
-# ╟─d6020710-ce87-4239-abdf-993020a3d6cb
 # ╟─b12ac464-8b45-4aa0-b264-bb5748a2d358
 # ╟─d0b2f64f-23e8-48ed-84a1-773ae9574788
 # ╟─cb44530e-7a02-43d0-ae20-47652aefb165
-# ╟─9ff8d3d4-c0bd-4ed9-9b9d-e7e702ec2237
-# ╠═23d9b01a-e48c-44b9-bde9-2c37c8151361
 # ╟─14987487-1494-490e-92d7-e0dcaa7cfb8e
 # ╠═cf0d8352-e0c4-4121-8712-58708750e845
 # ╟─720daabe-33a2-4082-aa8f-e79a9471a2ff
@@ -1928,9 +1827,7 @@ version = "1.9.2+0"
 # ╟─834fb306-5e7f-45d6-b982-5d479b2d71e7
 # ╟─f8d10372-8dce-4a94-99b2-8bb3f8377483
 # ╟─3d84373c-2e59-47a0-a89c-7d8a6ce602df
-# ╟─c091fb87-ecf6-4e14-ade1-0b7d140c2ba5
 # ╟─b65c93f0-d226-4c9a-8df7-ff3b97c79ca5
-# ╟─d054f1af-57d8-426b-95c0-fca38d1323a8
 # ╟─bbe8a2f1-0c16-4f88-8e48-7b0c1b8c895e
 # ╠═93e8ff57-b5a1-47ea-9518-3bc1fb6110c7
 # ╠═91813d11-454f-468d-a5cc-e59a862c9f13
