@@ -26,7 +26,7 @@
     # This information is used for caching.
     [PlutoStaticHTML.State]
     input_sha = "7f6d2c79d4e994a25b08d4ee57295d2ef1e865c282ddf1847c84c5dbceddbe9a"
-    julia_version = "1.11.7"
+    julia_version = "1.12.2"
 -->
 
 <div class="markdown"><h1 id="Getting-started-with-HerbConstraints">Getting started with HerbConstraints</h1><p>When enumerating programs using a grammar, we will encounter many redundant programs. For example, <code>x</code>, <code>-(-x)</code> and <code>1 * x</code> are syntactically different programs, but they have the same semantics. Grammar constraints aim to speed up synthesis by eliminating such redundant programs and thereby reducing the size of the program space.</p></div>
@@ -205,7 +205,7 @@ end</code></pre>
 <div class="markdown"><p>To be able to add our custom constraint to the grammar, we need to implement two more functions that are required for all grammar constraints:</p><ul><li><p><code>HerbCore.is_domain_valid()</code></p></li><li><p><code>HerbCore.issame()</code></p></li></ul><p>Let's look at <code>is_domain_valid</code> first. For a <code>ForbidConsecutive</code> constraint the domain is valid if its <code>rule</code> is a valid rule index, i.e. it does not exceed the number of rules in the given grammar.</p><p>The docs for tell us that there is two interfaces for <code>is_domain</code> and we will implement both.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>@doc HerbCore.is_domain_valid</code></pre>
-<div class="markdown"><pre><code>is_domain_valid(x, n_rules::Integer)
+<div class="markdown"><pre><code class="language-julia">is_domain_valid(x, n_rules::Integer)
 is_domain_valid(x, grammar::AbstractGrammar)</code></pre><p>Check if the domain for the given object <code>x</code> (ex: <a href="@ref"><code>RuleNode</code></a>, <a href="@ref"><code>Hole</code></a> or <a href="@ref"><code>AbstractConstraint</code></a>) is valid given the provided grammar or number of rules.</p><p>If <a href="@ref"><code>isfilled</code></a><code>(x)</code> and <code>x</code> has children, it checks if all children are valid.</p></div>
 
 
@@ -225,7 +225,7 @@ end</code></pre>
 <div class="markdown"><p><code>issame</code> is used by <code>addconstraint!</code> to avoid duplicate constraints, i.e. a constraint is only added to the grammar if it doesn't already exist. If not implemented for a specific type, <code>issame</code> defaults to <code>false</code>. </p></div>
 
 <pre class='language-julia'><code class='language-julia'>@doc HerbCore.issame</code></pre>
-<div class="markdown"><pre><code>issame(a, b)</code></pre><p>Returns whether the two given objects <code>a</code> and <code>b</code> (ex: <a href="@ref"><code>RuleNode</code></a>, <a href="@ref"><code>Hole</code></a> or <a href="@ref"><code>AbstractConstraint</code></a>) are the same.</p></div>
+<div class="markdown"><pre><code class="language-julia">issame(a, b)</code></pre><p>Returns whether the two given objects <code>a</code> and <code>b</code> (ex: <a href="@ref"><code>RuleNode</code></a>, <a href="@ref"><code>Hole</code></a> or <a href="@ref"><code>AbstractConstraint</code></a>) are the same.</p></div>
 
 
 <div class="markdown"><p>We consider two <code>ForbidConsecutive</code> constraints to be the same if their <code>rule</code>s are equal. </p></div>
@@ -340,4 +340,4 @@ mermaid.initialize({
     startOnLoad: true,
     theme: "neutral"
 });
-</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../TopDown/">« Top Down Iterator</a><a class="docs-footer-nextpage" href="../working_with_interpreters/">Working with custom interpreters »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 1 October 2025 10:22">Wednesday 1 October 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../TopDown/">« Top Down Iterator</a><a class="docs-footer-nextpage" href="../working_with_interpreters/">Working with custom interpreters »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 1 December 2025 08:43">Monday 1 December 2025</span>. Using Julia version 1.12.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

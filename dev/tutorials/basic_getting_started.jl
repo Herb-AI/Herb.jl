@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.13
+# v0.20.18
 
 using Markdown
 using InteractiveUtils
@@ -50,9 +50,12 @@ Second, the problem specification can be provided using e.g. input/output exampl
 problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 
 # ╔═╡ 08cc1274-3ea2-4e21-891b-e4cca9281eeb
-md"
+md"""
+For the search to produce programs that use the input examples, we need to ensure that there is a rule where the right-hand side matches the symbol used in the input to the `IOExample`.
+For an example like `IOExample(Dict(:x => 1), 2)`, there must be some rule like `Number = x`--the `x`'s must match, otherwise the input value will never be used in any of the programs. If you have multiple input arguments, like `IOExample(Dict(:x => 1, :name => "Alice", "1. Alice"))`, then you need two rules, such as `Number = x` and `String = name`, to construct programs that use both inputs.
+
 The problem is given now, let us search for a solution with `HerbSearch`. For now, we will just use the default parameters searching for a satisfying program over the grammar, given the problem and a starting symbol using
-"
+"""
 
 # ╔═╡ 2732bd85-4076-4530-99bf-9076a8811329
 iterator = BFSIterator(g, :Number, max_depth=5)
