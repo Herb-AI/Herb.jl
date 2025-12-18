@@ -1,6 +1,6 @@
 name = "Herb"
 uuid = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Tilman Hinnerichs <t.r.hinnerichs@tudelft.nl>", "Sebastijan Dumancic <s.dumancic@tudelft.nl>"]
 
 [deps]
