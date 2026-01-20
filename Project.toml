@@ -14,7 +14,7 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
 HerbConstraints = "0.5"
-HerbCore = "0.3"
+HerbCore = "0.3, 1"
 HerbGrammar = "0.6"
 HerbInterpret = "0.2"
 HerbSearch = "0.4"
