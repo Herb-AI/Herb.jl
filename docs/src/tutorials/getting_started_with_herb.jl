@@ -1,14 +1,14 @@
 ### A Pluto.jl notebook ###
-# v0.20.13
+# v0.20.18
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ 1212cbc3-bb49-46cb-b9a3-475815d59f2d
 begin
-	import Pkg
-	Pkg.activate(Base.current_project())
-	Pkg.instantiate()
+    import Pkg
+    Pkg.activate(Base.current_project())
+    Pkg.instantiate()
 end
 
 # ╔═╡ 1defafc5-ce65-42f0-90cd-de9e8895ec90
@@ -49,7 +49,7 @@ If you run this cell, you can see all the rules rolled out.
 
 # ╔═╡ 763b378b-66f9-481e-a3da-ca37825eb255
 g = HerbGrammar.@csgrammar begin
-    Number = 0|2|4|6|8
+    Number = 0 | 2 | 4 | 6 | 8
     Number = x
     Number = Number + Number
     Number = Number - Number
@@ -87,6 +87,14 @@ For now, this is irrelevant, and you can give the program any name you like.
 
 # ╔═╡ 059306d1-a45a-4727-ab01-1b5b80187999
 problem_1 = HerbSpecification.Problem("example", examples)
+
+# ╔═╡ e3204b9a-a97b-4f73-b6d3-d276b07cdd00
+md"""
+### Connecting grammar and problem specification
+For the search to produce programs that use the input examples, we need to ensure that there is a rule where the right-hand side matches the symbol used in the input to the `IOExample`.
+For an example like `IOExample(Dict(:x => 1), 2)`, there must be some rule like `Number = x`--the `x`'s must match, otherwise the input value will never be used in any of the programs. If you have multiple input arguments, like `IOExample(Dict(:x => 1, :name => "Alice", "1. Alice"))`, then you need two rules, such as `Number = x` and `String = name`, to construct programs that use both inputs.
+If these rules don't exist yet, they need to be added (see the tutorial on [Defining Grammars in Herb.jl](.defining_grammars.md) to learn how to add rules). 
+"""
 
 # ╔═╡ 0f090666-9007-417e-a801-8231fffa19f3
 md"""
@@ -169,6 +177,7 @@ end
 # ╠═8bf48b7a-0ff5-4015-81d3-ed2eeeceff1c
 # ╟─2baa7f33-c86d-40e2-9253-720ec19e4c43
 # ╠═059306d1-a45a-4727-ab01-1b5b80187999
+# ╟─e3204b9a-a97b-4f73-b6d3-d276b07cdd00
 # ╟─0f090666-9007-417e-a801-8231fffa19f3
 # ╠═d553f37b-bc8a-4426-a98b-fb195ed994d9
 # ╠═e1910236-9783-4989-a014-c3f7ccdf33d3

@@ -68,14 +68,17 @@ The specification is used to construct a problem instance. It will be combined w
 problem = Problem(specification)
 
 # ╔═╡ 08cc1274-3ea2-4e21-891b-e4cca9281eeb
-md"
+md"""
+For the search to produce programs that use the input examples, we need to ensure that there is a rule where the right-hand side matches the symbol used in the input to the `IOExample`.
+For an example like `IOExample(Dict(:x => 1), 2)`, there must be some rule like `Number = x`--the `x`'s must match, otherwise the input value will never be used in any of the programs. If you have multiple input arguments, like `IOExample(Dict(:x => 1, :name => "Alice", "1. Alice"))`, then you need two rules, such as `Number = x` and `String = name`, to construct programs that use both inputs.
+
 
 # Searching for Programs
 
 Having defined the grammar and problem, let us search for a solution with [`HerbSearch`](https://herb-ai.github.io/Herb.jl/dev/HerbSearch/). 
 
 To do so, we will iterate the space of all possible program trees in a breadth-first manner using a [`BFSIterator`](https://herb-ai.github.io/Herb.jl/dev/HerbSearch/#HerbSearch.BFSIterator). It starts with program tree consisting of a single `:Number` node, and is bounded by setting the maximum depth of the program tree to 5.
-"
+"""
 
 # ╔═╡ 2732bd85-4076-4530-99bf-9076a8811329
 program_tree_iterator = BFSIterator(g, :Number, max_depth=5)
