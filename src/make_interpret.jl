@@ -88,7 +88,6 @@ function build_match_cases(
             elseif _is_input_tag(x, input_set)
                 return :( input[$(QuoteNode(x))] )
             else
-                # Treat as a constant/function name in the target module
                 return GlobalRef(target_module, x)
             end
         elseif x isa Expr
@@ -136,15 +135,16 @@ function build_match_cases(
             rhs_code = emit_eval(rhs_rule, nxt)
 
         elseif rhs_rule isa Symbol
-            # Symbol terminals: input if configured, else constant symbol resolved in target_module
-            if _is_input_tag(rhs_rule, input_set)
+            if rhs_rule in grammar.types
+                # NEW: pass-through alias rule like Start = Number
+                rhs_code = :( $interp_name(c[1], input) )
+            elseif _is_input_tag(rhs_rule, input_set)
                 rhs_code = :( input[$(QuoteNode(rhs_rule))] )
             else
                 rhs_code = GlobalRef(target_module, rhs_rule)
             end
 
         else
-            # Literal terminals: Int, String, etc.
             rhs_code = rhs_rule
         end
 
@@ -179,6 +179,8 @@ function make_interpreter(
         input_symbols=input_symbols,
         target_module=target_module,
     )
+
+    @show branches
 
     cascade = Expr(:block,
         branches...,
