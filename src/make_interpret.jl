@@ -13,22 +13,6 @@ A tag is treated as an *input terminal* if:
 _is_input_tag(tag, input_set) =
     tag isa Symbol && (occursin("_arg_", String(tag)) || (input_set !== nothing && (tag in input_set)))
 
-# Example: :(Number + 1)  ->  Expr(:call, :+, :Number, 1)   (as *code*)
-_pat_atom(x) =
-    x isa Symbol ? QuoteNode(x) :
-    x isa Expr   ? _pat_expr(x) :
-    x
-
-"""
-    _pat_expr(ex::Expr)
-
-Internal helper that converts an `Expr` value into an MLStyle-friendly pattern AST. E.g. :(Number + 1) cannot be used directly on the left-hand-side of `@match`.
-"""
-function _pat_expr(ex::Expr)
-    return Expr(:call, :Expr, QuoteNode(ex.head), (_pat_atom(a) for a in ex.args)...)
-end
-
-
 """
     get_relevant_tags(grammar::AbstractGrammar) -> Dict{Int,Any}
 
@@ -70,38 +54,46 @@ function get_relevant_tags(grammar::AbstractGrammar)
 end
 
 
+# Resolve symbol `f` in `target_module` at compile time.
+function _qualify(target_module::Module, f)
+    return f isa Symbol ? GlobalRef(target_module, f) : f
+end
+
+
 """
-    build_match_cases(grammar::AbstractGrammar; interp_name=:interpret, input_symbols=nothing) -> Vector{Expr}
+    build_match_cases(grammar; interp_name=:interpret, input_symbols=nothing, target_module=@__MODULE__) -> Vector{Expr}
 
-Generate the case list inserted into `MLStyle.@match`.
+Return a vector of "guarded return" branches of the form:
 
-The generated cases implement a recursive interpreter of a `prog::AbstractRuleNode`:
+    r == k && return <rhs>
+
+These branches are intended to be spliced into a block after
+`r = get_rule(prog); c = get_children(prog)`.
 """
 function build_match_cases(
         grammar::AbstractGrammar;
         interp_name::Symbol = :interpret,
         input_symbols::Union{Nothing,AbstractVector{Symbol}} = nothing,
+        target_module::Module = @__MODULE__,
     )
-    tags  = get_relevant_tags(grammar)
-    cases = Expr[]
-
     input_set = input_symbols === nothing ? nothing : Set(input_symbols)
 
-    # Build an evaluation Expr from a rule expression, consuming `c[i]` for each nonterminal occurrence.
+    # Emit code to evaluate a rule RHS, consuming children c[i] for nonterminals.
     function emit_eval(x, next_child::Base.RefValue{Int})
         if x isa Symbol
             if x in grammar.types
                 i = next_child[]
                 next_child[] += 1
-                return :( $interp_name(c[$i], grammar_tags, input) )
+                return :( $interp_name(c[$i], input) )
             elseif _is_input_tag(x, input_set)
                 return :( input[$(QuoteNode(x))] )
             else
-                return x
+                # Treat as a constant/function name in the target module
+                return GlobalRef(target_module, x)
             end
         elseif x isa Expr
             if x.head == :call
-                f = x.args[1]
+                f = _qualify(target_module, x.args[1])
                 args = [emit_eval(a, next_child) for a in x.args[2:end]]
                 return Expr(:call, f, args...)
             elseif x.head == :if
@@ -117,107 +109,165 @@ function build_match_cases(
         end
     end
 
-    for (ind, r) in pairs(grammar.rules)
-        tag = tags[ind]
+    branches = Expr[]
 
-        if r isa Expr && r.head == :call
-            if tag isa Symbol
-                # pure operator rule: match the symbol value (:+, :*, ...)
-                nargs = length(r.args) - 1
-                args = [:( $interp_name(c[$i], grammar_tags, input) ) for i in 1:nargs]
-                rhs = Expr(:call, tag, args...)  # calls + / * / etc.
-                push!(cases, :($(QuoteNode(tag)) => $rhs))  # :+ => +(args...)
+    for (ind, rhs_rule) in pairs(grammar.rules)
+        rhs_code = nothing
 
+        if rhs_rule isa Expr && rhs_rule.head == :call
+            op = rhs_rule.args[1]
+            args = rhs_rule.args[2:end]
+
+            pure =
+                (op isa Symbol) &&
+                all(a -> (a isa Symbol) && (a in grammar.types), args)
+
+            if pure
+                nargs = length(args)
+                child_vals = [:( $interp_name(c[$i], input) ) for i in 1:nargs]
+                rhs_code = Expr(:call, _qualify(target_module, op), child_vals...)
             else
-                # partial: match structurally on the Expr tag (avoid :(...) patterns)
                 nxt = Ref(1)
-                rhs = emit_eval(r, nxt)
-                pat = _pat_expr(tag)  # e.g. Expr(:call, :+, :Number, 1)
-                push!(cases, :($pat => $rhs))
+                rhs_code = emit_eval(rhs_rule, nxt)
             end
-        elseif r isa Expr && r.head == :if
-            push!(cases, :( :IF =>
-                $interp_name(c[1], grammar_tags, input) ?
-                    $interp_name(c[2], grammar_tags, input) :
-                    $interp_name(c[3], grammar_tags, input)
-            ))
 
-        elseif _is_input_tag(tag, input_set)
-            push!(cases, :($(QuoteNode(tag)) => input[$(QuoteNode(tag))] ))
+        elseif rhs_rule isa Expr && rhs_rule.head == :if
+            nxt = Ref(1)
+            rhs_code = emit_eval(rhs_rule, nxt)
 
-        elseif tag isa Symbol && !(tag in grammar.types) && !_is_input_tag(tag, input_set)
-            lhs = :( $interp_name(c[1], grammar_tags, input) )
-            rhs = :( $interp_name(c[2], grammar_tags, input) )
-            op_expr = Expr(:call, tag, lhs, rhs)
-            push!(cases, :( $(QuoteNode(tag)) => $op_expr ))
+        elseif rhs_rule isa Symbol
+            # Symbol terminals: input if configured, else constant symbol resolved in target_module
+            if _is_input_tag(rhs_rule, input_set)
+                rhs_code = :( input[$(QuoteNode(rhs_rule))] )
+            else
+                rhs_code = GlobalRef(target_module, rhs_rule)
+            end
+
+        else
+            # Literal terminals: Int, String, etc.
+            rhs_code = rhs_rule
         end
+
+        push!(branches, :( r == $(ind) && return $rhs_code ))
     end
 
-    # Default branch: read from input if it is an input tag, otherwise return tag.
-    push!(cases, :( _ =>
-        begin
-            tag = grammar_tags[r]
-            return tag
-        end
-    ))
-
-    return cases
+    return branches
 end
+
 
 
 """
-    make_interpreter(grammar::AbstractGrammar; name=:interpret, input_symbols=nothing) -> Expr
+    make_interpreter(grammar; name=:interpret, input_symbols=nothing, target_module=@__MODULE__)
 
-Return an expression defining an interpreter function `name(prog, grammar_tags, input)`.
+Generate an interpreter as a simple cascade on the rule index `r`.
+The generated function signature is:
 
-Typical usage:
+    name(prog::AbstractRuleNode, input::AbstractDict{Symbol,Any})
 
-```julia
-g = @cfgrammar begin
-    Number = |(1:2)
-    Number = x
-    Number = Number + Number
-    Number = Number * Number
-    Number = Number + 1
-    Number = x * 2
-end
-rn = @rulenode 5{4{3,2},7}
+and additionally supports:
 
-tags = get_relevant_tags(g)
-ex = make_interpreter(g; name=:interpret_sui, input_symbols=[:x])
-Core.eval(Main, ex)  # or Core.eval(@__MODULE__, ex) to eval into the current module
-out  = interpret_sui(rn, tags, Dict(:x => 1))
-```
+    name(prog::AbstractRuleNode, inputs::AbstractVector{<:AbstractDict{Symbol,Any}})
 """
 function make_interpreter(
         grammar::AbstractGrammar;
         name::Symbol = :interpret,
         input_symbols::Union{Nothing,AbstractVector{Symbol}} = nothing,
+        target_module::Module = @__MODULE__,
     )
-    cases = build_match_cases(grammar; interp_name=name, input_symbols=input_symbols)
+    branches = build_match_cases(grammar;
+        interp_name=name,
+        input_symbols=input_symbols,
+        target_module=target_module,
+    )
 
-    # Build the @match call as syntax first 
-    match_expr = quote
-        MLStyle.@match grammar_tags[r] begin
-            $(cases...)
-        end
-    end
-
-    match_ast = Base.macroexpand(@__MODULE__, match_expr; recursive=true)
+    cascade = Expr(:block,
+        branches...,
+        :( error("No matching rule index: ", r) )
+    )
 
     return quote
-        function $(name)(prog::AbstractRuleNode,
-                         grammar_tags::Dict{Int,Any},
-                         input::Dict{Symbol,Any})
-            r = get_rule(prog)
-            c = get_children(prog)
-            $match_ast
+        using HerbCore
+        function $(name)(prog::HerbCore.AbstractRuleNode,
+                         input::AbstractDict{Symbol,Any})
+            r = HerbCore.get_rule(prog)
+            c = HerbCore.get_children(prog)
+            $cascade
         end
 
-        function $(name)(prog::AbstractRuleNode,
-                         grammar_tags::Dict{Int,Any},
-                         input::AbstractVector{Dict{Symbol,Any}})
-            return $(name).((prog,),(grammar_tags,),input)
+        function $(name)(prog::HerbCore.AbstractRuleNode,
+                         inputs::AbstractVector{<:AbstractDict{Symbol,Any}})
+            return $(name).((prog,), inputs)
         end
     end
+end
+
+
+"""
+    @make_interpreter grammar [name=:interpret] [input_symbols=nothing] [module=<caller>] [target_module=<caller>]
+
+Generate and define an interpreter function for `grammar`.
+
+Here we return code that:
+  1) evaluates `grammar_expr` at runtime,
+  2) builds the interpreter definition expression via `HerbInterpret.make_interpreter`,
+  3) evaluates that definition into the chosen module.
+"""
+macro make_interpreter(grammar_expr, args...)
+    # Defaults
+    name_expr   = QuoteNode(:interpret)
+    input_expr  = :(nothing)
+    module_expr = :(nothing)  # optional target module
+
+    # Parse options (keyword-like)
+    for a in args
+        if a isa Expr && a.head == :(=) && length(a.args) == 2
+            key, val = a.args[1], a.args[2]
+            if key === :name
+                # accept only literal symbols; if user passes a bare identifier, treat it as symbol
+                name_expr = val isa Symbol ? QuoteNode(val) : val
+            elseif key === :input_symbols
+                input_expr = val
+            elseif key === :module || key === :target_module
+                module_expr = val
+            else
+                error("@make_interpreter: unknown option $(key). Use name=..., input_symbols=..., and optionally module=...")
+            end
+        else
+            error("@make_interpreter: expected options like name=... and/or input_symbols=... (and optionally module=...), got: $(a)")
+        end
+    end
+
+    # __module__ is the caller module. This is where we want to evaluate our expressions.
+    # We capture this outside of the quote block below, so the runtime code can refer to it safely.
+    caller_mod = __module__
+
+    # Expand into runtime code (IMPORTANT!)
+    # `esc` tells Julia that references inside the returned syntax should be resolved in the *caller’s scope* (where the macro is used), not in the macro’s defining module.
+    return esc(quote
+        # Why we use locals here:
+        # - locals do not exist macro expansion time, so we force the compiler to run `grammar_expr` only when teh returned code runs.
+        # - locals avoid captuing names int he caller module.
+        local _caller = $(QuoteNode(caller_mod))
+
+        # grammar_expr runs at runtime, so `g` can be local inside a  @testset or function
+        local _g = $(grammar_expr)
+
+        local _name = $(name_expr)
+        _name isa Symbol || error("@make_interpreter: name must be a Symbol, got $(typeof(_name))")
+
+        local _inputs = $(input_expr)
+        (_inputs === nothing || _inputs isa AbstractVector{Symbol}) ||
+            error("@make_interpreter: input_symbols must be nothing or a Vector{Symbol}, got $(typeof(_inputs))")
+
+        # If no module was provided, install into caller module.
+        local _target = $(module_expr) === nothing ? _caller : $(module_expr)
+        _target isa Module || error("@make_interpreter: module/target_module must evaluate to a Module, got $(typeof(_target))")
+
+        local _ex = HerbInterpret.make_interpreter(_g; name=_name, input_symbols=_inputs, target_module=_target)
+        # Evaluate here, so it is hidden from user
+        Core.eval(_target, _ex)
+
+        # do not change this to `return nothing`! This will evaluate in the caller function and short-cut it
+        nothing
+    end)
 end
