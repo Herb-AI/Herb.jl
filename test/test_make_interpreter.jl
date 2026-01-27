@@ -1,7 +1,46 @@
 import HerbInterpret: make_interpreter
 
+# Small module for testing state-less make_interpret
 module LocalStringDSL
     concat_cvc(a::String, b::String) = a * b
+end
+
+# Small module for testing state-ful make_stateful_interpret
+module LocalStateDSL
+    # very small "state" type for testing
+    struct St
+        x::Int
+    end
+
+    inc(st::St) = St(st.x + 1)
+    iseven(st::St) = Base.iseven(st.x)
+
+    function command_while(cond_node, body_node, st::St; max_steps::Int=100)
+        ctr = max_steps
+        while ctr > 0 && interpret_state(cond_node, st)
+            st = interpret_state(body_node, st)
+            ctr -= 1
+        end
+        return st
+    end
+end
+
+module LocalStateDSL2
+    struct St
+        x::Int
+    end
+    inc(st::St) = St(st.x + 1)
+    dec(st::St) = St(st.x - 1)
+    iseven(st::St) = Base.iseven(st.x)
+
+    using HerbGrammar
+    g2 = @cfgrammar begin
+        Start = Step
+        Step  = IF(Cond, Step, Step)
+        Step  = inc()
+        Step  = dec()
+        Cond  = iseven()
+    end
 end
 
 @testset verbose=true "Test make_interpreter" begin
@@ -138,4 +177,67 @@ end
         @test LocalStringDSL.interpret_string(rn, input) == "XA"
         @test concat_cvc("X", "A") == "X|A"
     end
+
+    @testset "Stateful interpreter generation" begin
+        # A tiny stateful grammar:
+        # 1: Start = Sequence
+        # 2: Sequence = Step
+        # 3: Sequence = (Step; Sequence)
+        # 4: Step = inc()
+        # 5: Step = IF(Cond, Step, Step)
+        # 6: Cond = iseven()
+        g = @cfgrammar begin
+            Start    = Sequence
+            Sequence = Step
+            Sequence = (Step; Sequence)
+            Step     = inc()
+            Step     = IF(Cond, Step, Step)
+            Cond     = iseven()
+        end
+
+        # Generate interpreter into LocalStateDSL
+        @make_stateful_interpreter g name=:interpret_state target_module=LocalStateDSL
+        @test isdefined(LocalStateDSL, :interpret_state)
+
+        # Program: (inc(); inc()) starting from x=0 => x=2
+        # Build rulenode for Sequence = (Step; Sequence):
+        prog_two_incs = @rulenode(1{3{4,2{4}}})
+
+        st0 = LocalStateDSL.St(0)
+        out = LocalStateDSL.interpret_state(prog_two_incs, st0)
+        @test out == LocalStateDSL.St(2)
+
+        # Vector-of-states overload
+        outs = LocalStateDSL.interpret_state(prog_two_incs, [LocalStateDSL.St(0), LocalStateDSL.St(10)])
+        @test outs == [LocalStateDSL.St(2), LocalStateDSL.St(12)]
+
+        # IF test:
+        # Step = IF(Cond, Step, Step)
+        # Build: IF(Cond=iseven(), Step=inc(), Step=inc())  -> regardless increments once,
+        
+        # Grammar is defined in external module
+        @make_stateful_interpreter LocalStateDSL2.g2 name=:interpret_state2 target_module=LocalStateDSL2
+
+        # IF(iseven(), inc(), dec())
+        # rule indices here:
+        # 1 Start=Step
+        # 2 Step=IF(Cond,Step,Step)
+        # 3 Step=inc()
+        # 4 Step=dec()
+        # 5 Cond=iseven()
+        prog_if = @rulenode(2{5,3,4})
+
+        @test LocalStateDSL2.interpret_state2(prog_if, LocalStateDSL2.St(2)) == LocalStateDSL2.St(3)  # even -> inc
+        @test LocalStateDSL2.interpret_state2(prog_if, LocalStateDSL2.St(3)) == LocalStateDSL2.St(2)  # odd  -> dec
+
+        # IOExample support:
+        exs = [
+            HerbSpecification.IOExample(Dict{Symbol,Any}(:_arg_1 => LocalStateDSL2.St(2)), nothing),
+            HerbSpecification.IOExample(Dict{Symbol,Any}(:_arg_1 => LocalStateDSL2.St(3)), nothing),
+        ]
+        outs_ex = LocalStateDSL2.interpret_state2(prog_if, exs)
+        @test outs_ex == [LocalStateDSL2.St(3), LocalStateDSL2.St(2)]
+    end
 end
+
+        rn = @rulenode(5{4{3,2},7})   

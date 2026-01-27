@@ -11,8 +11,11 @@ export
     SymbolTable,
     interpret,
 
-    @make_interpreter,
     execute_on_input,
+
+    @make_interpreter,
+    @make_stateful_interpreter,
     build_match_cases,
+    build_match_cases_stateful
     get_relevant_tags
 end # module HerbInterpret
