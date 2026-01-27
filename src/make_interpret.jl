@@ -1,3 +1,5 @@
+using MLStyle
+
 """
     _is_input_tag(tag, input_set)
 
@@ -394,7 +396,7 @@ macro make_interpreter(grammar_expr, args...)
             key, val = a.args[1], a.args[2]
             if key === :name
                 # accept only literal symbols; if user passes a bare identifier, treat it as symbol
-                name_expr = val isa Symbol ? QuoteNode(val) : val
+                name_expr = val 
             elseif key === :input_symbols
                 input_expr = val
             elseif key === :module || key === :target_module
