@@ -187,16 +187,31 @@ function make_interpreter(
 
     return quote
         using HerbCore
+        using HerbSpecification
+        # Single input dictionary
         function $(name)(prog::HerbCore.AbstractRuleNode,
-                         input::AbstractDict{Symbol,Any})
+                        input::AbstractDict{Symbol,Any})
             r = HerbCore.get_rule(prog)
             c = HerbCore.get_children(prog)
             $cascade
         end
 
+        # Multiple input dictionaries
         function $(name)(prog::HerbCore.AbstractRuleNode,
-                         inputs::AbstractVector{<:AbstractDict{Symbol,Any}})
+                        inputs::AbstractVector{<:AbstractDict{Symbol,Any}})
             return $(name).((prog,), inputs)
+        end
+
+        # Single IOExample: use example.in as the input dictionary
+        function $(name)(prog::HerbCore.AbstractRuleNode,
+                        ex::HerbSpecification.IOExample)
+            return $(name)(prog, ex.in)
+        end
+
+        # Multiple IOExamples: evaluate on each example.in
+        function $(name)(prog::HerbCore.AbstractRuleNode,
+                        exs::AbstractVector{<:HerbSpecification.IOExample})
+            return [$(name)(prog, ex.in) for ex in exs]
         end
     end
 end
