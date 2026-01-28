@@ -1,4 +1,5 @@
-using MLStyle
+using RuntimeGeneratedFunctions
+RuntimeGeneratedFunctions.init(@__MODULE__) 
 
 """
     _is_input_tag(tag, input_set)
@@ -12,46 +13,6 @@ A tag is treated as an *input terminal* if:
 _is_input_tag(tag, input_set) =
     tag isa Symbol && (occursin("_arg_", String(tag)) || (input_set !== nothing && (tag in input_set)))
 
-"""
-    get_relevant_tags(grammar::AbstractGrammar) -> Dict{Int,Any}
-
-Compute a "tag" for each grammar rule index on which the generated interpreter matches on .
-
-Tagging rules:
-
-- Literal terminals (e.g. `1`, `2`) keep their literal values as tags.
-- Input terminals like `x` or `_arg_1` remain symbols (e.g. `:x`).
-- For `:call` rules:
-  - "Pure operator" rules whose RHS is only nonterminals (e.g. `Number = Number + Number`) are tagged by the operator symbol (e.g. `:+`, `:*`).
-  - "Composite" rules that contain literals or terminals on the RHS (e.g. `Number = Number + 1`,
-    `Number = x * 2`) are tagged by the full expression `Expr` (e.g. `:(Number + 1)`).
-- `:if` rules are tagged as `:IF`.
-- `:block` rules are tagged as `:OpSeq`.
-"""
-function get_relevant_tags(grammar::AbstractGrammar)
-    tags = Dict{Int,Any}()
-    for (ind, r) in pairs(grammar.rules)
-        tags[ind] = if r isa Expr
-            @match r.head begin
-                :block => :OpSeq
-                :if    => :IF
-                :call  => begin
-                    op = r.args[1]
-                    args = r.args[2:end]
-                    pure =
-                        (op isa Symbol) &&
-                        all(a -> (a isa Symbol) && (a in grammar.types), args)
-                    pure ? op : r  # composites like (Number + 1) keep full Expr as tag
-                end
-                _ => r.head
-            end
-        else
-            r
-        end
-    end
-    return tags
-end
-
 
 """
     _qualify(target_module::Module, f)
@@ -64,7 +25,7 @@ end
 
 
 """
-    build_match_cases(grammar; interp_name=:interpret, input_symbols=nothing, target_module=@__MODULE__)
+    build_match_cases(grammar; target_module=@__MODULE__, input_symbols=nothing)
 
 Return a vector of "guarded return" branches of the form:
 
@@ -76,46 +37,41 @@ These branches are intended to be spliced into a block after
 Returns a vector of branching expressions.
 """
 function build_match_cases(
-        grammar::AbstractGrammar;
-        interp_name::Symbol = :interpret,
-        input_symbols::Union{Nothing,AbstractVector{Symbol}} = nothing,
-        target_module::Module = @__MODULE__,
-    )
+    grammar::AbstractGrammar;
+    target_module::Module = @__MODULE__,
+    input_symbols::Union{Nothing,AbstractVector{Symbol}} = nothing,
+)
     input_set = input_symbols === nothing ? nothing : Set(input_symbols)
+
+    # recurse on child i as: self(self, c[i], input)
+    recur(i) = :( self(self, c[$i], input) )
 
     # Emit code to evaluate a rule RHS, consuming children c[i] for nonterminals.
     function emit_eval(x, next_child::Base.RefValue{Int})
         if x isa Symbol
             if x in grammar.types
-                # E.g., x is first Number symbol in Number + Number, then pick the first child 
                 i = next_child[]
                 next_child[] += 1
-                return :( $interp_name(c[$i], input) )
+                return recur(i)
             elseif _is_input_tag(x, input_set)
-                # If x is an input return a QuoteNode that refers to the input symbol
                 return :( input[$(QuoteNode(x))] )
             else
-                # Otherwise, check whether the symbol is defined in the original module.
                 return GlobalRef(target_module, x)
             end
         elseif x isa Expr
             if x.head == :call
-                # Regular expression, like :(Number + 1). Run target_module.func on the children.
                 f = _qualify(target_module, x.args[1])
                 args = [emit_eval(a, next_child) for a in x.args[2:end]]
                 return Expr(:call, f, args...)
             elseif x.head == :if
-                # get the expressions for the children and combine in if-then-else statement
                 cond = emit_eval(x.args[1], next_child)
                 tbr  = emit_eval(x.args[2], next_child)
                 fbr  = emit_eval(x.args[3], next_child)
                 return Expr(:if, cond, tbr, fbr)
             else
-                # Otherwise copy the original expression head and recurse on the children.
                 return Expr(x.head, (emit_eval(a, next_child) for a in x.args)...)
             end
         else
-            # x is e.g. a constant
             return x
         end
     end
@@ -126,22 +82,18 @@ function build_match_cases(
         rhs_code = nothing
 
         if rhs_rule isa Expr && rhs_rule.head == :call
-            op = rhs_rule.args[1]
+            op   = rhs_rule.args[1]
             args = rhs_rule.args[2:end]
 
-            # "pure" checks whether rhs only contains a single symbol/operator
-            # Used to check for composite rules, e.g., Number = Number + 1
             pure =
                 (op isa Symbol) &&
                 all(a -> (a isa Symbol) && (a in grammar.types), args)
 
             if pure
-                # rhs only contains single symbol/operator
                 nargs = length(args)
-                child_vals = [:( $interp_name(c[$i], input) ) for i in 1:nargs]
+                child_vals = [recur(i) for i in 1:nargs]
                 rhs_code = Expr(:call, _qualify(target_module, op), child_vals...)
             else
-                # Evaluate rhs, and recurse on children
                 nxt = Ref(1)
                 rhs_code = emit_eval(rhs_rule, nxt)
             end
@@ -152,16 +104,13 @@ function build_match_cases(
 
         elseif rhs_rule isa Symbol
             if rhs_rule in grammar.types
-                # Check whether rhs is a grammar type, e.g., Start = Number 
-                # Proceed to children in that case
-                rhs_code = :( $interp_name(c[1], input) )
+                rhs_code = recur(1)  # Start = Number  etc.
             elseif _is_input_tag(rhs_rule, input_set)
-                # rhs is an input, then use the input dict
                 rhs_code = :( input[$(QuoteNode(rhs_rule))] )
             else
-                # Otherwise use the function defined in the target module
                 rhs_code = GlobalRef(target_module, rhs_rule)
             end
+
         else
             rhs_code = rhs_rule
         end
@@ -173,88 +122,174 @@ function build_match_cases(
 end
 
 
+struct GeneratedInterpreter{F}
+    core::F
+end
+
+# Single input
+function (gi::GeneratedInterpreter)(prog::HerbCore.AbstractRuleNode,
+                                   input::AbstractDict{Symbol,Any})
+    return gi.core(gi.core, prog, input)
+end
+
+# Vector of inputs
+function (gi::GeneratedInterpreter)(prog::HerbCore.AbstractRuleNode,
+                                   inputs::AbstractVector{<:AbstractDict{Symbol,Any}})
+    return (gi.core).((gi.core,), (prog,), inputs)   # broadcasts (self, prog, input)
+end
+
+function (gi::GeneratedInterpreter)(prog::HerbCore.AbstractRuleNode,
+                                   ex::HerbSpecification.IOExample)
+    return gi(prog, ex.in)
+end
+
+function (gi::GeneratedInterpreter)(prog::HerbCore.AbstractRuleNode,
+                                   exs::AbstractVector{<:HerbSpecification.IOExample})
+    return [gi(prog, ex) for ex in exs]
+end
+
+
 """
-    build_match_cases_stateful( grammar::AbstractGrammar; interp_name::Symbol = :interpret, target_module::Module = @__MODULE__, state_name::Symbol = :state)
+    make_interpreter(grammar::AbstractGrammar; input_symbols::Union{Nothing,AbstractVector{Symbol}} = nothing, target_module::Module = @__MODULE__, cache_module::Module = HerbInterpret)
 
-Generate the branch list for a *state-threading* interpreter.
 
-This function does **not** create the interpreter by itself; it returns a vector of expressions
-(`branches`) that are meant to be spliced into a generated function body after computing.
+Construct a fast, *runtime-generated* interpreter for programs represented as
+`HerbCore.AbstractRuleNode`s.
 
-Each branch has the simple form: `r == k && return <rhs>` where k is the grammar rule index and <rhs> is the generated Julia code for evaluating the
-right-hand-side of that grammar rule.
+The returned value is a callable `GeneratedInterpreter` (a small wrapper around a
+`RuntimeGeneratedFunctions.RuntimeGeneratedFunction`) that can be applied to:
 
-Returns a vector of branching expression for each grammar rule.
+- a single input dictionary:
+  `interp(prog, input::AbstractDict{Symbol,Any})`
+- a vector of input dictionaries:
+  `interp(prog, inputs::AbstractVector{<:AbstractDict{Symbol,Any}})`
+- a single `HerbSpecification.IOExample`:
+  `interp(prog, ex::IOExample)` (uses `ex.in`)
+- a vector of `IOExample`s:
+  `interp(prog, exs::AbstractVector{<:IOExample})`
+
+## Arguments
+
+- `grammar`: The grammar whose rule indices define the operational semantics.
+  The interpreter dispatches by `r = HerbCore.get_rule(prog)`.
+
+## Keyword arguments
+
+- `input_symbols`: Optional list of symbols that should be interpreted as *inputs*.  If provided, terminals matching these symbols (and any symbol following the `_arg_` convention) are read from the `input` dict.
+
+- `target_module`: Module in which operator/function symbols appearing in the grammar are resolved. This is important when the grammar uses domain-specific primitives (e.g. `concat_cvc`, `substr_cvc`) that are defined in a benchmark module rather than in the caller’s module.
+
+- `cache_module`: Module used by `RuntimeGeneratedFunctions.jl` to store its internal cache. 
+"""
+function make_interpreter(grammar::AbstractGrammar;
+    input_symbols::Union{Nothing,AbstractVector{Symbol}} = nothing,
+    target_module::Module = @__MODULE__,
+    cache_module::Module = HerbInterpret
+)
+    # ensure the cache exists in the chosen cache module
+    RuntimeGeneratedFunctions.init(cache_module)
+
+    # build if-then-else statements to evaluate the expressions
+    branches = build_match_cases(grammar;
+        target_module = target_module,
+        input_symbols = input_symbols
+    )
+
+    # Add error for non-existent indices
+    cascade = Expr(:block, branches..., :(error("No matching rule index: ", r)))
+
+    # Bit of meta-programming magic:
+    # Constructs an anonymous function with an extra self arg for recursion.
+    ex = :(function (self, prog, input)
+        r = HerbCore.get_rule(prog)
+        c = HerbCore.get_children(prog)
+        $cascade
+    end)
+    Base.remove_linenums!(ex)
+
+    # Call RuntimeGeneratedFunction on this, so we can directly use it
+    core = RuntimeGeneratedFunctions.RuntimeGeneratedFunction(cache_module, target_module, ex)
+    return GeneratedInterpreter(core)
+end
+
+
+"""
+    build_match_cases_stateful_rgf(grammar; target_module=@__MODULE__, state_name=:state, max_steps=1000)
+
+Like `build_match_cases_stateful`, but emits code for a RuntimeGeneratedFunction body:
+- recursion is expressed as `self(self, child, state)`
+- `WHILE` is inlined (bounded by `max_steps`) to avoid needing external helpers
 """
 function build_match_cases_stateful(
         grammar::AbstractGrammar;
-        interp_name::Symbol = :interpret,
         target_module::Module = @__MODULE__,
-        state_name::Symbol = :state
+        state_name::Symbol = :state,
     )
-
     branches = Expr[]
+    max_steps=1000
 
-    # helper: recurse on child i
-    child_call(i) = :($interp_name(c[$i], $(state_name)))
+    # recurse into i-th child with threaded state
+    child_call(i) = :( self(self, c[$i], $(state_name)) )
 
     for (ind, rhs_rule) in pairs(grammar.rules)
         rhs_code = nothing
 
         if rhs_rule isa Expr
-            # Sequencing: (A; B) often becomes :block
             if rhs_rule.head == :block
-                # Convention: block has two statements e.g. for (Operation; Sequence)
-                # children are then [Operation, Sequence]
-                rhs_code = :( $interp_name(c[2], $interp_name(c[1], $(state_name))) )
+                # (A; B) sequencing
+                rhs_code = :( self(self, c[2], self(self, c[1], $(state_name))) )
 
             elseif rhs_rule.head == :call && rhs_rule.args[1] == :(;)
-                # Some grammars encode `;` as a call:
-                rhs_code = :( $interp_name(c[2], $interp_name(c[1], $(state_name))) )
+                # alternative encoding of sequencing
+                rhs_code = :( self(self, c[2], self(self, c[1], $(state_name))) )
 
             elseif rhs_rule.head == :call && rhs_rule.args[1] == :IF
-                # IF special-form: IF(Cond, T, F)
-                rhs_code = :( $interp_name(c[1], $(state_name)) ?
-                                $interp_name(c[2], $(state_name)) :
-                                $interp_name(c[3], $(state_name)) )
+                rhs_code = :( self(self, c[1], $(state_name)) ?
+                              self(self, c[2], $(state_name)) :
+                              self(self, c[3], $(state_name)) )
 
             elseif rhs_rule.head == :call && rhs_rule.args[1] == :WHILE
-                # Either inline loop or call helper in target module.
-                # Here: call helper `command_while(cond, body, state, max_steps)`
-                rhs_code = Expr(:call,
-                                _qualify(target_module, :command_while),
-                                :(c[1]), :(c[2]), :( $(state_name) ))
+                # Inline a bounded while-loop:
+                # WHILE(cond, body)
+                rhs_code = quote
+                    local st  = $(state_name)
+                    local ctr = $(max_steps)
+                    while ctr > 0 && self(self, c[1], st)
+                        st = self(self, c[2], st)
+                        ctr -= 1
+                    end
+                    st
+                end
 
             elseif rhs_rule.head == :call
-                f = rhs_rule.args[1]
+                f    = rhs_rule.args[1]
                 args = rhs_rule.args[2:end]
 
-                # Most stateful primitives appear as 0-arg calls in the grammar:
+                # Most stateful primitives are 0-arg: inc(), moveRight(), etc.
                 if isempty(args)
                     rhs_code = Expr(:call, _qualify(target_module, f), state_name)
                 else
-                    # For calls with nonterminals, just evaluate children in order
-                    # (works for pure combinators; IF/WHILE handled above)
-                    nargs = length(args)
+                    # For calls with nonterminals, interpret children and pass results
+                    nargs      = length(args)
                     child_vals = [child_call(i) for i in 1:nargs]
-                    rhs_code = Expr(:call, _qualify(target_module, f), child_vals...)
+                    rhs_code   = Expr(:call, _qualify(target_module, f), child_vals...)
                 end
             else
-                # Any other Expr: conservatively "recurse first child"
-                rhs_code = :( $interp_name(c[1], $(state_name)) )
+                # fallback: forward to first child
+                rhs_code = :( self(self, c[1], $(state_name)) )
             end
 
         elseif rhs_rule isa Symbol
             if rhs_rule in grammar.types
-                # Alias: Start = Number, Sequence = Operation, etc.
-                rhs_code = :( $interp_name(c[1], $(state_name)) )
+                # Alias: Start = Sequence, etc.
+                rhs_code = :( self(self, c[1], $(state_name)) )
             else
-                # A symbol terminal in a stateful DSL usually means "call it on state" (rare case)
+                # Rare: terminal symbol treated as primitive on state
                 rhs_code = Expr(:call, _qualify(target_module, rhs_rule), state_name)
             end
 
         else
-            # Literal terminals: just return it
+            # literal terminal
             rhs_code = rhs_rule
         end
 
@@ -265,236 +300,65 @@ function build_match_cases_stateful(
 end
 
 
-"""
-    make_interpreter(grammar; name=:interpret, input_symbols=nothing, target_module=@__MODULE__)
+struct GeneratedStatefulInterpreter{F}
+    core::F  # RuntimeGeneratedFunction
+end
 
-Generate an interpreter as a simple cascade on the rule index `r`. 
+# single state
+function (gi::GeneratedStatefulInterpreter)(prog::HerbCore.AbstractRuleNode, state)
+    return gi.core(gi.core, prog, state)
+end
 
-This function returns a quoted expression (`Expr`) that, when evaluated (e.g. with `Core.eval`), defines an interpreter function `name` that executes a program represented by an `HerbCore.AbstractRuleNode` on a given set of inputs.
+# vector of states
+function (gi::GeneratedStatefulInterpreter)(prog::HerbCore.AbstractRuleNode, states::AbstractVector)
+    core = gi.core
+    return core.((core,), (prog,), states)
+end
 
-Allows to customize input symbols, the target module, and the name of the function.
-"""
-function make_interpreter(
-        grammar::AbstractGrammar;
-        name::Symbol = :interpret,
-        input_symbols::Union{Nothing,AbstractVector{Symbol}} = nothing,
-        target_module::Module = @__MODULE__,
-    )
-    branches = build_match_cases(grammar;
-        interp_name=name,
-        input_symbols=input_symbols,
-        target_module=target_module,
-    )
+# IOExample (state in :_arg_1)
+function (gi::GeneratedStatefulInterpreter)(prog::HerbCore.AbstractRuleNode, ex::HerbSpecification.IOExample)
+    return gi(prog, ex.in[:_arg_1])
+end
 
-    cascade = Expr(:block,
-        branches...,
-        :( error("No matching rule index: ", r) )
-    )
-
-    return quote
-        using HerbCore
-        using HerbSpecification
-        # Single input dictionary
-        function $(name)(prog::HerbCore.AbstractRuleNode,
-                        input::AbstractDict{Symbol,Any})
-            r = HerbCore.get_rule(prog)
-            c = HerbCore.get_children(prog)
-            $cascade
-        end
-
-        # Multiple input dictionaries
-        function $(name)(prog::HerbCore.AbstractRuleNode,
-                        inputs::AbstractVector{<:AbstractDict{Symbol,Any}})
-            return $(name).((prog,), inputs)
-        end
-
-        # Single IOExample: use example.in as the input dictionary
-        function $(name)(prog::HerbCore.AbstractRuleNode,
-                        ex::HerbSpecification.IOExample)
-            return $(name)(prog, ex.in)
-        end
-
-        # Multiple IOExamples: evaluate on each example.in
-        function $(name)(prog::HerbCore.AbstractRuleNode,
-                        exs::AbstractVector{<:HerbSpecification.IOExample})
-            return [$(name)(prog, ex.in) for ex in exs]
-        end
-    end
+# vector of IOExamples
+function (gi::GeneratedStatefulInterpreter)(prog::HerbCore.AbstractRuleNode, exs::AbstractVector{<:HerbSpecification.IOExample})
+    return [gi(prog, ex) for ex in exs]
 end
 
 
 """
-    make_stateful_interpreter(
-        grammar::AbstractGrammar;
-        name::Symbol = :interpret,
-        target_module::Module = @__MODULE__,
-    ) -> Expr
+    make_stateful_interpreter_rgf(grammar; target_module=@__MODULE__, cache_module=HerbInterpret, max_steps=1000)
 
-Generate an interpreter *definition* for a **state-threading DSL** as an expression.
+Build a RuntimeGeneratedFunctions-backed state-threading interpreter.
 
-This function returns a quoted expression (`Expr`) that, when evaluated (e.g. with `Core.eval`), defines an interpreter function `name` that executes a program represented by an `HerbCore.AbstractRuleNode` on an explicit *state* value.
+- `target_module` controls where primitives (inc, moveRight, etc.) are resolved.
+- `cache_module` controls where RGF stores its cache. **This module must have**
+  `RuntimeGeneratedFunctions.init(@__MODULE__)` executed at module top level.
+- `max_steps` bounds generated WHILE loops.
 """
 function make_stateful_interpreter(
         grammar::AbstractGrammar;
-        name::Symbol = :interpret,
-        target_module::Module = @__MODULE__
+        target_module::Module = @__MODULE__,
+        cache_module::Module  = HerbInterpret,
     )
+    # IMPORTANT: cache_module must be initialized at module top-level.
+    RuntimeGeneratedFunctions.init(cache_module)
+
     branches = build_match_cases_stateful(grammar;
-        interp_name=name,
-        target_module=target_module,
-        state_name=:state
+        target_module = target_module,
+        state_name    = :state
     )
 
-    cascade = Expr(:block,
-        branches...,
-        :( error("No matching rule index: ", r) )
-    )
+    cascade = Expr(:block, branches..., :(error("No matching rule index: ", r)))
 
-    return quote
-        using HerbCore
-        using HerbSpecification
-        function $(name)(prog::HerbCore.AbstractRuleNode, state)
-            r = HerbCore.get_rule(prog)
-            c = HerbCore.get_children(prog)
-            $cascade
-        end
-
-        function $(name)(prog::HerbCore.AbstractRuleNode, states::AbstractVector)
-            return $(name).((prog,), states)
-        end
-
-        function $(name)(prog::HerbCore.AbstractRuleNode, ex::HerbSpecification.IOExample)
-            return $(name)(prog, ex.in[:_arg_1])
-        end
-
-        function $(name)(prog::HerbCore.AbstractRuleNode, exs::AbstractVector{<:HerbSpecification.IOExample})
-            return [$(name)(prog, ex) for ex in exs]
-        end
-    end
-end
-
-
-"""
-    @make_interpreter grammar [name=:interpret] [input_symbols=nothing] [module=<caller>] [target_module=<caller>]
-
-Generate and define an interpreter function for `grammar`.
-
-Here we return code that:
-  1) evaluates `grammar_expr` at runtime,
-  2) builds the interpreter definition expression via `HerbInterpret.make_interpreter`,
-  3) evaluates that definition into the chosen module.
-"""
-macro make_interpreter(grammar_expr, args...)
-    # Defaults
-    name_expr   = QuoteNode(:interpret)
-    input_expr  = :(nothing)
-    module_expr = :(nothing)  # optional target module
-
-    # Parse options (keyword-like)
-    for a in args
-        if a isa Expr && a.head == :(=) && length(a.args) == 2
-            key, val = a.args[1], a.args[2]
-            if key === :name
-                # accept only literal symbols; if user passes a bare identifier, treat it as symbol
-                name_expr = val 
-            elseif key === :input_symbols
-                input_expr = val
-            elseif key === :module || key === :target_module
-                module_expr = val
-            else
-                error("@make_interpreter: unknown option $(key). Use name=..., input_symbols=..., and optionally module=...")
-            end
-        else
-            error("@make_interpreter: expected options like name=... and/or input_symbols=... (and optionally module=...), got: $(a)")
-        end
-    end
-
-    # __module__ is the caller module. This is where we want to evaluate our expressions.
-    # We capture this outside of the quote block below, so the runtime code can refer to it safely.
-    caller_mod = __module__
-
-    # Expand into runtime code (IMPORTANT!)
-    # `esc` tells Julia that references inside the returned syntax should be resolved in the *caller’s scope* (where the macro is used), not in the macro’s defining module.
-    return esc(quote
-        # Why we use locals here:
-        # - locals do not exist macro expansion time, so we force the compiler to run `grammar_expr` only when teh returned code runs.
-        # - locals avoid captuing names int he caller module.
-        local _caller = $(QuoteNode(caller_mod))
-
-        # grammar_expr runs at runtime, so `g` can be local inside a  @testset or function
-        local _g = $(grammar_expr)
-
-        local _name = $(name_expr)
-        _name isa Symbol || error("@make_interpreter: name must be a Symbol, got $(typeof(_name))")
-
-        local _inputs = $(input_expr)
-        (_inputs === nothing || _inputs isa AbstractVector{Symbol}) ||
-            error("@make_interpreter: input_symbols must be nothing or a Vector{Symbol}, got $(typeof(_inputs))")
-
-        # If no module was provided, install into caller module.
-        local _target = $(module_expr) === nothing ? _caller : $(module_expr)
-        _target isa Module || error("@make_interpreter: module/target_module must evaluate to a Module, got $(typeof(_target))")
-
-        local _ex = HerbInterpret.make_interpreter(_g; name=_name, input_symbols=_inputs, target_module=_target)
-        # Evaluate here, so it is hidden from user
-        Core.eval(_target, _ex)
-
-        # do not change this to `return nothing`! This will evaluate in the caller function and short-cut it
-        nothing
+    # RGF body is an anonymous function. We add `self` for recursion.
+    ex = :(function (self, prog, state)
+        r = HerbCore.get_rule(prog)
+        c = HerbCore.get_children(prog)
+        $cascade
     end)
+    Base.remove_linenums!(ex)
+
+    core = RuntimeGeneratedFunctions.RuntimeGeneratedFunction(cache_module, target_module, ex)
+    return GeneratedStatefulInterpreter(core)
 end
-
-"""
-    @make_stateful_interpreter grammar [name=:interpret] [module=<caller>] [target_module=<caller>]
-
-Generate and define a *state-threading* interpreter function for `grammar`.
-
-The generated function(s) have signatures:
-
-    name(prog::HerbCore.AbstractRuleNode, state)
-    name(prog::HerbCore.AbstractRuleNode, states::AbstractVector)
-    name(prog::HerbCore.AbstractRuleNode, ex::HerbSpecification.IOExample)
-    name(prog::HerbCore.AbstractRuleNode, exs::AbstractVector{<:HerbSpecification.IOExample} 
-
-The macro expands to *runtime code* builds the definition expression via `HerbInterpret.make_stateful_interpreter`, and `Core.eval`s it into the chosen module.
-"""
-macro make_stateful_interpreter(grammar_expr, args...)
-    # Defaults
-    name_expr   = QuoteNode(:interpret)
-    module_expr = :(nothing)  # optional target module
-
-    # Parse options (keyword-like)
-    for a in args
-        if a isa Expr && a.head == :(=) && length(a.args) == 2
-            key, val = a.args[1], a.args[2]
-            if key === :name
-                name_expr = val isa Symbol ? QuoteNode(val) : val
-            elseif key === :module || key === :target_module
-                module_expr = val
-            else
-                error("@make_stateful_interpreter: unknown option $(key). Use name=... and optionally target_module=...")
-            end
-        else
-            error("@make_stateful_interpreter: expected options like name=... (and optionally target_module=...), got: $(a)")
-        end
-    end
-
-    caller_mod = __module__
-
-    return esc(quote
-        local _caller = $(QuoteNode(caller_mod))
-        local _g      = $(grammar_expr)
-
-        local _name = $(name_expr)
-        _name isa Symbol || error("@make_stateful_interpreter: name must be a Symbol, got $(typeof(_name))")
-
-        local _target = $(module_expr) === nothing ? _caller : $(module_expr)
-        _target isa Module || error("@make_stateful_interpreter: target_module must evaluate to a Module, got $(typeof(_target))")
-
-        local _ex = HerbInterpret.make_stateful_interpreter(_g; name=_name, target_module=_target)
-        Core.eval(_target, _ex)
-
-        nothing
-    end)
-end
-

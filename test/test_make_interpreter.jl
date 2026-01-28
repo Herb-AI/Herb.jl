@@ -1,39 +1,44 @@
 import HerbInterpret: make_interpreter
+using RuntimeGeneratedFunctions
+RuntimeGeneratedFunctions.init(@__MODULE__)
 
 # Small module for testing state-less make_interpret
 module LocalStringDSL
+    using HerbCore
+    using RuntimeGeneratedFunctions
+    RuntimeGeneratedFunctions.init(LocalStringDSL)
     concat_cvc(a::String, b::String) = a * b
 end
 
-# Small module for testing state-ful make_stateful_interpret
+# Simplest stateful grammar
 module LocalStateDSL
-    # very small "state" type for testing
+    using HerbCore
+    using RuntimeGeneratedFunctions
+    RuntimeGeneratedFunctions.init(LocalStateDSL)
+ 
     struct St
         x::Int
     end
 
     inc(st::St) = St(st.x + 1)
     iseven(st::St) = Base.iseven(st.x)
-
-    function command_while(cond_node, body_node, st::St; max_steps::Int=100)
-        ctr = max_steps
-        while ctr > 0 && interpret_state(cond_node, st)
-            st = interpret_state(body_node, st)
-            ctr -= 1
-        end
-        return st
-    end
 end
 
+# Stateful grammar with if-then-else
 module LocalStateDSL2
+    using HerbCore
+    using HerbGrammar
+    using RuntimeGeneratedFunctions
+    RuntimeGeneratedFunctions.init(LocalStateDSL2)
+ 
     struct St
         x::Int
     end
+
     inc(st::St) = St(st.x + 1)
     dec(st::St) = St(st.x - 1)
     iseven(st::St) = Base.iseven(st.x)
 
-    using HerbGrammar
     g2 = @cfgrammar begin
         Start = Step
         Step  = IF(Cond, Step, Step)
@@ -42,6 +47,29 @@ module LocalStateDSL2
         Cond  = iseven()
     end
 end
+
+# Stateful grammar with WHILE 
+module LocalStateDSL3
+    using HerbCore
+    using HerbGrammar
+    using RuntimeGeneratedFunctions
+    RuntimeGeneratedFunctions.init(LocalStateDSL3)
+ 
+    struct St
+        x::Int
+    end
+
+    inc(st::St) = St(st.x + 1)
+    lt3(st::St) = st.x < 3
+
+    g3 = @cfgrammar begin
+        Start = Step
+        Step  = WHILE(Cond, Step)
+        Step  = inc()
+        Cond  = lt3()
+    end
+end
+
 
 @testset verbose=true "Test make_interpreter" begin
     @testset "Test base functionality" begin
@@ -54,13 +82,13 @@ end
             Number = x * 2
         end
 
-        # Build and define the interpreter once for the next sub-testsets
-        ex = HerbInterpret.make_interpreter(g; input_symbols=[:x], name=:interpret_custom)
-        Core.eval(@__MODULE__, ex)
+        # Compile once
+        interpret_custom = HerbInterpret.make_interpreter(g; input_symbols=[:x])
 
-        @testset "Test make_interpreter on single input" begin
-            input = Dict{Symbol,Any}(:x => 1)
+        rn = @rulenode(5{4{3,2},7})  # (x + 2) * (x * 2)
+        input = Dict{Symbol,Any}(:x => 1)
 
+        @testset "Single input dict" begin
             # Leaves
             @test interpret_custom(@rulenode(1), input) == 1
             @test interpret_custom(@rulenode(2), input) == 2
@@ -74,90 +102,36 @@ end
             @test interpret_custom(@rulenode(6{3}), input) == 2     # x + 1
             @test interpret_custom(@rulenode(7), input) == 2        # x * 2
 
-            # Composite example: (x + 2) * (x * 2) with x=1 => 6
-            rn = @rulenode(5{4{3,2},7})
+            # Composite example
             @test interpret_custom(rn, input) == 6
         end
 
-        @testset "Test make_interpreter on multiple inputs" begin
-            rn = @rulenode(5{4{3,2},7})
-
+        @testset "Vector of input dicts" begin
             inputs = [
                 Dict{Symbol,Any}(:x => 1),
                 Dict{Symbol,Any}(:x => 3),
             ]
-
             outs = interpret_custom(rn, inputs)
+            @test outs == [6, 30]  # x=1 => 6, x=3 => 30
+        end
 
-            # x=1 => (1+2)*(2)=6
-            # x=3 => (3+2)*(6)=30
+        @testset "Single IOExample" begin
+            ex = HerbSpecification.IOExample(Dict{Symbol,Any}(:x => 1), nothing)
+            @test interpret_custom(rn, ex) == 6
+        end
+
+        @testset "Vector of IOExamples" begin
+            exs = [
+                HerbSpecification.IOExample(Dict{Symbol,Any}(:x => 1), nothing),
+                HerbSpecification.IOExample(Dict{Symbol,Any}(:x => 3), nothing),
+            ]
+            outs = interpret_custom(rn, exs)
             @test outs == [6, 30]
         end
     end
 
-    @testset "Test @make_interpreter macro forms" begin
-        g = @cfgrammar begin
-            Number = |(1:2)
-            Number = x
-            Number = Number + Number
-            Number = Number * Number
-            Number = Number + 1
-            Number = x * 2
-        end
-
-        rn = @rulenode(5{4{3,2},7})               # (x + 2) * (x * 2)
-        rn_without_input = @rulenode(5{4{1,2},2}) # (1 + 2) * 2
-        input = Dict{Symbol,Any}(:x => 1)
-
-        # We have to run all tests in a separate module to avoid overwriting existing functions and those warnings.
-        # We have to use Base.invokelatest to avoid world age issues here,a s the freshly generated binding is too new.
-        function run_in_fresh_module(expr_to_eval::Expr, fname::Symbol)
-            M = Module(gensym(:InterpTest))
-
-            # Make packages visible inside M
-            Core.eval(M, :(using HerbInterpret, HerbCore, HerbGrammar))
-
-            # Bind grammar inside M (so macro can reference `g`)
-            Core.eval(M, :(const g = $g))
-
-            # Run the macro call inside M
-            Core.eval(M, expr_to_eval)
-
-            # Return module and function name; we'll access/call via invokelatest
-            return M, fname
-        end
-
-        # @make_interpreter g  -> defines interpret
-        M, fname = run_in_fresh_module(:(@make_interpreter g), :interpret)
-        @test isdefined(M, :interpret)
-        f = getfield(M, :interpret)
-        @test Base.invokelatest(f, rn_without_input, Dict{Symbol,Any}()) == 6
-
-        # @make_interpreter g name=:interpret_sui
-        M, fname = run_in_fresh_module(:(@make_interpreter g name=:interpret_sui), :interpret_sui)
-        @test isdefined(M, :interpret_sui)
-        f = getfield(M, :interpret_sui)
-        @test Base.invokelatest(f, rn_without_input, Dict{Symbol,Any}()) == 6
-
-        # @make_interpreter g input_symbols=[:x]
-        M, fname = run_in_fresh_module(:(@make_interpreter g input_symbols=[:x]), :interpret)
-        @test isdefined(M, :interpret)
-        f = getfield(M, :interpret)
-        @test Base.invokelatest(f, rn, input) == 6
-
-        # @make_interpreter g name=:interpret_sui input_symbols=[:x]
-        M, fname = run_in_fresh_module(:(@make_interpreter g name=:interpret_sui input_symbols=[:x]), :interpret_sui)
-        @test isdefined(M, :interpret_sui)
-        f = getfield(M, :interpret_sui)
-        @test Base.invokelatest(f, rn, input) == 6
-
-        # Test the second function definition over multiple inputs
-        outs = Base.invokelatest(f, rn, [Dict{Symbol,Any}(:x => 1), Dict{Symbol,Any}(:x => 3)])
-        @test outs == [6, 30]
-    end
-
     @testset "Interpreter uses correct operators from target module" begin
-        # Conflicting operator in caller module
+        # Conflicting operator in caller module: must NOT be used
         concat_cvc(a::String, b::String) = a * "|" * b
 
         g = @cfgrammar begin
@@ -169,75 +143,115 @@ end
         rn = @rulenode(3{1,2})
         input = Dict{Symbol,Any}(:s => "X")
 
-        @make_interpreter g name=:interpret_string input_symbols=[:s] target_module=LocalStringDSL
+        # Compile once, but resolve operators in LocalStringDSL
+        interpret_string = HerbInterpret.make_interpreter(
+            g;
+            input_symbols=[:s],
+            target_module=LocalStringDSL,
+        )
 
-        @test isdefined(LocalStringDSL, :interpret_string)
-        @test !isdefined(@__MODULE__, :interpret_string)
+        # Dict form
+        @test interpret_string(rn, input) == "XA"
 
-        @test LocalStringDSL.interpret_string(rn, input) == "XA"
+        # IOExample form (optional extra check)
+        ex = HerbSpecification.IOExample(Dict{Symbol,Any}(:s => "X"), nothing)
+        @test interpret_string(rn, ex) == "XA"
+
+        # Prove caller's concat differs (and is not used)
         @test concat_cvc("X", "A") == "X|A"
     end
 
     @testset "Stateful interpreter generation" begin
-        # A tiny stateful grammar:
-        # 1: Start = Sequence
-        # 2: Sequence = Step
-        # 3: Sequence = (Step; Sequence)
-        # 4: Step = inc()
-        # 5: Step = IF(Cond, Step, Step)
-        # 6: Cond = iseven()
-        g = @cfgrammar begin
-            Start    = Sequence
-            Sequence = Step
-            Sequence = (Step; Sequence)
-            Step     = inc()
-            Step     = IF(Cond, Step, Step)
-            Cond     = iseven()
+        @testset "Test basic usage in external module" begin
+            # Rule indices:
+            # 1 Start    = Sequence
+            # 2 Sequence = Step
+            # 3 Sequence = (Step; Sequence)
+            # 4 Step     = inc()
+            # 5 Step     = IF(Cond, Step, Step)
+            # 6 Cond     = iseven()
+            g = @cfgrammar begin
+                Start    = Sequence
+                Sequence = Step
+                Sequence = (Step; Sequence)
+                Step     = inc()
+                Step     = IF(Cond, Step, Step)
+                Cond     = iseven()
+            end
+
+            # Build the interpreter object (RGF-backed)
+            interp = HerbInterpret.make_stateful_interpreter(
+                g;
+                target_module = LocalStateDSL,
+                cache_module  = @__MODULE__,
+            )
+
+            # Program: (inc(); inc()) starting from x=0 => x=2
+            # Start=Sequence -> Sequence=(Step;Sequence) -> Step=inc(); Sequence=Step -> Step=inc()
+            prog_two_incs = @rulenode(1{3{4,2{4}}})
+
+            st0 = LocalStateDSL.St(0)
+            out = interp(prog_two_incs, st0)
+            @test out == LocalStateDSL.St(2)
+
+            # Vector-of-states overload
+            outs = interp(prog_two_incs, [LocalStateDSL.St(0), LocalStateDSL.St(10)])
+            @test outs == [LocalStateDSL.St(2), LocalStateDSL.St(12)]
         end
 
-        # Generate interpreter into LocalStateDSL
-        @make_stateful_interpreter g name=:interpret_state target_module=LocalStateDSL
-        @test isdefined(LocalStateDSL, :interpret_state)
+        @testset "IF semantics in external target module" begin
+            # Build interpreter from grammar that lives in LocalStateDSL2
+            interp2 = HerbInterpret.make_stateful_interpreter(
+                LocalStateDSL2.g2;
+                target_module = LocalStateDSL2,
+                cache_module  = @__MODULE__,
+            )
 
-        # Program: (inc(); inc()) starting from x=0 => x=2
-        # Build rulenode for Sequence = (Step; Sequence):
-        prog_two_incs = @rulenode(1{3{4,2{4}}})
+            # Rule indices in LocalStateDSL2.g2:
+            # 1 Start=Step
+            # 2 Step=IF(Cond,Step,Step)
+            # 3 Step=inc()
+            # 4 Step=dec()
+            # 5 Cond=iseven()
 
-        st0 = LocalStateDSL.St(0)
-        out = LocalStateDSL.interpret_state(prog_two_incs, st0)
-        @test out == LocalStateDSL.St(2)
+            # IF(iseven(), inc(), dec())
+            prog_if = @rulenode(2{5,3,4})
 
-        # Vector-of-states overload
-        outs = LocalStateDSL.interpret_state(prog_two_incs, [LocalStateDSL.St(0), LocalStateDSL.St(10)])
-        @test outs == [LocalStateDSL.St(2), LocalStateDSL.St(12)]
+            @test interp2(prog_if, LocalStateDSL2.St(2)) == LocalStateDSL2.St(3)  # even -> inc
+            @test interp2(prog_if, LocalStateDSL2.St(3)) == LocalStateDSL2.St(2)  # odd  -> dec
 
-        # IF test:
-        # Step = IF(Cond, Step, Step)
-        # Build: IF(Cond=iseven(), Step=inc(), Step=inc())  -> regardless increments once,
-        
-        # Grammar is defined in external module
-        @make_stateful_interpreter LocalStateDSL2.g2 name=:interpret_state2 target_module=LocalStateDSL2
+            # IOExample support (state is in :_arg_1)
+            exs = [
+                HerbSpecification.IOExample(Dict{Symbol,Any}(:_arg_1 => LocalStateDSL2.St(2)), nothing),
+                HerbSpecification.IOExample(Dict{Symbol,Any}(:_arg_1 => LocalStateDSL2.St(3)), nothing),
+            ]
 
-        # IF(iseven(), inc(), dec())
-        # rule indices here:
-        # 1 Start=Step
-        # 2 Step=IF(Cond,Step,Step)
-        # 3 Step=inc()
-        # 4 Step=dec()
-        # 5 Cond=iseven()
-        prog_if = @rulenode(2{5,3,4})
+            outs_ex = interp2(prog_if, exs)
+            @test outs_ex == [LocalStateDSL2.St(3), LocalStateDSL2.St(2)]
+        end
 
-        @test LocalStateDSL2.interpret_state2(prog_if, LocalStateDSL2.St(2)) == LocalStateDSL2.St(3)  # even -> inc
-        @test LocalStateDSL2.interpret_state2(prog_if, LocalStateDSL2.St(3)) == LocalStateDSL2.St(2)  # odd  -> dec
+        @testset "WHILE operator (bounded loop) " begin
+            # Grammar lives in LocalStateDSL3.g3:
+            # 1 Start=Step
+            # 2 Step=WHILE(Cond, Step)
+            # 3 Step=inc()
+            # 4 Cond=lt3()
 
-        # IOExample support:
-        exs = [
-            HerbSpecification.IOExample(Dict{Symbol,Any}(:_arg_1 => LocalStateDSL2.St(2)), nothing),
-            HerbSpecification.IOExample(Dict{Symbol,Any}(:_arg_1 => LocalStateDSL2.St(3)), nothing),
-        ]
-        outs_ex = LocalStateDSL2.interpret_state2(prog_if, exs)
-        @test outs_ex == [LocalStateDSL2.St(3), LocalStateDSL2.St(2)]
+            interp3 = HerbInterpret.make_stateful_interpreter(
+                LocalStateDSL3.g3;
+                target_module = LocalStateDSL3,
+                cache_module  = @__MODULE__,
+            )
+
+            # WHILE(lt3(), inc())
+            prog_while = @rulenode(2{4,3})
+
+            @test interp3(prog_while, LocalStateDSL3.St(0)) == LocalStateDSL3.St(3)
+            @test interp3(prog_while, LocalStateDSL3.St(2)) == LocalStateDSL3.St(3)
+
+            # Vector-of-states
+            outs = interp3(prog_while, [LocalStateDSL3.St(0), LocalStateDSL3.St(1), LocalStateDSL3.St(3)])
+            @test outs == [LocalStateDSL3.St(3), LocalStateDSL3.St(3), LocalStateDSL3.St(3)]
+        end
     end
 end
-
-        rn = @rulenode(5{4{3,2},7})   

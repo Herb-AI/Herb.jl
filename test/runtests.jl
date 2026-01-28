@@ -2,6 +2,7 @@ using HerbInterpret
 using HerbInterpret: call_func
 using HerbCore
 using HerbGrammar
+using HerbSpecification
 using Test
 
 
