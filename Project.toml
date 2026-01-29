@@ -1,6 +1,6 @@
 name = "HerbInterpret"
 uuid = "5bbddadd-02c5-4713-84b8-97364418cca7"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Tilman Hinnerichs <t.r.hinnerichs@tudelft.nl>", "Jaap de Jong <jaapdejong15@gmail.com>", "Sebastijan Dumancic <s.dumancic@tudelft.nl>", "Reuben Gardos Reid <R.J.GardosReid@tudelft.nl>"]
 
 [deps]
