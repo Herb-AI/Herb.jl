@@ -9,7 +9,7 @@ function create_dummy_grammar()
 end
 
 function create_dummy_rulenode()
-    return RuleNode(4,[RuleNode(3),RuleNode(1)])
+    return @rulenode 4{3,1}
 end
 
 
