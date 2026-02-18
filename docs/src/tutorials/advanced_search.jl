@@ -75,6 +75,12 @@ Search procedures typically include hyperparameters that you can configure.
 In the following example, we consider two different values for `max_depth`, and see the effect on memory allocations using the `@timed` macro.  
 """
 
+# ╔═╡ a6fb2e91-b73a-4032-930f-d884abd539e2
+begin
+	iterator_3 = BFSIterator(g_1, :Number, max_depth=3)
+	solution_3 = @timed synth(problem_1, iterator_3)
+end
+
 # ╔═╡ d44afab4-dca1-4507-ab4d-0d2573603fa7
 begin
 	iterator_6 = BFSIterator(g_1, :Number, max_depth=6)
@@ -158,6 +164,12 @@ end
 # ╔═╡ 94e0d676-a9c7-4291-8696-15301e541c30
 problem_2 = Problem([IOExample(Dict{Symbol,Any}(), x) for x ∈ 1:5])
 
+# ╔═╡ a4a7daed-f89b-44ad-8787-9199c05bf046
+# ╠═╡ disabled = true
+#=╠═╡
+iterator_3 = BFSIterator(g_2, :Index, max_depth=2)
+  ╠═╡ =#
+
 # ╔═╡ 4821fd3a-ff2d-4991-99ad-76608d11b1da
 Test.@test_throws HerbSearch.EvaluationError synth(problem_2, iterator_3)
 
@@ -170,7 +182,7 @@ As expected, an exception occurs during the synthesis process. Now we try the sa
 solution_4 = synth(problem_2, iterator_3, allow_evaluation_errors=true)
 
 # ╔═╡ c262116e-138e-4133-a032-d2f50bfbf5bd
-md""""This time we find a solution, although a suboptimal one."""
+md"""This time we find a solution, although a suboptimal one."""
 
 # ╔═╡ 9b4b21e0-dc6a-43ae-a511-79988ee99001
 md"""
@@ -432,8 +444,18 @@ md"""
 We use the same example as for MH. SA additionally has the option to specify the `initial_temperature` for the annealing (default `initial_temperature=1`). Let's see what effect changing the temperature from 1 to 2 has on the solution program.   
 """
 
+# ╔═╡ ba1432fc-2a00-4f90-8918-8129856d7941
+md"""
+We define the problem:
+"""
+
 # ╔═╡ e25d115f-7549-4606-b96c-9ef700810f7b
 problem_sa, examples_sa = create_problem(e_mh)
+
+# ╔═╡ 6e90ce61-f299-41b6-9a88-8e16814d0a40
+md"""
+First with temperature 1:
+"""
 
 # ╔═╡ 94f2bd5e-e11e-42e7-9a3e-3c9d5ae43cd4
 initial_temperature1 = 1
@@ -441,8 +463,24 @@ initial_temperature1 = 1
 # ╔═╡ eb851d7b-803e-45f6-ad10-fa0bde78826a
 iterator_sa1 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature1) 
 
+# ╔═╡ 524928be-7ef8-4dac-bdbd-800ec7b712b6
+program_sa1 = @timed synth(problem_sa, iterator_sa1)
+
+# ╔═╡ 553770a9-5c27-4317-a4b1-ec9729c88edc
+md"""
+and get the following solution and runtime:
+"""
+
+# ╔═╡ 5b4a9e96-c4a2-4a75-92b0-805ceb88fa52
+program_sa1[1]
+
 # ╔═╡ 73304e3f-05bf-4f0c-9acd-fc8afa87b460
-program_sa1 = synth(problem_sa, iterator_sa1)
+program_sa1[2]
+
+# ╔═╡ 0a4525a3-fe2b-4d0b-8a7b-8ca42b53b4f8
+md"""
+And now the same with tempeture 2: 
+"""
 
 # ╔═╡ 07f11eb1-6b45-441a-a481-57628bad23ae
 initial_temperature2 = 2
@@ -450,8 +488,19 @@ initial_temperature2 = 2
 # ╔═╡ 4ff69f0a-6626-4593-b361-a2387eecc731
 iterator_sa2 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature2) 
 
+# ╔═╡ 72e3ad32-0a3d-4bd1-a663-e981781ef7f9
+program_sa2 = @timed synth(problem_sa, iterator_sa2)
+
+# ╔═╡ 1c7fe3c1-85bf-4af7-912c-68adbca471e4
+program_sa2[1]
+
 # ╔═╡ 36051751-6579-4a84-b531-b66e8e7dbd3e
-program_sa2 = synth(problem_sa, iterator_sa2)
+program_sa2[2]
+
+# ╔═╡ c1ab6f55-cedd-49a8-9ea0-e512a8b89ca8
+md"""
+We can see that a higher tempture 1 solves this problem quicker than tempeture 2.
+"""
 
 # ╔═╡ 5df0ba53-b528-4baf-9980-cafe5d73f9dd
 md"""
@@ -478,18 +527,6 @@ begin
 	program_gs, error_gs = synth(problem_gs, iterator_gs)
 	rulenode2expr(program_gs, g_4)
 end
-
-# ╔═╡ a6fb2e91-b73a-4032-930f-d884abd539e2
-begin
-	iterator_3 = BFSIterator(g_1, :Number, max_depth=3)
-	solution_3 = @timed synth(problem_1, iterator_3)
-end
-
-# ╔═╡ a4a7daed-f89b-44ad-8787-9199c05bf046
-# ╠═╡ disabled = true
-#=╠═╡
-iterator_3 = BFSIterator(g_2, :Index, max_depth=2)
-  ╠═╡ =#
 
 # ╔═╡ Cell order:
 # ╠═dddca175-3d88-45ce-90da-575c0ba38175
@@ -522,7 +559,7 @@ iterator_3 = BFSIterator(g_2, :Index, max_depth=2)
 # ╠═4821fd3a-ff2d-4991-99ad-76608d11b1da
 # ╟─b2eb08d7-3e53-46c5-84b1-e1fa0e07e291
 # ╠═606070e1-83a7-4cca-a716-4fa459f78772
-# ╟─c262116e-138e-4133-a032-d2f50bfbf5bd
+# ╠═c262116e-138e-4133-a032-d2f50bfbf5bd
 # ╟─9b4b21e0-dc6a-43ae-a511-79988ee99001
 # ╟─115c02c9-ae0c-4623-a61d-831fc6ad55a2
 # ╠═3af650d9-19c6-4351-920d-d2361091f628
@@ -568,13 +605,22 @@ iterator_3 = BFSIterator(g_2, :Index, max_depth=2)
 # ╠═36f0e0cf-c871-42c9-956e-054767cbf693
 # ╟─599194a8-3f47-4917-9143-a5fe0d43029f
 # ╟─dd6aee87-cd96-4be1-b8fb-03fffee5ea43
+# ╠═ba1432fc-2a00-4f90-8918-8129856d7941
 # ╠═e25d115f-7549-4606-b96c-9ef700810f7b
+# ╠═6e90ce61-f299-41b6-9a88-8e16814d0a40
 # ╠═94f2bd5e-e11e-42e7-9a3e-3c9d5ae43cd4
 # ╠═eb851d7b-803e-45f6-ad10-fa0bde78826a
+# ╠═524928be-7ef8-4dac-bdbd-800ec7b712b6
+# ╠═553770a9-5c27-4317-a4b1-ec9729c88edc
+# ╠═5b4a9e96-c4a2-4a75-92b0-805ceb88fa52
 # ╠═73304e3f-05bf-4f0c-9acd-fc8afa87b460
+# ╠═0a4525a3-fe2b-4d0b-8a7b-8ca42b53b4f8
 # ╠═07f11eb1-6b45-441a-a481-57628bad23ae
 # ╠═4ff69f0a-6626-4593-b361-a2387eecc731
+# ╠═72e3ad32-0a3d-4bd1-a663-e981781ef7f9
+# ╠═1c7fe3c1-85bf-4af7-912c-68adbca471e4
 # ╠═36051751-6579-4a84-b531-b66e8e7dbd3e
+# ╠═c1ab6f55-cedd-49a8-9ea0-e512a8b89ca8
 # ╟─5df0ba53-b528-4baf-9980-cafe5d73f9dd
 # ╠═99ea1c20-ca2c-4d77-bc3b-06814db1d666
 # ╠═d991edb9-2291-42a7-97ff-58c456515505
