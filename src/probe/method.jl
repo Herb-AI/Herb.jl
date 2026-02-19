@@ -25,28 +25,33 @@ function probe(
         max_iterations::Int = typemax(Int),
         max_iteration_time::Int = typemax(Int),
         kwargs...
-)::Union{AbstractRuleNode, Nothing}
+)#::Union{AbstractRuleNode, Nothing}
     if isnothing(grammar.log_probabilities)
         init_probabilities!(grammar)
     end
 
+    counter = 0
     for _ in 1:probe_cycles
         # Gets an iterator with some limit (the low-level budget)
         iterator = MLFSIterator(grammar, starting_sym; kwargs...)
 
         # Run a budgeted search
-        promising_programs, result_flag = get_promising_programs_with_fitness(
+        promising_programs, result_flag, num_programs = get_promising_programs_with_fitness(
             iterator, problem; max_time = max_iteration_time,
             max_enumerations = max_iterations)
+        counter += num_programs
 
         if result_flag == optimal_program
+            @show promising_programs
             program, score = only(promising_programs) # returns the only element
-            return program
+            return (program, counter)
         end
 
         # Throw an error if no programs were found.
         if length(promising_programs) == 0
-            throw(NoProgramFoundError("No promising program found for the given specification. Try exploring more programs."))
+            # throw(NoProgramFoundError("No promising program found for the given specification. Try exploring more programs."))
+            println("No program found.")
+            return (nothing, counter)
         end
 
         # Update grammar probabilities 
@@ -54,7 +59,7 @@ function probe(
     end
 
     @warn "No solution found within $probe_cycles Probe iterations."
-    return nothing
+    return (nothing, counter)
 end
 
 
@@ -70,8 +75,7 @@ function decide_probe(
         grammar::ContextSensitiveGrammar,
         symboltable::SymbolTable)::Real
     expr = rulenode2expr(program, grammar)
-    println("expr:", expr)
-    fitness = evaluate(problem, expr, symboltable, shortcircuit = false)
+    fitness = evaluate(problem, expr, symboltable, shortcircuit = false, allow_evaluation_errors=true)
     return fitness
 end
 
@@ -125,19 +129,22 @@ function get_promising_programs_with_fitness(
         max_time = typemax(Int),
         max_enumerations = typemax(Int),
         mod::Module = Main
-)::Tuple{Set{Tuple{AbstractRuleNode, Real}}, SynthResult}
+)
     start_time = time()
     grammar = get_grammar(iterator.solver)
     symboltable::SymbolTable = grammar2symboltable(grammar, mod)
 
     promising_programs = Set{Tuple{AbstractRuleNode, Real}}()
 
+    counter = 0
     for (i, candidate_program) in enumerate(iterator)
+        counter = i
         fitness = decide_probe(candidate_program, problem, grammar, symboltable)
 
         if fitness == 1
+            empty!(promising_programs)
             push!(promising_programs, (freeze_state(candidate_program), fitness))
-            return (promising_programs, optimal_program)
+            return (promising_programs, optimal_program, counter)
         elseif fitness > 0
             push!(promising_programs, (freeze_state(candidate_program), fitness))
         end
@@ -148,7 +155,7 @@ function get_promising_programs_with_fitness(
         end
     end
 
-    return (promising_programs, suboptimal_program)
+    return (promising_programs, suboptimal_program, counter)
 end
 
 export 

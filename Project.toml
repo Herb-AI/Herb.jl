@@ -6,11 +6,7 @@ version = "0.1.1"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 Herb = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
 
-[deps]
-DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
-Herb = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
-
 [compat]
 DocStringExtensions = "0.9.3"
-Herb = "0.4.1"
-julia = "^1.8"
+Herb = "1"
+julia = "1.10"
