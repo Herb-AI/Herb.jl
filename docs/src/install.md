@@ -17,8 +17,7 @@ julia --project=.
 
 From the Julia REPL run 
 ```julia
-]
-add Herb
+] add Herb
 ```
 
 or 
@@ -69,7 +68,7 @@ You should see something similar to this:
 
 You will see the start-up message above, including the version number. At the time of writing, this is `1.10.2`. You will likely see the latest stable release, [listed on the Julia organization's website](https://julialang.org/downloads/#current_stable_release).
 
-### Julia REPL
+#### Julia REPL
 What you see right now on the screen is called the Julia REPL (**R**ead–**E**val–**P**rint **L**oop). This is similar to `ghci` from Haskell and similar to `node`'s REPL too.
 
 Let's try some simple things. Only type the part after `julia>` without the comment (the part after `#`)
@@ -96,7 +95,7 @@ julia> for x in 1:10        # for loop in julia
 Now that `julia` hopefully works, let's clone the repositories. To exit `julia` use `Ctrl+D` or simply type `exit()`.
 
 Typing `?` opens a help menu for what the `REPL` can do.
-```sh
+```Julia
 help?> 
 search:  ] [ = $ ; ( @ { " ) ? . } ⊽ ⊼ ⊻ ⊋ ⊊ ⊉ ⊈ ⊇ ⊆ ≥ ≤ ≢ ≡ ≠ ≉ ≈ ∪ ∩ ∜ ∛ √ ∘ ∌ ∋ ∉ ∈ ℯ π ÷ ~ | ^ \ > < : / - + * ' & % ! && if :: as
 
@@ -137,7 +136,7 @@ The output should look similar to this:
 
 ![image](assets/julia_pkg.png)
 8. Exit the terminal (Ctrl+D) and check that a new folder `dev` appeared using `ls` (Linux) or `dir` (Windows)
-9. Navigate to that folder `cd dev`. This is the folder where the `HerbSearch` package was cloned and where we are going to _develop_ our code. If we need to modify the code from other published packages such as `HerbData` we would have to `dev` the package locally to change it (e.g. `dev HerbData`)
+9. Navigate to that folder `cd dev`. This is the folder where the `HerbSearch` package was cloned and where we are going to _develop_ our code. If we need to modify the code from other published packages such as `HerbGrammar` we would have to `dev` the package locally to change it (e.g. `dev HerbGrammar`)
 
 ### 3. Setup IDE (VSCode)
 
@@ -161,18 +160,18 @@ Open the extension tab either by clicking or by using the keyboard shortcut (`Ct
 ![image](assets/vscode_julia.png)
 
 
-#### 3. Run some example code 
+#### 3. Build and run an example
 
-Create a new file in folder `src` and give it a name (e.g., `getting_started.jl`) with `.jl` as the suffix.
-Paste the following example code 
+Lets start with creating a folder for our project, we can call it `JuliaTestProject`. In the project folrder, create a new file in folder `src` and give it a name (e.g., `my_first_script.jl`) with `.jl` as the suffix.
 
-```jl
-# add all imports
-using HerbSearch, HerbSpecification, HerbInterpret, HerbGrammar
+Below is a simple scipt using Herb you can paste it in to your file.
+
+```Julia
+using Herb
 
 # define our very simple context-free grammar
 # Can add and multiply an input variable x or the integers 1,2.
-g = @cfgrammar begin
+grammar = @cfgrammar begin
     Number = |(1:2)
     Number = x
     Number = Number + Number
@@ -185,25 +184,34 @@ iterator = BFSIterator(g, :Number, max_depth=5)
 
 # the solution found is a program from the arithmetic grammar above that will pass all examples
 solution, flag = synth(problem, iterator)
-program = rulenode2expr(solution, g) # should yield 2*6 +1 
+program = rulenode2expr(solution, grammar)
 
 println("Found program is: ", program)
 println("This program should be equiavalent to the function 2x + 1")
 
 # here we can evaluate our program on with input x = 6
 input = 6
-output = execute_on_input(grammar2symboltable(g), program, Dict(:x => input)) 
+output = execute_on_input(grammar2symboltable(grammar), program, Dict(:x => input)) 
+println("Output for input ", input, " is: ", output)
 ```
 
-To run either click on the _Run_ button in the top right side of the screen and choose `Julia: Execute Active file in REPL` or press `ALT+Enter`
-This will create a window that will spawn the Julia REPL and evaluate the code.
+To run either click on the _Run_ button in the top right side of the screen and choose `Julia: Execute Active file in REPL` or press `ALT+Enter` (`option+Enter` on Mac)
+This will create a window that will spawn the Julia REPL and evaluate the code in the file. To run part of a file you can use `shift+Enter`, which will run in the REPL (open one if needed) the selected code (current line if no code is selected).
 
-This will *not* work because by default VSCode chooses the Julia _environment_ `1.10` to run the code (Think about python virtualenv).
-We want to run the code in the environment of `HerbSearch`. To do that we need to tell VSCode to switch to the right environment.
+If you did not add Herb into the global Julia _environment_, this will *not* work, because by default VSCode uses it (similar to Python virtualenv).
+To create your own environment in your new project, run in a julia REPL:
 
-Open the command palette by typing Ctrl+Shift+P and type `change environment`
+```Julia
+] 
+activate .
+add Herb
+```
+
+This first line will put you in pkg mode. You can see here which enviorment is active. The second line will creat a new enviorment for your project (if it does not exist), and activate it. The second line adds Herb to this new enviorment. You will see a `Project.toml` has been added to your project folder, and in it Herb is specified as a dependencie for this project. 
+
+Now, we want VSCode to switch to the environment of our project. Open the command palette by typing Ctrl+Shift+P and search for `Julia: >Activate Parent Environment`. This is how it should look:
 ![image](assets/change_julia_env.png)
 
-Now `Pick a folder` -> `HerbSearch`
+The small `Julia env: ...` on the bottom should now say your project name. You can also click on it to change it.
 
 Try again to run the code and it should work now.

@@ -14,7 +14,7 @@ As you can see from the picture above, there are a few parts that needed in the 
 3. Iterator
 4. Examples
 
-Each part will be discussed in detail how it is implemented in Herb, and small code examples will be provided. After reading through this tutorial you should have a basic general understanding of how _Herb_ works and have an overview of important Herb modules (e.g., `HerbSearch`, `HerbCore`, `HerbSpecification`, `HerbBenchmarks`, `HerbCore`, etc.)
+Each part will be discussed in detail how it is implemented in Herb, and small code examples will be provided. After reading through this tutorial you should have a basic general understanding of how _Herb_ works and have an overview of important Herb modules (e.g., `HerbCore`, `HerbSpecification`, `HerbSearch`, `HerbBenchmarks`, etc.)
 
 ### 1. HerbGrammar
 First of, let's start with how do we define grammars in Herb. Grammars provide a set of rules that are used when creating programs. One could have an arithmetic expression grammar that allows addition, subtraction, multiplication, etc. Another example could be a grammar that allows bit manipulation operations (e.g., *shift left*, *shift right*, etc.), string operations (e.g., `concat`, `replace`, `findindex`, etc.).
@@ -38,12 +38,12 @@ Of course, just having a static grammar in a file is not too interesting. The us
 But wait a minute…, how can we know how the users want the program to be evaluated from the grammar? Well, in this case, we can _infer_ that he probably means to evaluate arithmetic expressions in the mathematical sense. 
 
 Unfortunately, we cannot do this for any user defined grammar. 
-In general, grammars only provide the rules to create valid programs, but they _do not_ say _how_ to evaluate those programs. What to do then :shrug: ?
+In general, grammars only provide the rules to create valid programs, but they _do not_ say _how_ to evaluate those programs. What to do then?
 
-Well, one option is to let the users define _both_ the grammar and the specification on how to _evaluate_ programs. The users will have a great amount of flexibility with this solution. However, they would have to do that for every new grammar that they define. That will definitely be a tedious task. If you think a bit about it, this is just defining your own _programming language_. You would have both _the syntax_ of the language and the how to evaluate/interpret the syntax. Can't we do better :question:  
+Well, one option is to let the users define _both_ the grammar and the specification on how to _evaluate_ programs. The users will have a great amount of flexibility with this solution. However, they would have to do that for every new grammar that they define. That will definitely be a tedious task. If you think a bit about it, this is just defining your own _programming language_. You would have both _the syntax_ of the language and the how to evaluate/interpret the syntax. Can we do better?
 
 Well, it turns out that we are already programming in Julia. Can't we use the `Julia`'s parser and interpreter to _parse_ the grammar and _evaluate_ programs? If this were possible, we would definitely cut down the work of users since the parser and interpreter will be already be implemented by someone else (Julia's developers). 
-This is essentially _piggybacking_ on the work of other people :) Programmers are known to be lazy, thus this solution seems to be a good fit.
+This is essentially _piggybacking_ on the work of other people. Programmers are known to be lazy, thus this solution seems to be a good fit.
 
 
 #### Defining grammars in Herb - intro
@@ -64,7 +64,7 @@ end
 ```
 Here, we define a grammar with 6 rules. 
 
-However, if you type this the code above in the `Julia`'s REPL, you will notice something interesting. The given output has more rules :)
+However, if you type this the code above in the `Julia`'s REPL, you will notice something interesting. The given output has more rules:
 ```julia
 1: Number = Constant
 2: Constant = 1
