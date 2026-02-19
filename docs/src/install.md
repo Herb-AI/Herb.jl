@@ -162,14 +162,14 @@ Open the extension tab either by clicking or by using the keyboard shortcut (`Ct
 
 #### 3. Build and run an example
 
-Lets start with creating a folder for our project, we can call it `JuliaTestProject`. In the project folrder, create a new file in folder `src` and give it a name (e.g., `my_first_script.jl`) with `.jl` as the suffix.
+Let's start by creating a folder for our project. We can call it `juliaTestProject`. In the project folder, create a new file in the folder `src` and give it a name (e.g., `my_first_script.jl`) with `.jl` as the suffix.
 
-Below is a simple scipt using Herb you can paste it in to your file.
+Below is a simple script using Herb; you can paste it into your file.
 
 ```Julia
 using Herb
 
-# define our very simple context-free grammar
+# define our elementary context-free grammar
 # Can add and multiply an input variable x or the integers 1,2.
 grammar = @cfgrammar begin
     Number = |(1:2)
@@ -182,24 +182,24 @@ end
 problem = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 iterator = BFSIterator(g, :Number, max_depth=5)
 
-# the solution found is a program from the arithmetic grammar above that will pass all examples
+# The solution found is a program from the arithmetic grammar above that will pass all examples
 solution, flag = synth(problem, iterator)
 program = rulenode2expr(solution, grammar)
 
 println("Found program is: ", program)
 println("This program should be equiavalent to the function 2x + 1")
 
-# here we can evaluate our program on with input x = 6
+# Here we can evaluate our program with input x = 6
 input = 6
 output = execute_on_input(grammar2symboltable(grammar), program, Dict(:x => input)) 
 println("Output for input ", input, " is: ", output)
 ```
 
-To run either click on the _Run_ button in the top right side of the screen and choose `Julia: Execute Active file in REPL` or press `ALT+Enter` (`option+Enter` on Mac)
-This will create a window that will spawn the Julia REPL and evaluate the code in the file. To run part of a file you can use `shift+Enter`, which will run in the REPL (open one if needed) the selected code (current line if no code is selected).
+To run, either click on the _Run_ button in the top right side of the screen and choose `Julia: Execute Active file in REPL` or press `ALT+Enter` (`option+Enter` on Mac).
+This will create a window that spawns the Julia REPL and evaluates the code in the file. To run part of a file, you can use `shift+Enter`, which runs the selected code (the current line if no code is selected) in the REPL (open one if needed).
 
-If you did not add Herb into the global Julia _environment_, this will *not* work, because by default VSCode uses it (similar to Python virtualenv).
-To create your own environment in your new project, run in a julia REPL:
+If you did not add Herb to the global Julia _environment_, this will *not* work, because by default VSCode uses it (similar to Python virtualenv).
+To create your own environment in your new project, run in a Julia REPL:
 
 ```Julia
 ] 
@@ -207,11 +207,11 @@ activate .
 add Herb
 ```
 
-This first line will put you in pkg mode. You can see here which enviorment is active. The second line will creat a new enviorment for your project (if it does not exist), and activate it. The second line adds Herb to this new enviorment. You will see a `Project.toml` has been added to your project folder, and in it Herb is specified as a dependencie for this project. 
+This first line will put you in pkg mode. You can see here which environment is active. The second line will create a new environment for your project (if it does not exist), and activate it. The second line adds Herb to this new environment. You will see that a `Project.toml` file was added to your project folder, and in it, Herb is specified as a dependency for this project. 
 
 Now, we want VSCode to switch to the environment of our project. Open the command palette by typing Ctrl+Shift+P and search for `Julia: >Activate Parent Environment`. This is how it should look:
 ![image](assets/change_julia_env.png)
 
 The small `Julia env: ...` on the bottom should now say your project name. You can also click on it to change it.
 
-Try again to run the code and it should work now.
+Try rerunning the code, and it should work now.
