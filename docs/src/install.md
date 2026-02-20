@@ -95,7 +95,7 @@ julia> for x in 1:10        # for loop in julia
 Now that `julia` hopefully works, let's clone the repositories. To exit `julia` use `Ctrl+D` or simply type `exit()`.
 
 Typing `?` opens a help menu for what the `REPL` can do.
-```Julia
+```julia
 help?> 
 search:  ] [ = $ ; ( @ { " ) ? . } ⊽ ⊼ ⊻ ⊋ ⊊ ⊉ ⊈ ⊇ ⊆ ≥ ≤ ≢ ≡ ≠ ≉ ≈ ∪ ∩ ∜ ∛ √ ∘ ∌ ∋ ∉ ∈ ℯ π ÷ ~ | ^ \ > < : / - + * ' & % ! && if :: as
 
@@ -166,7 +166,7 @@ Let's start by creating a folder for our project. We can call it `juliaTestProje
 
 Below is a simple script using Herb; you can paste it into your file.
 
-```Julia
+```julia
 using Herb
 
 # define our elementary context-free grammar
@@ -201,7 +201,7 @@ This will create a window that spawns the Julia REPL and evaluates the code in t
 If you did not add Herb to the global Julia _environment_, this will *not* work, because by default VSCode uses it (similar to Python virtualenv).
 To create your own environment in your new project, run in a Julia REPL:
 
-```Julia
+```julia
 ] 
 activate .
 add Herb
