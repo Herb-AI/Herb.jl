@@ -29,7 +29,7 @@ Pkg.add("Herb")
 
 This will install all dependencies automatically.
 
-For later convenience we can also add the respective dependencies to our project, so that we do not have to write `Herb.HerbGrammar` every time.
+The package `Herb` includes the subpackages `HerbCore`, `HerbGrammar`, `HerbConstraints, `HerbSearch`, and `HerbSpecification` as dependencies, and re-exports all of their exported types and functions. Including `Herb` should give you a "batteries-included" experience with everything you need to get started.
 ```julia
 ] add HerbConstraints HerbCore HerbSpecification HerbInterpret HerbGrammar HerbSearch
 ```
