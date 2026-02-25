@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.13
+# v0.20.21
 
 using Markdown
 using InteractiveUtils
@@ -27,13 +27,13 @@ md"""
 # Advanced Search Procedures in Herb.jl
 
 [A more verbose getting started with Herb.jl]() described the concept of a program space and showed how to search it with Herb.jl, using a simple breadth-first-search (BFS) iterator for the search. 
-This tutorial takes a closer look at advanced search procedures hat can be employed to find a solution program to a program synthesis problem. 
+This tutorial takes a closer look at advanced search procedures that can be employed to define the iterator. 
 
 More specifically, you will learn about
 
 - **Parameters** that can be specified and their effect on the search procedure.  
 - **Deterministic search methods** BFS and DFS.
-- **Stochastic search methods**, which introduce randomness to search the program space. We will look at Metropolis-Hastings, Very Large Scale Neighbourhood Search, Simulated Annealing and Genetic Search.
+- **Stochastic search methods**, which introduce randomness to search the program space. We will look at Metropolis-Hastings, Very Large Scale Neighbourhood Search, Simulated Annealing, and Genetic Search.
 """
 
 # ╔═╡ 61cee94c-2481-4268-823b-ca596592b63c
@@ -66,51 +66,52 @@ problem_1 = Problem([IOExample(Dict(:x => x), 2x+1) for x ∈ 1:5])
 md"""
 ## Parameters
 
-Search procedures typically have some hyperparameters that you can configure.
+Search procedures typically include hyperparameters that you can configure.
 
 ### `max_depth`
 
-`max_depth` controls the maximum depth of the program trees that are explored during the search, effectively limiting the size and complexity of the synthesized program. The parameter is configured as part of the iterator.
+`max_depth` controls the maximum depth of program trees explored during the search, effectively limiting the size and complexity of the synthesized program. The parameter is configured when constructing the iterator.
 
-In the following example, we consider two different values for `max_depth`.
-"""
-
-# ╔═╡ 338f19f1-3a62-4462-b8dc-24424d7644f2
-iterator_1 = BFSIterator(g_1, :Number, max_depth=3)
-
-# ╔═╡ 542cd47e-74cd-4b6f-acc9-bf524222e583
-iterator_2 = BFSIterator(g_1, :Number, max_depth=6)
-
-# ╔═╡ 63e97576-1c34-464d-a106-d59d5fb1ee38
-md"""
-To see the effect `max_depth` has on the number of memory allocations made during the program synthesis process, we use the `@time` macro.  
-"""
-
-# ╔═╡ 7e251a07-0041-4dc2-ac09-94fb01075c03
-md"""
-Solution for max_depth = 3:
+In the following example, we consider two different values for `max_depth`, and see the effect on memory allocations using the `@timed` macro.  
 """
 
 # ╔═╡ a6fb2e91-b73a-4032-930f-d884abd539e2
-solution_1 = @time synth(problem_1, iterator_1)
+begin
+	iterator_3 = BFSIterator(g_1, :Number, max_depth=3)
+	solution_3 = @timed synth(problem_1, iterator_3)
+end
 
 # ╔═╡ d44afab4-dca1-4507-ab4d-0d2573603fa7
-rulenode2expr(solution_1[1], g_1)
+begin
+	iterator_6 = BFSIterator(g_1, :Number, max_depth=6)
+	solution_6 = @timed synth(problem_1, iterator_6)
+end
+
+# ╔═╡ 7e251a07-0041-4dc2-ac09-94fb01075c03
+md"""
+Since the problem we consider has a solution of depth 3, with both iteretaors we get the same solution:
+"""
+
+# ╔═╡ 8711e4f5-5eda-4e1f-a268-384e507d0c13
+rulenode2expr(solution_3[1][1], g_1)
+
+# ╔═╡ b4fb44e2-b72f-4b2f-88e7-c3ca34fe5137
+rulenode2expr(solution_6[1][1], g_1)
 
 # ╔═╡ d1b02aac-f93d-4643-98da-62eb74933e5b
 md"""
-Solution for max_depth = 6:
+But for max_depth = 6, we allocate more memory:
 """
 
 # ╔═╡ e1d2cb58-5409-4eed-8ce1-9636e5ee2d1e
-begin
-	solution_2 = @time synth(problem_1, iterator_2)
-	rulenode2expr(solution_2[1], g_1)
-end
+solution_3[3]
+
+# ╔═╡ 83340349-df6f-4216-a8d6-dee6dbce97bc
+solution_6[3]
 
 # ╔═╡ 58c1a904-4d87-43f7-bcc3-884a8663c1da
 md"""
-While increasing `max_depth` allows us to explore more complex and deeper program trees, which may lead to a better solution, it also requires more memory allocation and can increase the execution time. 
+While increasing `max_depth` allows us to explore more complex program trees, which may help solve harder problems, it also requires more memory allocation and can increase the execution time. 
 """
 
 # ╔═╡ 35405357-179b-4e77-9bdc-edf5a550b36d
@@ -164,7 +165,10 @@ end
 problem_2 = Problem([IOExample(Dict{Symbol,Any}(), x) for x ∈ 1:5])
 
 # ╔═╡ a4a7daed-f89b-44ad-8787-9199c05bf046
+# ╠═╡ disabled = true
+#=╠═╡
 iterator_3 = BFSIterator(g_2, :Index, max_depth=2)
+  ╠═╡ =#
 
 # ╔═╡ 4821fd3a-ff2d-4991-99ad-76608d11b1da
 Test.@test_throws HerbSearch.EvaluationError synth(problem_2, iterator_3)
@@ -178,7 +182,7 @@ As expected, an exception occurs during the synthesis process. Now we try the sa
 solution_4 = synth(problem_2, iterator_3, allow_evaluation_errors=true)
 
 # ╔═╡ c262116e-138e-4133-a032-d2f50bfbf5bd
-md""""This time we find a solution, although a suboptimal one."""
+md"""This time we find a solution, although a suboptimal one."""
 
 # ╔═╡ 9b4b21e0-dc6a-43ae-a511-79988ee99001
 md"""
@@ -440,8 +444,18 @@ md"""
 We use the same example as for MH. SA additionally has the option to specify the `initial_temperature` for the annealing (default `initial_temperature=1`). Let's see what effect changing the temperature from 1 to 2 has on the solution program.   
 """
 
+# ╔═╡ ba1432fc-2a00-4f90-8918-8129856d7941
+md"""
+We define the problem:
+"""
+
 # ╔═╡ e25d115f-7549-4606-b96c-9ef700810f7b
 problem_sa, examples_sa = create_problem(e_mh)
+
+# ╔═╡ 6e90ce61-f299-41b6-9a88-8e16814d0a40
+md"""
+First with temperature 1:
+"""
 
 # ╔═╡ 94f2bd5e-e11e-42e7-9a3e-3c9d5ae43cd4
 initial_temperature1 = 1
@@ -449,14 +463,44 @@ initial_temperature1 = 1
 # ╔═╡ eb851d7b-803e-45f6-ad10-fa0bde78826a
 iterator_sa1 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature1) 
 
+# ╔═╡ 524928be-7ef8-4dac-bdbd-800ec7b712b6
+program_sa1 = @timed synth(problem_sa, iterator_sa1)
+
+# ╔═╡ 553770a9-5c27-4317-a4b1-ec9729c88edc
+md"""
+and get the following solution and runtime:
+"""
+
+# ╔═╡ 5b4a9e96-c4a2-4a75-92b0-805ceb88fa52
+program_sa1[1]
+
 # ╔═╡ 73304e3f-05bf-4f0c-9acd-fc8afa87b460
-program_sa1 = synth(problem_sa, iterator_sa1)
+program_sa1[2]
+
+# ╔═╡ 0a4525a3-fe2b-4d0b-8a7b-8ca42b53b4f8
+md"""
+And now the same with tempeture 2: 
+"""
 
 # ╔═╡ 07f11eb1-6b45-441a-a481-57628bad23ae
 initial_temperature2 = 2
 
 # ╔═╡ 4ff69f0a-6626-4593-b361-a2387eecc731
 iterator_sa2 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature2) 
+
+# ╔═╡ 72e3ad32-0a3d-4bd1-a663-e981781ef7f9
+program_sa2 = @timed synth(problem_sa, iterator_sa2)
+
+# ╔═╡ 1c7fe3c1-85bf-4af7-912c-68adbca471e4
+program_sa2[1]
+
+# ╔═╡ 36051751-6579-4a84-b531-b66e8e7dbd3e
+program_sa2[2]
+
+# ╔═╡ c1ab6f55-cedd-49a8-9ea0-e512a8b89ca8
+md"""
+We can see that a higher tempture 1 solves this problem quicker than tempeture 2.
+"""
 
 # ╔═╡ 5df0ba53-b528-4baf-9980-cafe5d73f9dd
 md"""
@@ -485,7 +529,7 @@ begin
 end
 
 # ╔═╡ Cell order:
-# ╟─dddca175-3d88-45ce-90da-575c0ba38175
+# ╠═dddca175-3d88-45ce-90da-575c0ba38175
 # ╟─d52591c1-7544-4543-a4a1-2a1b94bd1d87
 # ╟─c0748da9-24da-4365-ba67-43bd593d5ea6
 # ╟─61cee94c-2481-4268-823b-ca596592b63c
@@ -495,16 +539,16 @@ end
 # ╠═e41c61a4-0b2c-46da-8f7b-fe6dc529c544
 # ╟─9ad0a92a-10d5-458a-8f05-9011c8553609
 # ╠═65317911-bc92-4b84-9744-ed784adcab4a
-# ╟─e9c6bc00-21f5-4a99-8bec-63cf2156c233
-# ╠═338f19f1-3a62-4462-b8dc-24424d7644f2
-# ╠═542cd47e-74cd-4b6f-acc9-bf524222e583
-# ╟─63e97576-1c34-464d-a106-d59d5fb1ee38
-# ╠═7e251a07-0041-4dc2-ac09-94fb01075c03
+# ╠═e9c6bc00-21f5-4a99-8bec-63cf2156c233
 # ╠═a6fb2e91-b73a-4032-930f-d884abd539e2
 # ╠═d44afab4-dca1-4507-ab4d-0d2573603fa7
+# ╠═7e251a07-0041-4dc2-ac09-94fb01075c03
+# ╠═8711e4f5-5eda-4e1f-a268-384e507d0c13
+# ╠═b4fb44e2-b72f-4b2f-88e7-c3ca34fe5137
 # ╠═d1b02aac-f93d-4643-98da-62eb74933e5b
 # ╠═e1d2cb58-5409-4eed-8ce1-9636e5ee2d1e
-# ╟─58c1a904-4d87-43f7-bcc3-884a8663c1da
+# ╠═83340349-df6f-4216-a8d6-dee6dbce97bc
+# ╠═58c1a904-4d87-43f7-bcc3-884a8663c1da
 # ╟─35405357-179b-4e77-9bdc-edf5a550b36d
 # ╠═3954dd49-07a2-4ec2-91b4-9c9596d5c264
 # ╟─9892e91b-9115-4520-9637-f8d7c8905825
@@ -515,7 +559,7 @@ end
 # ╠═4821fd3a-ff2d-4991-99ad-76608d11b1da
 # ╟─b2eb08d7-3e53-46c5-84b1-e1fa0e07e291
 # ╠═606070e1-83a7-4cca-a716-4fa459f78772
-# ╟─c262116e-138e-4133-a032-d2f50bfbf5bd
+# ╠═c262116e-138e-4133-a032-d2f50bfbf5bd
 # ╟─9b4b21e0-dc6a-43ae-a511-79988ee99001
 # ╟─115c02c9-ae0c-4623-a61d-831fc6ad55a2
 # ╠═3af650d9-19c6-4351-920d-d2361091f628
@@ -561,12 +605,22 @@ end
 # ╠═36f0e0cf-c871-42c9-956e-054767cbf693
 # ╟─599194a8-3f47-4917-9143-a5fe0d43029f
 # ╟─dd6aee87-cd96-4be1-b8fb-03fffee5ea43
+# ╠═ba1432fc-2a00-4f90-8918-8129856d7941
 # ╠═e25d115f-7549-4606-b96c-9ef700810f7b
+# ╠═6e90ce61-f299-41b6-9a88-8e16814d0a40
 # ╠═94f2bd5e-e11e-42e7-9a3e-3c9d5ae43cd4
 # ╠═eb851d7b-803e-45f6-ad10-fa0bde78826a
+# ╠═524928be-7ef8-4dac-bdbd-800ec7b712b6
+# ╠═553770a9-5c27-4317-a4b1-ec9729c88edc
+# ╠═5b4a9e96-c4a2-4a75-92b0-805ceb88fa52
 # ╠═73304e3f-05bf-4f0c-9acd-fc8afa87b460
+# ╠═0a4525a3-fe2b-4d0b-8a7b-8ca42b53b4f8
 # ╠═07f11eb1-6b45-441a-a481-57628bad23ae
 # ╠═4ff69f0a-6626-4593-b361-a2387eecc731
+# ╠═72e3ad32-0a3d-4bd1-a663-e981781ef7f9
+# ╠═1c7fe3c1-85bf-4af7-912c-68adbca471e4
+# ╠═36051751-6579-4a84-b531-b66e8e7dbd3e
+# ╠═c1ab6f55-cedd-49a8-9ea0-e512a8b89ca8
 # ╟─5df0ba53-b528-4baf-9980-cafe5d73f9dd
 # ╠═99ea1c20-ca2c-4d77-bc3b-06814db1d666
 # ╠═d991edb9-2291-42a7-97ff-58c456515505
