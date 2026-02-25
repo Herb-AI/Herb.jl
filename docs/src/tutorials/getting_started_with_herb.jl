@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.18
+# v0.20.21
 
 using Markdown
 using InteractiveUtils
@@ -32,16 +32,16 @@ First, we start with the setup. We need access to all the function in the Herb.j
 md"""
 ### Defining the program space
 
-Next, we start by creating a grammar. We define a context-free grammar as a [`HerbGrammar.ContextSpecificGrammar`](@ref) without any constraints. A context-free grammar is just a simple set of production rules for defining combinations of terminal symbols (in our case integers). 
+Next, we create a grammar. We define a context-free grammar as a [`HerbGrammar.ContextSpecificGrammar`](https://herb-ai.github.io/Herb.jl/dev/HerbGrammar/#HerbGrammar.ContextSensitiveGrammar) without any constraints. A context-free grammar is just a simple set of production rules for defining combinations of terminal symbols (in our case, integers). 
 
-Alternatively we could define a context-sensitive grammar, when the production rules only hold in a certain context. For more information on this, please see our tutorial on [defining grammars](defining_grammars.md).
+Alternatively, we could define a context-sensitive grammar in which the production rules hold only in specific contexts. For more information on this, please see our tutorial on [defining grammars](https://herb-ai.github.io/Herb.jl/dev/tutorials/defining_grammars/).
 
 For now, we specify a simple grammar (using the `@csgrammar` macro) for dealing with integers and explain all the rules individually:
 
 1. First, we specify our number values and constrain them to being positive even integers.
 2. Then, we can also use the variable `x` to hold an integer.
-3. The third rule determines we can add two integers.
-4. The fourth rule determines we can subtract an integer from another.
+3. The third rule determines that we can add two integers.
+4. The fourth rule determines that we can subtract an integer from another.
 5. Finally, we also allow the multiplication of two integers.
 
 If you run this cell, you can see all the rules rolled out.
@@ -93,7 +93,7 @@ md"""
 ### Connecting grammar and problem specification
 For the search to produce programs that use the input examples, we need to ensure that there is a rule where the right-hand side matches the symbol used in the input to the `IOExample`.
 For an example like `IOExample(Dict(:x => 1), 2)`, there must be some rule like `Number = x`--the `x`'s must match, otherwise the input value will never be used in any of the programs. If you have multiple input arguments, like `IOExample(Dict(:x => 1, :name => "Alice", "1. Alice"))`, then you need two rules, such as `Number = x` and `String = name`, to construct programs that use both inputs.
-If these rules don't exist yet, they need to be added (see the tutorial on [Defining Grammars in Herb.jl](.defining_grammars.md) to learn how to add rules). 
+If these rules don't exist yet, they need to be added (see the tutorial on [Defining Grammars in Herb.jl](https://herb-ai.github.io/Herb.jl/dev/tutorials/defining_grammars/) to learn how to add rules). 
 """
 
 # ╔═╡ 0f090666-9007-417e-a801-8231fffa19f3
@@ -102,11 +102,11 @@ md"""
 
 Now that we have defined the search space and the goal of the search, we can start the search. 
 
-Of course, our problem is underdefined as there might be multiple programs that satisfy our examples. 
-Let us consider the case where we also have a ternary if-then-else operator and standard boolean operators in our grammar: we could synthesize the program `x ≤ 5 ? 3x+5 : 0`. 
+Of course, our problem is underdefined, as there might be multiple programs that satisfy our examples. 
+Let us consider the case where we also have a ternary if-then-else operator and standard boolean operators in our grammar: we could synthesize the program `x ≤ 5 ? 4x+6 : 0`. 
 This program satisfies all our examples, but we don't expect it to generalize very well.
 
-To search through a program space, we first need to define a [`HerbSearch.ProgramIterator`](@ref), which can be instantiated with different iterators, for now we use a simple [`HerbSearch.BFSIterator`](@ref). For more advanced search methods check out our tutorial on [advanced search](.advanced_search.md). For more information about iterators, check out our tutorial on [working with interpreters](.working_with_interpreters.md). 
+To search through a program space, we first need to define a [`HerbSearch.ProgramIterator`](https://herb-ai.github.io/Herb.jl/dev/HerbSearch/#HerbSearch.ProgramIterator), which can be instantiated with different iterators, for now we use a simple [`HerbSearch.BFSIterator`](https://herb-ai.github.io/Herb.jl/dev/HerbSearch/#HerbSearch.BFSIterator). For more advanced search methods check out our tutorial on [advanced search](https://herb-ai.github.io/Herb.jl/dev/tutorials/advanced_search/). For more information about iterators, check out our tutorial on [working with interpreters](https://herb-ai.github.io/Herb.jl/dev/tutorials/working_with_interpreters/). 
 
 In general, we assume that a smaller program is more general than a larger program. 
 Therefore, we search for the smallest program in our grammar that satisfies our examples. 
@@ -136,22 +136,21 @@ In the previous case, we used the built-ins of the search procedure. However, we
 
 We first define a new problem to test with, we are looking for the programs that can compute the value `168`. We immediately pass the examples to the problem and then set up the new search.
 
-Search is done by passing the grammar, the problem and the starting point like before. We now also specify the enumeration function to be used, and now we use depth-first search. Then, we give the maximum depth of the programs we want to search for `(3)`, the maximum number of nodes in the Abstract Syntax Tree that exists during search `(10)`, and the maximum time in seconds allowed for the search.
+Search is done by passing the grammar, the problem and the starting point like before. We now also specify the enumeration function to be used, and now we use depth-first search. Then, we give the maximum depth of the programs we want to search for `(3)`, the maximum number of nodes in the Abstract Syntax Tree that exists during search `(10)`, and the maximum time in seconds allowed for the search `(5)`.
 """
 
 # ╔═╡ cdab3f55-37e4-4aee-bae1-14d3475cbdcd
 begin
     problem_2 = HerbSpecification.Problem("example2", [HerbSpecification.IOExample(Dict(:x => x), 168) for x ∈ 1:5])
-    iterator_2 = HerbSearch.BFSIterator(g, :Number, max_depth=4, max_size=30)
-    expr_2, flag_2 = HerbSearch.synth(problem_2, iterator_2)
-    println(expr_2)
-    program_2 = rulenode2expr(expr_2, g)
-    println(program_2)
+    iterator_2 = HerbSearch.BFSIterator(g, :Number, max_depth=3, max_size=10)
+    result = HerbSearch.synth(problem_2, iterator_2, max_time=5)
+    println(result)
+    println(rulenode2expr(result[1], g))
 end
 
 # ╔═╡ 5ad86beb-eb25-4bae-b0c2-a33d1a38581a
 md"""
-We see that our synthesizer can find a program to construct the value `168`, though a fun experiment would be trying to get the value `167`, what do you think would happen? You can try below, using the same iterator.
+We see that our synthesizer can find a program to construct the value `168`, though a fun experiment would be trying to get the value `167`, what do you think would happen? You can try below, using the same iterator. Hint: look what the flag value is.
 
 In any case, this concludes our first introduction to the `Herb.jl` program synthesis framework. You can see more examples in this repository, or explore yourself. Enjoy!
 """
@@ -160,9 +159,8 @@ In any case, this concludes our first introduction to the `Herb.jl` program synt
 begin
     problem_3 = HerbSpecification.Problem("example3", [HerbSpecification.IOExample(Dict(:x => x), 167) for x ∈ 1:5])
     expr_3, flag_3 = HerbSearch.synth(problem_3, iterator_2)
-    println(expr_3)
-    program_3 = rulenode2expr(expr_3, g)
-    println(program_3)
+    println(flag_3)
+    println(rulenode2expr(expr_3, g))
 end
 
 # ╔═╡ Cell order:
@@ -170,19 +168,19 @@ end
 # ╟─841f097d-a389-4dd2-9ad3-1a2292568634
 # ╠═1212cbc3-bb49-46cb-b9a3-475815d59f2d
 # ╠═1defafc5-ce65-42f0-90cd-de9e8895ec90
-# ╟─db7fe47b-ab3e-4705-b6ac-2733b9e81434
+# ╠═db7fe47b-ab3e-4705-b6ac-2733b9e81434
 # ╠═763b378b-66f9-481e-a3da-ca37825eb255
 # ╟─6d01dfe8-9048-4696-916c-b33fbc97268b
 # ╟─56a63f9e-b484-4d85-af3e-de2cc4476e09
 # ╠═8bf48b7a-0ff5-4015-81d3-ed2eeeceff1c
 # ╟─2baa7f33-c86d-40e2-9253-720ec19e4c43
 # ╠═059306d1-a45a-4727-ab01-1b5b80187999
-# ╟─e3204b9a-a97b-4f73-b6d3-d276b07cdd00
-# ╟─0f090666-9007-417e-a801-8231fffa19f3
+# ╠═e3204b9a-a97b-4f73-b6d3-d276b07cdd00
+# ╠═0f090666-9007-417e-a801-8231fffa19f3
 # ╠═d553f37b-bc8a-4426-a98b-fb195ed994d9
 # ╠═e1910236-9783-4989-a014-c3f7ccdf33d3
 # ╟─4c9f6236-2a84-4e76-86ab-c1fd1c7a1ba1
-# ╟─8f87eed7-dfa1-47e4-a9b3-8e2a8a966207
+# ╠═8f87eed7-dfa1-47e4-a9b3-8e2a8a966207
 # ╠═cdab3f55-37e4-4aee-bae1-14d3475cbdcd
-# ╟─5ad86beb-eb25-4bae-b0c2-a33d1a38581a
+# ╠═5ad86beb-eb25-4bae-b0c2-a33d1a38581a
 # ╠═c06d09a5-138a-4821-8a60-074fa7ec026d

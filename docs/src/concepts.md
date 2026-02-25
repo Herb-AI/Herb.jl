@@ -14,7 +14,7 @@ As you can see from the picture above, there are a few parts that needed in the 
 3. Iterator
 4. Examples
 
-Each part will be discussed in detail how it is implemented in Herb, and small code examples will be provided. After reading through this tutorial you should have a basic general understanding of how _Herb_ works and have an overview of important Herb modules (e.g., `HerbSearch`, `HerbCore`, `HerbSpecification`, `HerbBenchmarks`, `HerbCore`, etc.)
+Each part will be discussed in detail how it is implemented in Herb, and small code examples will be provided. After reading through this tutorial you should have a basic general understanding of how _Herb_ works and have an overview of important Herb modules (e.g., `HerbCore`, `HerbSpecification`, `HerbSearch`, `HerbBenchmarks`, etc.)
 
 ### 1. HerbGrammar
 First of, let's start with how do we define grammars in Herb. Grammars provide a set of rules that are used when creating programs. One could have an arithmetic expression grammar that allows addition, subtraction, multiplication, etc. Another example could be a grammar that allows bit manipulation operations (e.g., *shift left*, *shift right*, etc.), string operations (e.g., `concat`, `replace`, `findindex`, etc.).
@@ -22,7 +22,7 @@ First of, let's start with how do we define grammars in Herb. Grammars provide a
 Ideally, it should be possible to define _any_ grammar in Herb.
 
 One possible approach could be to let users write the grammar definition in a file `mygrammar` in a grammar format (e.g., BNF). For instance, for arithmetic expressions, a user would create a grammar as shown below. 
-```
+```julia
 <expr> ::= <term> "+" <expr>
         |  <term>
 
@@ -38,12 +38,12 @@ Of course, just having a static grammar in a file is not too interesting. The us
 But wait a minute…, how can we know how the users want the program to be evaluated from the grammar? Well, in this case, we can _infer_ that he probably means to evaluate arithmetic expressions in the mathematical sense. 
 
 Unfortunately, we cannot do this for any user defined grammar. 
-In general, grammars only provide the rules to create valid programs, but they _do not_ say _how_ to evaluate those programs. What to do then :shrug: ?
+In general, grammars only provide the rules to create valid programs, but they _do not_ say _how_ to evaluate those programs. What to do then?
 
-Well, one option is to let the users define _both_ the grammar and the specification on how to _evaluate_ programs. The users will have a great amount of flexibility with this solution. However, they would have to do that for every new grammar that they define. That will definitely be a tedious task. If you think a bit about it, this is just defining your own _programming language_. You would have both _the syntax_ of the language and the how to evaluate/interpret the syntax. Can't we do better :question:  
+Well, one option is to let the users define _both_ the grammar and the specification on how to _evaluate_ programs. The users will have a great amount of flexibility with this solution. However, they would have to do that for every new grammar that they define. That will definitely be a tedious task. If you think a bit about it, this is just defining your own _programming language_. You would have both _the syntax_ of the language and the how to evaluate/interpret the syntax. Can we do better?
 
 Well, it turns out that we are already programming in Julia. Can't we use the `Julia`'s parser and interpreter to _parse_ the grammar and _evaluate_ programs? If this were possible, we would definitely cut down the work of users since the parser and interpreter will be already be implemented by someone else (Julia's developers). 
-This is essentially _piggybacking_ on the work of other people :) Programmers are known to be lazy, thus this solution seems to be a good fit.
+This is essentially _piggybacking_ on the work of other people. Programmers are known to be lazy, thus this solution seems to be a good fit.
 
 
 #### Defining grammars in Herb - intro
@@ -64,8 +64,8 @@ end
 ```
 Here, we define a grammar with 6 rules. 
 
-However, if you type this the code above in the `Julia`'s REPL, you will notice something interesting. The given output has more rules :)
-```jl
+However, if you type this the code above in the `Julia`'s REPL, you will notice something interesting. The given output has more rules:
+```julia
 1: Number = Constant
 2: Constant = 1
 3: Constant = 2
@@ -81,7 +81,7 @@ Each item on the left hand of the grammar side is `Symbol` and the items on the 
 The grammar data structure uses rule indices to access rules. In Julia, array indices start from `1`!
 
 Run the following examples and check that you can follow what the indices do.
-```sh
+```julia
 julia> grammar_arithmetic.rules[1] # gives the RHS(expression) of the 1st rule
 :Constant
 julia> grammar_arithmetic.rules[6] # gives the RHS(expression) of the 6th rule
@@ -91,7 +91,7 @@ julia> grammar_arithmetic.types[6] # gives the LHS (symbol) of the 6th rule
 ```
 
 Of course, I am just scratching the surface here... To see all the fields that the Grammar provides from the REPL you can type `?` to enter _docs mode_ and type [`ContextSensitiveGrammar`](@ref) (there is no context free grammar because a context-sensitive grammar can also be context free)
-```sh
+```julia
 help?> ContextSensitiveGrammar
 ... useful docs taken from the comments
 ```
@@ -117,7 +117,7 @@ for _ in 1:10
 end
 ```
 
-> The short answer to what a RuleNode is that is provides the derivation tree (AST tree) of a program in the grammar. The value at each node of the tree is given by the rule index that corresponds to the grammar.
+> The short answer is that a RuleNode provides the derivation tree (AST tree) of a program in the grammar. The value at each node of the tree is given by the rule index that corresponds to the grammar.
 
 This definition might be difficult to visualize, that is why we are going to look at some simple examples of how this work.
 
@@ -125,7 +125,7 @@ This definition might be difficult to visualize, that is why we are going to loo
 
 We are going to return to our simple `grammar_arithmetic` that we have already seen before.
 
-```jl
+```julia
 grammar_arithmetic = @csgrammar begin
     Number =  1 | 2 | 3 # constant can be 1 or 2 or 3
     Number = x
@@ -151,7 +151,7 @@ On the left-hand side, you can see that grammar rules and their corresponding in
 
 Thus, a `RuleNode` is just the derivation tree of a program from the grammar. We can now check the definition of the `RuleNode` in Herb.
 Again, using typing `?` in the REPL and then `RuleNode` will show us useful information.
-```sh
+```julia
 help?> RuleNode
   RuleNode <: AbstractRuleNode
 
@@ -167,7 +167,7 @@ help?> RuleNode
 
 The [`HerbCore.RuleNode`](@ref) is defined in `HerbCore`.
 The definition is as follows:
-```jl
+```julia
 mutable struct RuleNode <: AbstractRuleNode
     ind::Int # index in grammar
     _val::Any  #value of _() evals
@@ -212,7 +212,7 @@ Let's try to directly change a RuleNode
 julia> rulenode.ind = 9 # set the root value to use the rule index 9 (But there is no rule index 9 in the grammar)
 9
 julia> rulenode2expr(rulenode,  grammar_arithmetic) # let's try to print the new rulenode 
-ERROR: BoundsError: attempt to access 7-element Vector{Any} at index [9] # <- Ups error..
+ERROR: BoundsError: attempt to access 7-element Vector{Any} at index [9] # <- Oops error..
 Stacktrace:
  [1] getindex
    @ ./essentials.jl:13 [inlined]
@@ -282,7 +282,7 @@ struct NiceCustomIterator
 end
 ```
 
-2. Secondly, we need to know the state of the iterator. We need to keep track of the both running timers to ensure that we switch from random to BFS and vice versa at the right time. A simple way to do this would be to store the `start_time_random` of the random iterator and then in the `iterate` function check if the current_time is bigger than the `starting time + timer_run_random`. We can do the same for BFS using a field `start_time_bfs`. It would also be helpful to know which timer should we check (random or BFS). For that a boolean `is_running_random` can be used.
+2. Secondly, we need to know the state of the iterator. We need to keep track of the both running timers to ensure that we switch from random to BFS and vice versa at the right time. A simple way to do this would be to store the `start_time_random` of the random iterator and then in the `iterate` function check if the `current_time` is bigger than the `starting time + timer_run_random`. We can do the same for BFS using a field `start_time_bfs`. It would also be helpful to know which timer should we check (random or BFS). For that a boolean `is_running_random` can be used.
 
 The definition we have so far looks like this:
 ```jl

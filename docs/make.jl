@@ -50,6 +50,9 @@ makedocs(
     format=HTML(
         sidebar_sitename=false,
         size_threshold=2^20,
+        assets = [
+            "assets/favicon.ico",
+        ],
     ),
     warnonly=[:missing_docs, :cross_references, :doctest],
 )
