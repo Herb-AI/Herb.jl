@@ -26,7 +26,7 @@ using Herb
 md"""
 # Advanced Search Procedures in Herb.jl
 
-[A more verbose getting started with Herb.jl]() described the concept of a program space and showed how to search it with Herb.jl, using a simple breadth-first-search (BFS) iterator for the search. 
+[A more verbose getting started with Herb.jl](https://herb-ai.github.io/Herb.jl/dev/tutorials/getting_started_with_herb/) described the concept of a program space and showed how to search it with Herb.jl, using a simple breadth-first-search (BFS) iterator for the search. 
 This tutorial takes a closer look at advanced search procedures that can be employed to define the iterator. 
 
 More specifically, you will learn about
