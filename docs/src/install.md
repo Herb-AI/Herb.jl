@@ -1,6 +1,6 @@
 # Installation Guide
 
-Before installing Herb.jl, ensure that you have a running Julia distribution installed (Julia 1.7 or later was tested). 
+Before installing Herb.jl, ensure that you have a running Julia distribution installed (Julia 1.10 or later). 
 For information on installing Julia, getting to know it, and setting up an IDE, see [Modern Julia Workflows](https://modernjuliaworkflows.org/writing/)
 
 Thanks to Julia's package management, installing Herb.jl is very straightforward. 
