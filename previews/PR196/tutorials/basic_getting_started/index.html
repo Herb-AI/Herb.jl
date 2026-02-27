@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Getting Started · Herb.jl</title><meta name="title" content="Getting Started · Herb.jl"/><meta property="og:title" content="Getting Started · Herb.jl"/><meta property="twitter:title" content="Getting Started · Herb.jl"/><meta name="description" content="Documentation for Herb.jl."/><meta property="og:description" content="Documentation for Herb.jl."/><meta property="twitter:description" content="Documentation for Herb.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="Herb.jl logo"/></a><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><span class="tocitem">Basics</span><ul><li><a class="tocitem" href="../../">Herb.jl</a></li><li><a class="tocitem" href="../../install/">Installation Guide</a></li><li class="is-active"><a class="tocitem" href>Getting Started</a></li><li><a class="tocitem" href="../../concepts/">Herb Architecture and Core Concepts</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../getting_started_with_herb/">A more verbose getting started with Herb.jl</a></li><li><a class="tocitem" href="../defining_grammars/">Defining Grammars in Herb.jl</a></li><li><a class="tocitem" href="../advanced_search/">Advanced Search Procedures</a></li><li><a class="tocitem" href="../TopDown/">Top Down Iterator</a></li><li><a class="tocitem" href="../getting_started_with_constraints/">Getting started with Constraints</a></li><li><a class="tocitem" href="../working_with_interpreters/">Working with custom interpreters</a></li><li><a class="tocitem" href="../abstract_syntax_trees/">Abstract Syntax Trees</a></li></ul></li><li><span class="tocitem">Sub-Modules</span><ul><li><a class="tocitem" href="../../HerbCore/">HerbCore.jl</a></li><li><a class="tocitem" href="../../HerbGrammar/">HerbGrammar.jl</a></li><li><a class="tocitem" href="../../HerbSpecification/">HerbSpecification.jl</a></li><li><a class="tocitem" href="../../HerbInterpret/">HerbInterpret.jl</a></li><li><a class="tocitem" href="../../HerbConstraints/">HerbConstraints.jl</a></li><li><a class="tocitem" href="../../HerbSearch/">HerbSearch.jl</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Basics</a></li><li class="is-active"><a href>Getting Started</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Getting Started</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl/blob/main/docs/src/tutorials/basic_getting_started.jl" title="View source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><style>
+    #documenter-page table {
+        display: table !important;
+        margin: 2rem auto !important;
+        border-top: 2pt solid rgba(0,0,0,0.2);
+        border-bottom: 2pt solid rgba(0,0,0,0.2);
+    }
+
+    #documenter-page pre, #documenter-page div {
+        margin-top: 1.4rem !important;
+        margin-bottom: 1.4rem !important;
+    }
+
+    .code-output {
+        padding: 0.7rem 0.5rem !important;
+    }
+
+    .admonition-body {
+        padding: 0em 1.25em !important;
+    }
+</style>
+
+<!-- PlutoStaticHTML.Begin -->
+<!--
+    # This information is used for caching.
+    [PlutoStaticHTML.State]
+    input_sha = "230d4d09e68559abf4f23c6472bdf9e61d83739b723fcbff8f0ff702bb10649b"
+    julia_version = "1.12.5"
+-->
+
+<div class="markdown"><h1 id="Getting-Started">Getting Started</h1><p>You can either paste this code into the Julia REPL or into a separate file, e.g. <code>get_started.jl</code>. If using a separate file you can execute using <code>julia get_started.jl</code> or <code>julia --project=. get_started.jl</code> depending on whether you installed Herb.jl globally or in a project.</p><p>To begin, we need to import <code>Herb</code>.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    import Pkg
+    Pkg.activate(Base.current_project())
+    Pkg.instantiate()
+end</code></pre>
+
+
+<pre class='language-julia'><code class='language-julia'>using Herb</code></pre>
+
+
+
+<div class="markdown"><p>To define a program synthesis problem, we need a grammar and specification. </p><ul><li><p>The grammar defines the space of programs, in the form of syntax trees.</p></li><li><p>The specification describes the behavior of the desired program. </p></li></ul><p>Having defined a problem, we use <a href="https://herb-ai.github.io/Herb.jl/dev/HerbSearch/"><code>HerbSearch</code></a> to find syntax trees that match the specification. These trees can be executed using <a href="https://herb-ai.github.io/Herb.jl/dev/HerbInterpret/"><code>HerbInterpret</code></a>.</p><h2 id="The-Grammar">The Grammar</h2><p>We will start by creating a grammar using the <a href="https://herb-ai.github.io/Herb.jl/dev/HerbGrammar/#HerbGrammar.@csgrammar-Tuple{Any}"><code>@csgrammar</code></a> macro, included in <a href="https://herb-ai.github.io/Herb.jl/dev/HerbGrammar/"><code>HerbGrammar</code></a>.  Here, we describe a simple integer arithmetic example grammar that consisting of a only one type, <code>Number</code>. We define a single input variable <code>x</code>, and the values <code>1,2</code>, of that type. Then, we allow the addition and multiplication of <code>Number</code>s.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>grammar = @csgrammar begin
+    Number = |(1:2)
+    Number = x
+    Number = Number + Number
+    Number = Number * Number
+end</code></pre>
+<pre class="code-output documenter-example-output" id="var-grammar">1: Number = 1
+2: Number = 2
+3: Number = x
+4: Number = Number + Number
+5: Number = Number * Number
+</pre>
+
+
+<div class="markdown"><div class="admonition is-note"><header class="admonition-header">Note</header><div class="admonition-body"><p>The symbol <code>x</code> in the grammar corresponds to a variable in the arithmetic expression. It can have any name in the grammar, as long as the name does not collide with already defined symbols in julia, such as <code>+</code>.</p></div></div><h2 id="The-Specification">The Specification</h2><p><a href="https://herb-ai.github.io/Herb.jl/dev/HerbSpecification/"><code>HerbSpecification</code></a> defines different forms for the specification. In this guide, the specification is a collection of examples, constructed for input-output pairs. Inputs are provided as a <a href="https://docs.julialang.org/en/v1/base/collections/#Base.Dict"><code>Dict</code></a>, where the keys are symbols of the input variables (in this example, <code>x</code>), and the values are the input variables corresponding values. The outputs of the program are simply the expected return values for the given inputs. The specification is then defined as a list of <a href="https://herb-ai.github.io/Herb.jl/dev/HerbSpecification/#HerbSpecification.IOExample"><code>IOExample</code></a>s.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>specification = [IOExample(Dict(:x =&gt; x), 2x+1) for x ∈ 1:5]</code></pre>
+<pre class="code-output documenter-example-output" id="var-specification">5-element Vector{IOExample{Int64, Int64}}:
+ IOExample{Int64, Int64}(Dict(:x =&gt; 1), 3)
+ IOExample{Int64, Int64}(Dict(:x =&gt; 2), 5)
+ IOExample{Int64, Int64}(Dict(:x =&gt; 3), 7)
+ IOExample{Int64, Int64}(Dict(:x =&gt; 4), 9)
+ IOExample{Int64, Int64}(Dict(:x =&gt; 5), 11)</pre>
+
+
+<div class="markdown"><p>The specification is used to construct a problem instance.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>problem = Problem(specification)</code></pre>
+<pre class="code-output documenter-example-output" id="var-problem">Problem{Vector{IOExample{Int64, Int64}}}("", IOExample{Int64, Int64}[IOExample{Int64, Int64}(Dict(:x =&gt; 1), 3), IOExample{Int64, Int64}(Dict(:x =&gt; 2), 5), IOExample{Int64, Int64}(Dict(:x =&gt; 3), 7), IOExample{Int64, Int64}(Dict(:x =&gt; 4), 9), IOExample{Int64, Int64}(Dict(:x =&gt; 5), 11)])</pre>
+
+
+<div class="markdown"><h1 id="Searching-for-Programs">Searching for Programs</h1><p>Having defined the grammar and problem, let us search for a solution with <a href="https://herb-ai.github.io/Herb.jl/dev/HerbSearch/"><code>HerbSearch</code></a>. </p><div class="admonition is-note"><header class="admonition-header">Note</header><div class="admonition-body"><p>For the search to be able produce programs that use the examples' inputs, we need to ensure that there is a rule where the right-hand side matches the symbol used in the input of the <code>IOExample</code>s. For an example <code>IOExample(Dict(:x =&gt; 1), 2)</code>, there must be some rule <code>Number = x</code> – the <code>x</code>'s must match, otherwise the input value will never be used in any of the programs.  If you have multiple input arguments, like <code>IOExample(Dict(:x =&gt; 1, :name =&gt; "Alice"), "1. Alice")</code>, then you need two rules, such as <code>Number = x</code> and <code>String = name</code>, to construct programs that use both inputs.</p></div></div><p>To do so, we will iterate the space of all possible program trees in a breadth-first manner using a <a href="https://herb-ai.github.io/Herb.jl/dev/HerbSearch/#HerbSearch.BFSIterator"><code>BFSIterator</code></a>.  We define it to start with a program tree that have a <code>:Number</code> node in the root, dictating the output of the problem is of type <code>Number</code> defined in the grammar.  We also bound the search by setting the maximum depth of the program tree to 5.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>program_tree_iterator = BFSIterator(grammar, :Number, max_depth=5)</code></pre>
+<pre class="code-output documenter-example-output" id="var-program_tree_iterator">BFSIterator(GenericSolver(1: Number = 1
+2: Number = 2
+3: Number = x
+4: Number = Number + Number
+5: Number = Number * Number
+, SolverState(Hole[Bool[1, 1, 1, 1, 1]], Set{AbstractLocalConstraint}(), true), DataStructures.PriorityQueue{AbstractLocalConstraint, Int64, Base.Order.ForwardOrdering}(), nothing, false, 9223372036854775807, 5))</pre>
+
+
+<div class="markdown"><p>The problem, along with the program tree iterator, can then be handed to the <a href="https://herb-ai.github.io/Herb.jl/dev/HerbSearch/#HerbSearch.synth-Tuple{Problem,%20ProgramIterator}"><code>synth</code></a> function to run the search.  The search will continue until it finds a program that satisfies all the examples in the specification, or until the iterator is exhausted. When it terminates, it returns the program that satisfies the most examples, along with a flag that indicates whether the program satisfies <em>all</em> the examples or not.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>solution, flag = synth(problem, program_tree_iterator)</code></pre>
+<pre class="code-output documenter-example-output" id="var-flag">(4{4{1,3},3}, optimal_program)</pre>
+
+
+<div class="markdown"><h2 id="Using-the-Synthesized-Program">Using the Synthesized Program</h2><p>Eventually, we want to test our solution on some other inputs. To that end, we transform the solution from a syntax tree back to a readable and exicutable format using <a href="https://herb-ai.github.io/Herb.jl/dev/HerbGrammar/#HerbGrammar.rulenode2expr-Tuple%7BAbstractRuleNode,%20AbstractGrammar%7D"><code>rulenode2expr</code></a>.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    program = rulenode2expr(solution, grammar)
+    println(program)
+end</code></pre>
+
+
+
+<div class="markdown"><p>To set up an environment that correctly binds values to the variables in the program, we provide the <a href="https://herb-ai.github.io/Herb.jl/dev/HerbInterpret/#HerbInterpret.execute_on_input-Union{Tuple{T},%20Tuple{Dict{Symbol,%20Any},%20Any,%20Dict{Symbol,%20T}}}%20where%20T"><code>execute_on_input</code></a> function.  It takes in three arguments:</p><ul><li><p>A <a href="https://herb-ai.github.io/Herb.jl/dev/HerbGrammar/#HerbGrammar.SymbolTable"><code>SymbolTable</code></a>, which is nothing more than a dictionary mapping symbols from the grammar to symbols in the Julia expression. This can be created using the <a href="https://herb-ai.github.io/Herb.jl/dev/HerbGrammar/#HerbGrammar.grammar2symboltable"><code>grammar2symboltable</code></a> function.</p></li><li><p>The program to execute. <strong>Note:</strong> This is not the solution from the search, but the Julia expression built from the solution and the grammar.</p></li><li><p>Values for all the variables in the grammar.</p></li></ul></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    output = execute_on_input(grammar2symboltable(grammar), program, Dict(:x =&gt; 6)) 
+    println(output)
+end</code></pre>
+
+
+
+<div class="markdown"><p>If you run the completed code it will output both the generated Julia expression and the result from assigning value.</p><p>Just like that we tackled (almost) all modules of Herb.jl.</p><h2 id="Where-to-go-from-here?">Where to go from here?</h2><p>See our other tutorials!</p><h2 id="The-full-code-example">The full code example</h2></div>
+
+
+<div class="markdown"><pre><code class="language-julia">using Herb
+
+# define our very simple context-free grammar
+# Can add and multiply over the input variable x and the integers 1,2.
+grammar = @csgrammar begin
+    Number = |(1:2)
+    Number = x
+    Number = Number + Number
+    Number = Number * Number
+end
+
+# define the synthesis problem specification as input-output examples, in this case using the function 2x+1
+problem = Problem([IOExample(Dict(:x =&gt; x), 2x+1) for x ∈ 1:5])
+
+# define a breadth-first iterator over program trees with root node :Number and max depth 5
+iterator = BFSIterator(grammar, :Number, max_depth=5)
+
+# run the synthesis, returning the best solution and a flag indicating whether all examples were satisfied
+solution, flag = synth(problem, iterator)
+
+# convert the solution from a syntax tree to a Julia expression, and print it
+program = rulenode2expr(solution, grammar)
+println(program)
+
+# execute the program on the input x=6, and print the output
+output = execute_on_input(grammar2symboltable(grammar), program, Dict(:x =&gt; 6)) 
+println(output)
+</code></pre></div>
+
+<!-- PlutoStaticHTML.End --><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+    startOnLoad: true,
+    theme: "neutral"
+});
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../install/">« Installation Guide</a><a class="docs-footer-nextpage" href="../../concepts/">Herb Architecture and Core Concepts »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 27 February 2026 09:14">Friday 27 February 2026</span>. Using Julia version 1.12.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
