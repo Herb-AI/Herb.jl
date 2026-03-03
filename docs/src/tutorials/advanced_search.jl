@@ -6,7 +6,7 @@ using InteractiveUtils
 
 # ╔═╡ 73ca98e1-9937-4ea7-a9bb-1a16aa67b5f8
 begin
-	using Pkg: Pkg
+	using Pkg
 	Pkg.activate(Base.current_project())
 	Pkg.instantiate()
 end
