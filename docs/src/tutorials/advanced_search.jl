@@ -1,12 +1,12 @@
 ### A Pluto.jl notebook ###
-# v0.20.21
+# v0.20.23
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ 73ca98e1-9937-4ea7-a9bb-1a16aa67b5f8
 begin
-	import Pkg
+	using Pkg
 	Pkg.activate(Base.current_project())
 	Pkg.instantiate()
 end
@@ -26,7 +26,7 @@ using Herb
 md"""
 # Advanced Search Procedures in Herb.jl
 
-[A more verbose getting started with Herb.jl]() described the concept of a program space and showed how to search it with Herb.jl, using a simple breadth-first-search (BFS) iterator for the search. 
+[A more verbose getting started with Herb.jl](https://herb-ai.github.io/Herb.jl/dev/tutorials/getting_started_with_herb/) described the concept of a program space and showed how to search it with Herb.jl, using a simple breadth-first-search (BFS) iterator for the search. 
 This tutorial takes a closer look at advanced search procedures that can be employed to define the iterator. 
 
 More specifically, you will learn about
@@ -48,10 +48,10 @@ We start with a simple grammar:.
 
 # ╔═╡ e41c61a4-0b2c-46da-8f7b-fe6dc529c544
 g_1 = @csgrammar begin
-    Number = |(1:2)
-    Number = x
-    Number = Number + Number
-    Number = Number * Number
+	Number = |(1:2)
+	Number = x
+	Number = Number + Number
+	Number = Number * Number
 end
 
 # ╔═╡ 9ad0a92a-10d5-458a-8f05-9011c8553609
@@ -77,13 +77,13 @@ In the following example, we consider two different values for `max_depth`, and 
 
 # ╔═╡ a6fb2e91-b73a-4032-930f-d884abd539e2
 begin
-	iterator_3 = BFSIterator(g_1, :Number, max_depth=3)
+	iterator_3 = BFSIterator(g_1, :Number, max_depth = 3)
 	solution_3 = @timed synth(problem_1, iterator_3)
 end
 
 # ╔═╡ d44afab4-dca1-4507-ab4d-0d2573603fa7
 begin
-	iterator_6 = BFSIterator(g_1, :Number, max_depth=6)
+	iterator_6 = BFSIterator(g_1, :Number, max_depth = 6)
 	solution_6 = @timed synth(problem_1, iterator_6)
 end
 
@@ -129,14 +129,14 @@ begin
 	nodes = []
 	iterations = []
 	for i in range(1, 50)
-		iterator = BFSIterator(g_1, :Number, max_depth=i)
+		iterator = BFSIterator(g_1, :Number, max_depth = i)
 		solution = @timed synth(problem_1, iterator)
 		push!(times, solution.time)
 		push!(nodes, solution[1][1])
 		push!(solutions, rulenode2expr(solution[1][1], g_1))
 		push!(iterations, i)
 	end
-       pretty_table(HTML, [iterations nodes solutions times], column_labels=[["Iteration", "RuleNode", "Program", "Duration"]])
+	pretty_table(HTML, [iterations nodes solutions times], column_labels = [["Iteration", "RuleNode", "Program", "Duration"]])
 end
 
 # ╔═╡ 9892e91b-9115-4520-9637-f8d7c8905825
@@ -162,7 +162,7 @@ g_2 = @csgrammar begin
 end
 
 # ╔═╡ 94e0d676-a9c7-4291-8696-15301e541c30
-problem_2 = Problem([IOExample(Dict{Symbol,Any}(), x) for x ∈ 1:5])
+problem_2 = Problem([IOExample(Dict{Symbol, Any}(), x) for x ∈ 1:5])
 
 # ╔═╡ a4a7daed-f89b-44ad-8787-9199c05bf046
 # ╠═╡ disabled = true
@@ -179,7 +179,7 @@ As expected, an exception occurs during the synthesis process. Now we try the sa
 """
 
 # ╔═╡ 606070e1-83a7-4cca-a716-4fa459f78772
-solution_4 = synth(problem_2, iterator_3, allow_evaluation_errors=true)
+solution_4 = synth(problem_2, iterator_3, allow_evaluation_errors = true)
 
 # ╔═╡ c262116e-138e-4133-a032-d2f50bfbf5bd
 md"""This time we find a solution, although a suboptimal one."""
@@ -198,8 +198,6 @@ First, we explore two fundamental deterministic top-down search algorithms: **br
 
 # ╔═╡ 115c02c9-ae0c-4623-a61d-831fc6ad55a2
 md"""
-First, we explore two fundamental deterministic top-down search algorithms: **breadth-first search (BFS)** and **depth-first search (DFS)**. Both algorithms are implemented using the abstract type `TopDownIterator`, which can be customized through the functions priority_function, derivation_heuristic, and hole_heuristic.
-
 ### Breadth-First Search
 
 The `BFSIterator` enumerates all possible programs at a given depth before progressing to the next level, ensuring that trees are explored in increasing order of size. This guarantees that smaller programs are evaluated first, and larger, more complex ones are considered only after all smaller ones have been processed.
@@ -209,8 +207,8 @@ To explore `BFSIterator`, we define another very simple grammar.
 
 # ╔═╡ 3af650d9-19c6-4351-920d-d2361091f628
 g_3 = @csgrammar begin
-	    Real = 1 | 2
-	    Real = Real * Real
+	Real = 1 | 2
+	Real = Real * Real
 end
 
 # ╔═╡ 4cb08dba-aea5-4c31-998c-844d1fce8c81
@@ -219,7 +217,7 @@ Next, we define a `BFSIterator` with a `max_depth` of 2 and a `max_size` of infi
 """
 
 # ╔═╡ f2521a57-267e-4b49-9179-4e9c2e6bdec7
-iterator_bfs = BFSIterator(g_3, :Real, max_depth=2, max_size=typemax(Int))
+iterator_bfs = BFSIterator(g_3, :Real, max_depth = 2, max_size = typemax(Int))
 
 # ╔═╡ bf038215-1ecf-4e1c-a9be-e133e4497293
 md"""
@@ -241,7 +239,7 @@ answer_programs = [
 	RuleNode(3, [RuleNode(1), RuleNode(1)]),
 	RuleNode(3, [RuleNode(1), RuleNode(2)]),
 	RuleNode(3, [RuleNode(2), RuleNode(1)]),
-	RuleNode(3, [RuleNode(2), RuleNode(2)])
+	RuleNode(3, [RuleNode(2), RuleNode(2)]),
 ]
 
 # ╔═╡ a2ce4b5c-da9a-468a-8bf3-5a784e123266
@@ -260,7 +258,7 @@ As before, we `collect` the candidate programs using the same grammar, but a `DF
 """
 
 # ╔═╡ db5be2c3-0b36-40b4-bf14-20e2c7063ad7
-iterator_dfs = DFSIterator(g_3, :Real, max_depth=2, max_size=typemax(Int))
+iterator_dfs = DFSIterator(g_3, :Real, max_depth = 2, max_size = typemax(Int))
 
 # ╔═╡ 4048ff37-e7d1-44ee-bfa3-aa058b6f53b6
 programs_dfs = collect(iterator_dfs)
@@ -280,16 +278,16 @@ By default, `priority_function` for a `TopDownIterator` is that of a BFS iterato
 
 # ╔═╡ 75b1abfd-19ed-43f5-ac65-f8ffde76c581
 function priority_function(
-    ::DFSIteratorRightmost, 
-    ::AbstractGrammar, 
-    ::AbstractRuleNode, 
-    parent_value::Union{Real, Tuple{Vararg{Real}}},
-    isrequeued::Bool
+	::DFSIteratorRightmost,
+	::AbstractGrammar,
+	::AbstractRuleNode,
+	parent_value::Union{Real, Tuple{Vararg{Real}}},
+	isrequeued::Bool,
 )
-    if isrequeued
-        return parent_value;
-    end
-    return parent_value - 1;
+	if isrequeued
+		return parent_value;
+	end
+	return parent_value - 1;
 end
 
 # ╔═╡ 7480d1e4-e417-4d87-80b7-513a098da70e
@@ -299,11 +297,11 @@ Next, we need to implement the `hole_heuristic` to be rightmost-first.
 
 # ╔═╡ 7e2af72d-b71c-4234-9bca-cb9a90732a91
 function hole_heuristic(::DFSIteratorRightmost, node::AbstractRuleNode, max_depth::Int)::Union{ExpandFailureReason, HoleReference}
-    return heuristic_rightmost(node, max_depth);
+	return heuristic_rightmost(node, max_depth);
 end
 
 # ╔═╡ 00d05a7e-ca79-4d6b-828d-b24ef1cb80a2
-iteratordfs_rightmost = DFSIteratorRightmost(g_3, :Real, max_depth=2, max_size=typemax(Int))
+iteratordfs_rightmost = DFSIteratorRightmost(g_3, :Real, max_depth = 2, max_size = typemax(Int))
 
 # ╔═╡ e0e8042d-ae41-4046-ab4f-5954a0d1cfb7
 programs_dfs_rightmost = collect(iteratordfs_rightmost)
@@ -335,17 +333,17 @@ We start with a simple grammar and a helper function to create the input-output 
 
 # ╔═╡ a4b522cf-78f0-4d44-88c8-82dd0cdbf952
 g_4 = @csgrammar begin
-    X = |(1:5)
-    X = X * X
-    X = X + X
-    X = X - X
-    X = x
+	X = |(1:5)
+	X = X * X
+	X = X + X
+	X = X - X
+	X = x
 end
 
 # ╔═╡ f313edb9-8fd9-4d78-88cd-89226f5c769d
-function create_problem(f, range=20)
-    examples = [IOExample(Dict(:x => x), f(x)) for x ∈ 1:range]
-    return Problem(examples), examples
+function create_problem(f, range = 20)
+	examples = [IOExample(Dict(:x => x), f(x)) for x ∈ 1:range]
+	return Problem(examples), examples
 end
 
 # ╔═╡ 8e75ec35-94dc-4292-ab36-83731b3b9318
@@ -384,13 +382,13 @@ begin
 	programs = []
 	iters = []
 	for i in range(1, 3)
-		iterator_mh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth=3) 
+		iterator_mh = MHSearchIterator(g_4, :X, examples_mh, cost_function, max_depth = 3)
 		program_mh = synth(problem_mh, iterator_mh)
 		push!(rules, program_mh[1])
 		push!(programs, rulenode2expr(program_mh[1], g_4))
 		push!(iters, i)
 	end
-       pretty_table(HTML, [iters rules programs], column_labels=[["Run", "RuleNode", "Program"]])
+	pretty_table(HTML, [iters rules programs], column_labels = [["Run", "RuleNode", "Program"]])
 end
 
 # ╔═╡ 700270ea-90bd-474b-91d9-0e5ed329776a
@@ -411,7 +409,7 @@ e_vlsn = x -> 10
 problem_vlsn1, examples_vlsn1 = create_problem(e_vlsn)
 
 # ╔═╡ 7c738d7b-bf05-40c7-b3b7-1512fbae7299
-iterator_vlsn1 = VLSNSearchIterator(g_4, :X, examples_vlsn1, cost_function, max_depth=2) 
+iterator_vlsn1 = VLSNSearchIterator(g_4, :X, examples_vlsn1, cost_function, max_depth = 2)
 
 # ╔═╡ 33af905e-e8ca-425d-9805-eb02bec7c26b
 program_vlsn1 = synth(problem_vlsn1, iterator_vlsn1)
@@ -423,7 +421,7 @@ e_vlsn2 = x -> x
 problem_vlsn2, examples_vlsn2 = create_problem(e_vlsn2)
 
 # ╔═╡ 285043ef-c295-400f-91c5-f3c6c69ac2bf
-iterator_vlsn2 = VLSNSearchIterator(g_4, :X, examples_vlsn2, cost_function, max_depth=1) 
+iterator_vlsn2 = VLSNSearchIterator(g_4, :X, examples_vlsn2, cost_function, max_depth = 1)
 
 # ╔═╡ 36f0e0cf-c871-42c9-956e-054767cbf693
 program_vlsn2 = synth(problem_vlsn2, iterator_vlsn2)
@@ -461,7 +459,7 @@ First with temperature 1:
 initial_temperature1 = 1
 
 # ╔═╡ eb851d7b-803e-45f6-ad10-fa0bde78826a
-iterator_sa1 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature1) 
+iterator_sa1 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth = 3, initial_temperature = initial_temperature1)
 
 # ╔═╡ 524928be-7ef8-4dac-bdbd-800ec7b712b6
 program_sa1 = @timed synth(problem_sa, iterator_sa1)
@@ -486,7 +484,7 @@ And now the same with tempeture 2:
 initial_temperature2 = 2
 
 # ╔═╡ 4ff69f0a-6626-4593-b361-a2387eecc731
-iterator_sa2 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth=3, initial_temperature = initial_temperature2) 
+iterator_sa2 = SASearchIterator(g_4, :X, examples_sa, cost_function, max_depth = 3, initial_temperature = initial_temperature2)
 
 # ╔═╡ 72e3ad32-0a3d-4bd1-a663-e981781ef7f9
 program_sa2 = @timed synth(problem_sa, iterator_sa2)
@@ -520,7 +518,7 @@ e_gs = x -> 3 * x * x + (x + 2)
 problem_gs, examples_gs = create_problem(e_gs)
 
 # ╔═╡ 069591a3-b89b-4fc6-afba-2145e32852b7
-iterator_gs = GeneticSearchIterator(g_4, :X, examples_gs, population_size = 10, mutation_probability = 0.8, maximum_initial_population_depth = 3) 
+iterator_gs = GeneticSearchIterator(g_4, :X, examples_gs, population_size = 10, mutation_probability = 0.8, maximum_initial_population_depth = 3)
 
 # ╔═╡ 5bef5754-d81b-4160-8ed6-396d02853d9a
 begin
