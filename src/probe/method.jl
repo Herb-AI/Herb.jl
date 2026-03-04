@@ -18,43 +18,44 @@ Synthesize a program using the `grammar` that follows the `spec` following the m
 ```
 """
 function probe(
-        grammar::AbstractGrammar,
-        starting_sym::Symbol,
-        problem::Problem;
-        probe_cycles::Int = 3,
-        max_iterations::Int = typemax(Int),
-        max_iteration_time::Int = typemax(Int),
-        kwargs...
-)#::Union{AbstractRuleNode, Nothing}
+    grammar::AbstractGrammar,
+    starting_sym::Symbol,
+    problem::Problem;
+    interpret::F,
+    probe_cycles::Int = 3,
+    max_iterations::Int = typemax(Int),
+    max_iteration_time::Int = typemax(Int),
+    eq::Function = _outputs_match,
+    allow_errors::Bool = true,
+    kwargs...,
+) where {F}
     if isnothing(grammar.log_probabilities)
         init_probabilities!(grammar)
     end
 
     counter = 0
     for _ in 1:probe_cycles
-        # Gets an iterator with some limit (the low-level budget)
         iterator = MLFSIterator(grammar, starting_sym; kwargs...)
 
-        # Run a budgeted search
-        promising_programs, result_flag, num_programs = get_promising_programs_with_fitness(
-            iterator, problem; max_time = max_iteration_time,
-            max_enumerations = max_iterations)
+        promising_programs, result_flag, num_programs =
+            get_promising_programs_with_fitness(
+                iterator, problem, interpret;
+                max_time = max_iteration_time,
+                max_enumerations = max_iterations,
+                eq = eq,
+                allow_errors = allow_errors,
+            )
         counter += num_programs
 
         if result_flag == optimal_program
-            @show promising_programs
-            program, score = only(promising_programs) # returns the only element
+            program, _ = only(promising_programs)
             return (program, counter)
         end
 
-        # Throw an error if no programs were found.
-        if length(promising_programs) == 0
-            # throw(NoProgramFoundError("No promising program found for the given specification. Try exploring more programs."))
-            println("No program found.")
+        if isempty(promising_programs)
             return (nothing, counter)
         end
 
-        # Update grammar probabilities 
         modify_grammar_probe!(promising_programs, grammar)
     end
 
@@ -63,6 +64,8 @@ function probe(
 end
 
 
+_outputs_match(x, y) = (x == y)
+
 """
     $(TYPEDSIGNATURES)
 
@@ -70,14 +73,33 @@ Decide whether to keep a program, or discard it, based on the specification.
 Returns the portion of solved examples.
 """
 function decide_probe(
-        program::AbstractRuleNode,
-        problem::Problem,
-        grammar::ContextSensitiveGrammar,
-        symboltable::SymbolTable)::Real
-    expr = rulenode2expr(program, grammar)
-    fitness = evaluate(problem, expr, symboltable, shortcircuit = false, allow_evaluation_errors=true)
-    return fitness
+    program::AbstractRuleNode,
+    problem::Problem,
+    interp::F;
+    eq::Function = _outputs_match,
+    allow_errors::Bool = true,
+) where {F}
+    solved = 0
+    for ex in problem.spec
+        ok = false
+        if allow_errors
+            try
+                y = interp(program, ex.in)
+                ok = eq(y, ex.out)
+            catch err
+                ok = false
+            end
+        else
+            y = interp(program, ex.in)
+            ok = eq(y, ex.out)
+        end
+
+        solved += ok ? 1 : 0
+    end
+
+    return solved / length(problem.spec)
 end
+
 
 """
     $(TYPEDSIGNATURES)
@@ -88,28 +110,26 @@ Updates a rules probability based on the highest program fitness the rule occurr
 The update function is taken from the Probe paper. Instead of introducing a normalization value, we just call `normalize!` instead.
 """
 function modify_grammar_probe!(
-        saved_program_fitness::Set{Tuple{<:AbstractRuleNode, Real}},
-        grammar::AbstractGrammar
-)::AbstractGrammar 
-    orig_probs = exp.(grammar.log_probabilities)
-    
-    for i in 1:length(grammar.log_probabilities)
-        max_fitness = 0
+    saved_program_fitness::Set{Tuple{<:AbstractRuleNode, Real}},
+    grammar::AbstractGrammar,
+)
+    if isnothing(grammar.log_probabilities)
+        init_probabilities!(grammar)
+    end
 
-        # Find maximum fitness for programs with that rule among saved programs
+    for i in 1:length(grammar.log_probabilities)
+        max_fitness = 0.0
         for (program, fitness) in saved_program_fitness
             if !isempty(rulesoftype(program, Set(i))) && fitness > max_fitness
-                max_fitness = fitness                
+                max_fitness = fitness
             end
         end
 
-        # Update the probability according to Probe's formula
-        prob = log_probability(grammar, i)
-        orig_probs[i] = log(exp(prob)^(1-max_fitness))
+        lp = log_probability(grammar, i)
+        grammar.log_probabilities[i] = (1 - max_fitness) * lp
     end
-    # Normalize probabilities after the update
-    normalize!(grammar)
 
+    normalize!(grammar)
     return grammar
 end
 
@@ -124,22 +144,23 @@ If a program solves some of the problem (e.g. some but not all examples) it is a
 The set of promising programs is returned eventually.
 """
 function get_promising_programs_with_fitness(
-        iterator::ProgramIterator,
-        problem::Problem;
-        max_time = typemax(Int),
-        max_enumerations = typemax(Int),
-        mod::Module = Main
-)
+    iterator::ProgramIterator,
+    problem::Problem,
+    interpret::F;
+    max_time = typemax(Int),
+    max_enumerations = typemax(Int),
+    eq::Function = _outputs_match,
+    allow_errors::Bool = true,
+) where {F}
     start_time = time()
-    grammar = get_grammar(iterator.solver)
-    symboltable::SymbolTable = grammar2symboltable(grammar, mod)
-
     promising_programs = Set{Tuple{AbstractRuleNode, Real}}()
 
     counter = 0
     for (i, candidate_program) in enumerate(iterator)
         counter = i
-        fitness = decide_probe(candidate_program, problem, grammar, symboltable)
+
+        fitness = decide_probe(candidate_program, problem, interpret;
+                               eq=eq, allow_errors=allow_errors)
 
         if fitness == 1
             empty!(promising_programs)
@@ -149,8 +170,7 @@ function get_promising_programs_with_fitness(
             push!(promising_programs, (freeze_state(candidate_program), fitness))
         end
 
-        # Check stopping criteria
-        if i > max_enumerations || time() - start_time > max_time
+        if i > max_enumerations || (time() - start_time) > max_time
             break
         end
     end
