@@ -7,9 +7,9 @@ using Herb.HerbSearch: ProgramIterator, evaluate
 using Herb.HerbInterpret: SymbolTable
 using Herb.HerbConstraints: get_grammar, freeze_state
 using Herb.HerbGrammar: ContextSensitiveGrammar, grammar2symboltable, rulenode2expr,
-                        isterminal, iscomplete, add_rule!
+    isterminal, iscomplete, add_rule!
 
-@enum SynthResult optimal_program=1 suboptimal_program=2
+@enum SynthResult optimal_program = 1 suboptimal_program = 2
 
 struct NoProgramFoundError <: Exception
     message::String
@@ -42,7 +42,7 @@ function frangel(
         frangel_iterations::Int = 3,
         max_iteration_time::Int = typemax(Int),
         kwargs...
-)::Union{AbstractRuleNode, Nothing} where {T <: ProgramIterator}
+    )::Union{AbstractRuleNode, Nothing} where {T <: ProgramIterator}
     # FrAngel config arguments
 
     for _ in 1:frangel_iterations
@@ -50,9 +50,11 @@ function frangel(
         iterator = iterator_type(grammar, starting_sym; kwargs...)
 
         # Run a budgeted search
-        promising_programs, result_flag = get_promising_programs(
+        promising_programs,
+            result_flag = get_promising_programs(
             iterator, problem; max_time = max_iteration_time,
-            max_enumerations = max_iterations)
+            max_enumerations = max_iterations
+        )
 
         if result_flag == optimal_program
             return only(promising_programs) # returns the only element
@@ -88,7 +90,7 @@ function decide_frangel(
         problem::Problem,
         grammar::ContextSensitiveGrammar,
         symboltable::SymbolTable
-)
+    )
     expr = rulenode2expr(program, grammar)
     score = evaluate(problem, expr, symboltable, shortcircuit = false)
     return score
@@ -104,7 +106,7 @@ function modify_grammar_frangel!(
         fragments::AbstractVector{<:AbstractRuleNode},
         grammar::AbstractGrammar;
         max_fragment_rules::Int = typemax(Int)
-)
+    )
     for f in fragments
         ind = get_rule(f)
         type = grammar.types[ind]
@@ -119,6 +121,7 @@ function modify_grammar_frangel!(
         expr = rulenode2expr(f, grammar)
         add_rule!(grammar, Meta.parse("$frag_type = $expr"))
     end
+    return
 end
 
 """
@@ -130,7 +133,7 @@ Selects the smallest (fewest number of nodes) fragments from the set of mined fr
 function select_smallest_fragments(
         fragments::Set{AbstractRuleNode};
         num_programs::Int = 3
-)::AbstractVector{<:AbstractRuleNode}
+    )::AbstractVector{<:AbstractRuleNode}
     sorted_nodes = sort(collect(fragments), by = x -> length(x))
 
     # Select the top 3 elements
@@ -146,7 +149,7 @@ Selects the shallowest (smallest depth) fragments from the set of mined fragment
 function select_shallowest_fragments(
         fragments::Set{AbstractRuleNode};
         num_programs::Int = 3
-)::AbstractVector{<:AbstractRuleNode}
+    )::AbstractVector{<:AbstractRuleNode}
     sorted_nodes = sort(collect(fragments), by = x -> depth(x))
 
     # Select the top 3 elements
@@ -154,7 +157,7 @@ function select_shallowest_fragments(
 end
 
 function select_fragments(fragments::Set{AbstractRuleNode})
-    select_smallest_fragments(fragments; num_programs = 3)
+    return select_smallest_fragments(fragments; num_programs = 3)
 end
 
 """
@@ -172,7 +175,7 @@ function get_promising_programs(
         max_time = typemax(Int),
         max_enumerations = typemax(Int),
         mod::Module = Main
-)::Tuple{Set{AbstractRuleNode}, SynthResult}
+    )::Tuple{Set{AbstractRuleNode}, SynthResult}
     start_time = time()
     grammar = get_grammar(iterator.solver)
     symboltable::SymbolTable = grammar2symboltable(grammar, mod)
@@ -207,7 +210,8 @@ The result is a set of the distinct program fragments, generated recursively by 
 
 """
 function mine_fragments(
-        grammar::AbstractGrammar, program::AbstractRuleNode)::Set{AbstractRuleNode}
+        grammar::AbstractGrammar, program::AbstractRuleNode
+    )::Set{AbstractRuleNode}
     fragments = Set{AbstractRuleNode}()
     # Push terminals as they are
     if isfilled(program) && !isterminal(grammar, program)
@@ -229,7 +233,8 @@ end
 Finds fragments (subprograms) of each program in `programs`.
 """
 function mine_fragments(
-        grammar::AbstractGrammar, programs::Set{<:AbstractRuleNode})::Set{AbstractRuleNode}
+        grammar::AbstractGrammar, programs::Set{<:AbstractRuleNode}
+    )::Set{AbstractRuleNode}
     fragments = reduce(union, mine_fragments(grammar, p) for p in programs)
     fragments = setdiff(fragments, programs) # Don't include the programs themselves in the set of fragments
 
@@ -237,9 +242,9 @@ function mine_fragments(
 end
 
 export
-       frangel,
-       decide_frangel,
-       modify_grammar_frangel!,
-       get_promising_programs
+    frangel,
+    decide_frangel,
+    modify_grammar_frangel!,
+    get_promising_programs
 
 end

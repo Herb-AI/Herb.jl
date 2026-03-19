@@ -11,7 +11,6 @@ using Herb.HerbSpecification: IOExample, Problem
 using Garden: optimal_program, suboptimal_program
 using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
 
-
 @testset "Probe" begin
     @testset verbose = true "Integration tests" begin
         grammar = @cfgrammar begin
@@ -25,18 +24,19 @@ using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
 
         interp = HerbInterpret.make_interpreter(
             grammar;
-            input_symbols=[:x],
+            input_symbols = [:x],
             target_module = @__MODULE__,
-            cache_module  = @__MODULE__,
+            cache_module = @__MODULE__
         )
 
-        program, num_programs = probe(
+        program,
+            num_programs = probe(
             grammar,
             :Start,
             problem;
             interpret = interp,
             max_depth = 3,
-            allow_errors=false
+            allow_errors = false
         )
 
         @test !isnothing(program)
@@ -56,18 +56,19 @@ using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
 
         interp = HerbInterpret.make_interpreter(
             grammar;
-            input_symbols=[:x],
+            input_symbols = [:x],
             target_module = @__MODULE__,
-            cache_module  = @__MODULE__,
+            cache_module = @__MODULE__
         )
 
-        program, num_programs = probe(
+        program,
+            num_programs = probe(
             grammar,
             :Start,
             impossible_problem;
             interpret = interp,
             max_depth = 3,
-            probe_cycles = 2,
+            probe_cycles = 2
         )
 
         @test isnothing(program)
@@ -85,28 +86,30 @@ using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
         init_probabilities!(grammar)
 
         # Impossible problem, 5/6 examples are easily solvable.
-        problem = Problem([
-            [IOExample(Dict{Symbol, Any}(:x => x), x + 1) for x in 1:5];
-            IOExample(Dict{Symbol, Any}(:x => 6), 0)
-        ])
+        problem = Problem(
+            [
+                [IOExample(Dict{Symbol, Any}(:x => x), x + 1) for x in 1:5];
+                IOExample(Dict{Symbol, Any}(:x => 6), 0)
+            ]
+        )
 
         interp = HerbInterpret.make_interpreter(
             grammar;
-            input_symbols=[:x],
+            input_symbols = [:x],
             target_module = @__MODULE__,
-            cache_module  = @__MODULE__,
+            cache_module = @__MODULE__
         )
 
-        iterator = CostBasedBottomUpIterator(grammar, :Start; current_costs=get_costs(grammar), max_depth = 3)
+        iterator = CostBasedBottomUpIterator(grammar, :Start; current_costs = get_costs(grammar), max_depth = 3)
 
-        promising_programs, result_flag, num_programs =
-            get_promising_programs_with_fitness(
-                iterator,
-                problem,
-                interp;
-                max_enumerations = 100,
-                allow_errors = false,
-            )
+        promising_programs, result_flag,
+            num_programs = get_promising_programs_with_fitness(
+            iterator,
+            problem,
+            interp;
+            max_enumerations = 100,
+            allow_errors = false
+        )
 
         @test num_programs > 0
         @test result_flag in (optimal_program, suboptimal_program)

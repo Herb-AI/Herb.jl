@@ -6,7 +6,7 @@ include("utils.jl")
 include("probe/Probe.jl")
 include("frangel/method.jl")
 
-export 
+export
     Probe,
     NoProgramFoundError,
     SynthResult,

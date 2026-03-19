@@ -3,12 +3,13 @@ module Probe
 using DocStringExtensions
 using Garden: SynthResult, optimal_program, suboptimal_program
 using Herb.HerbCore: AbstractRuleNode, AbstractGrammar, rulesoftype
-using Herb.HerbGrammar: normalize!, init_probabilities!, ContextSensitiveGrammar, rulenode2expr, grammar2symboltable
+using Herb.HerbGrammar: normalize!, init_probabilities!, ContextSensitiveGrammar,
+    rulenode2expr, grammar2symboltable
 using Herb.HerbSpecification: AbstractSpecification, Problem
 using Herb.HerbInterpret: SymbolTable
 using Herb.HerbConstraints: freeze_state, get_grammar
-using Herb.HerbSearch: CostBasedBottomUpIterator, evaluate, ProgramIterator, log_probability, get_costs
-
+using Herb.HerbSearch: CostBasedBottomUpIterator, evaluate, ProgramIterator,
+    log_probability, get_costs
 
 """
     $(TYPEDSIGNATURES)
@@ -56,17 +57,17 @@ A tuple `(program, total_enumerated)` where:
   all Probe rounds.
 """
 function probe(
-    grammar::AbstractGrammar,
-    starting_sym::Symbol,
-    problem::Problem;
-    interpret::F,
-    probe_cycles::Int = 3,
-    max_iterations::Int = typemax(Int),
-    max_iteration_time::Int = typemax(Int),
-    eq::Function = _outputs_match,
-    allow_errors::Bool = true,
-    kwargs...,
-) where {F}
+        grammar::AbstractGrammar,
+        starting_sym::Symbol,
+        problem::Problem;
+        interpret::F,
+        probe_cycles::Int = 3,
+        max_iterations::Int = typemax(Int),
+        max_iteration_time::Int = typemax(Int),
+        eq::Function = _outputs_match,
+        allow_errors::Bool = true,
+        kwargs...
+    ) where {F}
     if isnothing(grammar.log_probabilities)
         init_probabilities!(grammar)
     end
@@ -74,16 +75,18 @@ function probe(
     total_enumerated = 0
 
     for _ in 1:probe_cycles
-        iterator = CostBasedBottomUpIterator(grammar, starting_sym; current_costs=get_costs(grammar), kwargs...)
+        iterator = CostBasedBottomUpIterator(
+            grammar, starting_sym; current_costs = get_costs(grammar), kwargs...
+        )
 
-        promising_programs, result_flag, programs_enumerated =
-            get_promising_programs_with_fitness(
-                iterator, problem, interpret;
-                max_time = max_iteration_time,
-                max_enumerations = max_iterations,
-                eq = eq,
-                allow_errors = allow_errors,
-            )
+        promising_programs, result_flag,
+            programs_enumerated = get_promising_programs_with_fitness(
+            iterator, problem, interpret;
+            max_time = max_iteration_time,
+            max_enumerations = max_iterations,
+            eq = eq,
+            allow_errors = allow_errors
+        )
 
         total_enumerated += programs_enumerated
 
@@ -112,12 +115,12 @@ Decide whether to keep a program, or discard it, based on the specification.
 Returns the portion of solved examples.
 """
 function decide_probe(
-    program::AbstractRuleNode,
-    problem::Problem,
-    interp::F;
-    eq::Function = _outputs_match,
-    allow_errors::Bool = true,
-) where {F}
+        program::AbstractRuleNode,
+        problem::Problem,
+        interp::F;
+        eq::Function = _outputs_match,
+        allow_errors::Bool = true
+    ) where {F}
     solved = 0
     for ex in problem.spec
         ok = false
@@ -139,7 +142,6 @@ function decide_probe(
     return solved / length(problem.spec)
 end
 
-
 """
     $(TYPEDSIGNATURES)
 
@@ -149,9 +151,9 @@ Updates a rules probability based on the highest program fitness the rule occurr
 The update function is taken from the Probe paper. Instead of introducing a normalization value, we just call `normalize!` instead.
 """
 function modify_grammar_probe!(
-    saved_program_fitness::AbstractSet{<:Tuple{<:AbstractRuleNode, <:Real}},
-    grammar::AbstractGrammar,
-)
+        saved_program_fitness::AbstractSet{<:Tuple{<:AbstractRuleNode, <:Real}},
+        grammar::AbstractGrammar
+    )
     if isnothing(grammar.log_probabilities)
         init_probabilities!(grammar)
     end
@@ -172,7 +174,6 @@ function modify_grammar_probe!(
     return grammar
 end
 
-
 """
     $(TYPEDSIGNATURES)
 
@@ -183,14 +184,14 @@ If a program solves some of the problem (e.g. some but not all examples) it is a
 The set of promising programs is returned eventually.
 """
 function get_promising_programs_with_fitness(
-    iterator::ProgramIterator,
-    problem::Problem,
-    interpret::F;
-    max_time = typemax(Int),
-    max_enumerations = typemax(Int),
-    eq::Function = _outputs_match,
-    allow_errors::Bool = true,
-) where {F}
+        iterator::ProgramIterator,
+        problem::Problem,
+        interpret::F;
+        max_time = typemax(Int),
+        max_enumerations = typemax(Int),
+        eq::Function = _outputs_match,
+        allow_errors::Bool = true
+    ) where {F}
     start_time = time()
     promising_programs = Set{Tuple{AbstractRuleNode, Real}}()
     programs_enumerated = 0
@@ -203,7 +204,7 @@ function get_promising_programs_with_fitness(
             problem,
             interpret;
             eq = eq,
-            allow_errors = allow_errors,
+            allow_errors = allow_errors
         )
 
         if fitness == 1
@@ -222,9 +223,9 @@ function get_promising_programs_with_fitness(
     return (promising_programs, suboptimal_program, programs_enumerated)
 end
 
-export 
-    probe, 
-    decide_probe, 
+export
+    probe,
+    decide_probe,
     modify_grammar_probe!,
     get_promising_programs_with_fitness
 

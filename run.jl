@@ -11,26 +11,26 @@ grammar = @cfgrammar begin
     Int = x
 end
 # problem = Problem( [IOExample{Symbol, Any}(Dict(), 2)])
-problem = Problem([IOExample(Dict{Symbol, Any}(:x => x), x+1) for x ∈ 1:5])
+problem = Problem([IOExample(Dict{Symbol, Any}(:x => x), x + 1) for x in 1:5])
 
 interp = HerbInterpret.make_interpreter(
-            grammar;
-            input_symbols=[:x],
-            target_module = @__MODULE__,
-            cache_module  = @__MODULE__,
-        )
+    grammar;
+    input_symbols = [:x],
+    target_module = @__MODULE__,
+    cache_module = @__MODULE__
+)
 
 @show grammar
 @show grammar.log_probabilities
 
-program, num_programs = probe(
+program,
+    num_programs = probe(
     grammar,
     :Start,
     problem;
     interpret = interp,
     max_depth = 3,
-    allow_errors=false
+    allow_errors = false
 )
 
 @show program, num_programs
-

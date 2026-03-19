@@ -14,41 +14,7 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
   format:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        version:
-          - '1'
-        os:
-          - ubuntu-latest
-        arch:
-          - x64
+    name: Format Julia code
     steps:
       - uses: actions/checkout@v4
-
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            julia_file_change:
-              - added|modified: '**.jl'
-          list-files: 'shell'
-
-      - uses: julia-actions/setup-julia@latest
-        if: steps.filter.outputs.julia_file_change == 'true'
-        with:
-          version: ${{ matrix.version }}
-
-      - uses: julia-actions/cache@v2
-
-      - name: Apply JuliaFormatter
-        if: steps.filter.outputs.julia_file_change == 'true'
-        run: |
-          julia --color=yes .dev/herb_format.jl --verbose ${{ steps.filter.outputs.julia_file_change_files }}
-
-      - name: Check formatting diff
-        if: steps.filter.outputs.julia_file_change == 'true'
-        run: |
-          git diff --color=always --exit-code
+      - uses: fredrikekre/runic-action@v1
