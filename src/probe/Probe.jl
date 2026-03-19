@@ -223,10 +223,4 @@ function get_promising_programs_with_fitness(
     return (promising_programs, suboptimal_program, programs_enumerated)
 end
 
-export
-    probe,
-    decide_probe,
-    modify_grammar_probe!,
-    get_promising_programs_with_fitness
-
 end
