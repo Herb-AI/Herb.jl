@@ -7,15 +7,53 @@ using Herb.HerbGrammar: normalize!, init_probabilities!, ContextSensitiveGrammar
 using Herb.HerbSpecification: AbstractSpecification, Problem
 using Herb.HerbInterpret: SymbolTable
 using Herb.HerbConstraints: freeze_state, get_grammar
-using Herb.HerbSearch: MLFSIterator, evaluate, ProgramIterator, log_probability
+using Herb.HerbSearch: CostBasedBottomUpIterator, evaluate, ProgramIterator, log_probability, get_costs
 
 
 """
     $(TYPEDSIGNATURES)
 
-Synthesize a program using the `grammar` that follows the `spec` following the method from 
-["Just-in-time learning for bottom-up enumerative synthesis"](https://doi.org/10.1145/3428295).
-```
+Synthesize a program for `problem` from `grammar` using Probe
+([Barke, Peleg, and Polikarpova, OOPSLA 2020](https://doi.org/10.1145/3428295)).
+
+Probe alternates between bottom-up enumeration and grammar reweighting:
+
+1. candidate programs are enumerated from `grammar`,
+2. each candidate is evaluated on all examples in `problem`,
+3. candidates with non-zero fitness are kept as *promising programs*,
+4. rule probabilities are updated based on the best fitness of any promising
+   program containing that rule.
+
+This process is repeated for at most `probe_cycles` rounds.
+
+If an exact solution is found, it is returned immediately. If no exact solution
+is found within the given budgets, `nothing` is returned.
+
+An `intrepret` function is required and must be a callable of the form
+
+    interpret(program, input) -> output
+
+`HerbInterpret.make_interpret` and `HerbInterpret.make_stateful_interpret` provide a standard way to generate this for a given grammar.
+
+# Keyword Arguments
+- `interpret`: callable used to execute candidate programs.
+- `probe_cycles::Int=3`: maximum number of Probe reweighting rounds.
+- `max_iterations::Int=typemax(Int)`: maximum number of enumerated programs
+  per Probe round.
+- `max_iteration_time::Int=typemax(Int)`: time budget in seconds per Probe
+  round.
+- `eq::Function=_outputs_match`: predicate used to compare interpreter outputs
+  to expected outputs.
+- `allow_errors::Bool=true`: if `true`, interpreter errors are treated as
+  failed examples; otherwise they are rethrown.
+- `kwargs...`: forwarded to `CostBasedBottomUpIterator`.
+
+# Returns
+A tuple `(program, total_enumerated)` where:
+- `program` is the first program that satisfies all examples, or `nothing`
+  if no exact solution was found;
+- `num_enumerated` is the total number of candidate programs enumerated across
+  all Probe rounds.
 """
 function probe(
     grammar::AbstractGrammar,
@@ -33,11 +71,12 @@ function probe(
         init_probabilities!(grammar)
     end
 
-    counter = 0
-    for _ in 1:probe_cycles
-        iterator = MLFSIterator(grammar, starting_sym; kwargs...)
+    total_enumerated = 0
 
-        promising_programs, result_flag, num_programs =
+    for _ in 1:probe_cycles
+        iterator = CostBasedBottomUpIterator(grammar, starting_sym; current_costs=get_costs(grammar), kwargs...)
+
+        promising_programs, result_flag, programs_enumerated =
             get_promising_programs_with_fitness(
                 iterator, problem, interpret;
                 max_time = max_iteration_time,
@@ -45,24 +84,24 @@ function probe(
                 eq = eq,
                 allow_errors = allow_errors,
             )
-        counter += num_programs
+
+        total_enumerated += programs_enumerated
 
         if result_flag == optimal_program
             program, _ = only(promising_programs)
-            return (program, counter)
+            return program, total_enumerated
         end
 
         if isempty(promising_programs)
-            return (nothing, counter)
+            return nothing, total_enumerated
         end
 
         modify_grammar_probe!(promising_programs, grammar)
     end
 
     @warn "No solution found within $probe_cycles Probe iterations."
-    return (nothing, counter)
+    return nothing, total_enumerated
 end
-
 
 _outputs_match(x, y) = (x == y)
 
@@ -110,17 +149,17 @@ Updates a rules probability based on the highest program fitness the rule occurr
 The update function is taken from the Probe paper. Instead of introducing a normalization value, we just call `normalize!` instead.
 """
 function modify_grammar_probe!(
-    saved_program_fitness::Set{Tuple{<:AbstractRuleNode, Real}},
+    saved_program_fitness::AbstractSet{<:Tuple{<:AbstractRuleNode, <:Real}},
     grammar::AbstractGrammar,
 )
     if isnothing(grammar.log_probabilities)
         init_probabilities!(grammar)
     end
 
-    for i in 1:length(grammar.log_probabilities)
+    for i in eachindex(grammar.log_probabilities)
         max_fitness = 0.0
         for (program, fitness) in saved_program_fitness
-            if !isempty(rulesoftype(program, Set(i))) && fitness > max_fitness
+            if !isempty(rulesoftype(program, Set([i]))) && fitness > max_fitness
                 max_fitness = fitness
             end
         end
@@ -154,28 +193,33 @@ function get_promising_programs_with_fitness(
 ) where {F}
     start_time = time()
     promising_programs = Set{Tuple{AbstractRuleNode, Real}}()
+    programs_enumerated = 0
 
-    counter = 0
     for (i, candidate_program) in enumerate(iterator)
-        counter = i
+        programs_enumerated = i
 
-        fitness = decide_probe(candidate_program, problem, interpret;
-                               eq=eq, allow_errors=allow_errors)
+        fitness = decide_probe(
+            candidate_program,
+            problem,
+            interpret;
+            eq = eq,
+            allow_errors = allow_errors,
+        )
 
         if fitness == 1
             empty!(promising_programs)
             push!(promising_programs, (freeze_state(candidate_program), fitness))
-            return (promising_programs, optimal_program, counter)
+            return (promising_programs, optimal_program, programs_enumerated)
         elseif fitness > 0
             push!(promising_programs, (freeze_state(candidate_program), fitness))
         end
 
-        if i > max_enumerations || (time() - start_time) > max_time
+        if i >= max_enumerations || (time() - start_time) > max_time
             break
         end
     end
 
-    return (promising_programs, suboptimal_program, counter)
+    return (promising_programs, suboptimal_program, programs_enumerated)
 end
 
 export 

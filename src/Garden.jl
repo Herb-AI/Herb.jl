@@ -3,7 +3,7 @@ module Garden
 using DocStringExtensions
 
 include("utils.jl")
-include("probe/method.jl")
+include("probe/Probe.jl")
 include("frangel/method.jl")
 
 export 
