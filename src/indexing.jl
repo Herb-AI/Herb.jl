@@ -20,9 +20,13 @@ function is_domain_valid end
 """
     issame(a, b)
 
-Returns whether the two given objects `a` and `b` (ex: [`RuleNode`](@ref),
-[`Hole`](@ref) or [`AbstractConstraint`](@ref)) are the same.
+!!! warning 
+
+    This function is deprecated and should not be used. Use `==` instead.
+
 """
 function issame(a, b)
-    false
+    return a == b
 end
+
+Base.@deprecate issame Base.:(==) false

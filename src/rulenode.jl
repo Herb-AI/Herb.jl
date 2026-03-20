@@ -60,6 +60,7 @@ function update_rule_indices!(node::RuleNode, n_rules::Integer)
     for child in children
         update_rule_indices!(child, n_rules)
     end
+    return
 end
 
 """
@@ -76,7 +77,7 @@ function update_rule_indices!(
         node::RuleNode,
         n_rules::Integer,
         mapping::AbstractDict{<:Integer, <:Integer}
-)
+    )
     rule_ind = get_rule(node)
     if rule_ind > n_rules
         error("Rule index $(rule_ind) exceeds the number of grammar rules ($n_rules).")
@@ -88,6 +89,7 @@ function update_rule_indices!(
     for child in children
         update_rule_indices!(child, n_rules, mapping)
     end
+    return
 end
 
 # Check whether the `node`'s rule index exceeds the number of rules `n_rules.`
@@ -95,7 +97,7 @@ function is_domain_valid(node::RuleNode, n_rules::Integer)
     if get_rule(node) > n_rules
         return false
     end
-    all(child -> is_domain_valid(child, n_rules), get_children(node))
+    return all(child -> is_domain_valid(child, n_rules), get_children(node))
 end
 
 """
@@ -133,7 +135,7 @@ function is_domain_valid(hole::AbstractHole, n_rules::Integer)
     if length(hole.domain) != n_rules
         return false
     end
-    all(child -> is_domain_valid(child, n_rules), get_children(hole))
+    return all(child -> is_domain_valid(child, n_rules), get_children(hole))
 end
 
 """
@@ -154,6 +156,7 @@ function update_rule_indices!(hole::AbstractHole, n_rules::Integer)
     for child in children
         update_rule_indices!(child, n_rules)
     end
+    return
 end
 
 """
@@ -168,10 +171,11 @@ Errors if the length of the domain vector exceeds new `n_rules`.
 - `n_rules`: The new number of rules in the grammar
 - `mapping`: A dictionary mapping the old rule indices to new ones
 """
-function update_rule_indices!(hole::AbstractHole,
+function update_rule_indices!(
+        hole::AbstractHole,
         n_rules::Integer,
         mapping::AbstractDict{<:Integer, <:Integer}
-)
+    )
     update_rule_indices!(hole, n_rules) # resize (also checks n_rules)
     # update domain BV according to mapping
     rule_indices = findall(hole.domain)
@@ -185,6 +189,7 @@ function update_rule_indices!(hole::AbstractHole,
     for child in children
         update_rule_indices!(child, n_rules, mapping)
     end
+    return
 end
 
 """
@@ -221,16 +226,16 @@ function _get_hole_name(holetype)
     else
         throw(
             ArgumentError(
-            styled"""
-            Input to the {code:@rulenode} macro appears to be a hole, but the macro does not support the type: {code:{red:$holetype}}. The macro currently supports concrete subtypes of {code:AbstractHole}s {bold:that are defined in {code:HerbCore.jl}}.
-            """,
-        ),
+                styled"""
+                Input to the {code:@rulenode} macro appears to be a hole, but the macro does not support the type: {code:{red:$holetype}}. The macro currently supports concrete subtypes of {code:AbstractHole}s {bold:that are defined in {code:HerbCore.jl}}.
+                """,
+            ),
         )
     end
 end
 
 function _shorthand2rulenode(i::Integer)
-    :(RuleNode($i))
+    return :(RuleNode($i))
 end
 
 function _shorthand2rulenode(ex::Expr)
@@ -261,8 +266,10 @@ function _shorthand2rulenode(ex::Expr)
     # rulenodes without children
     ex = postwalk(ex) do x
         @capture(x, {children__}) || return x
-        children = [isexpr(child, Int, Integer) ? :(RuleNode($child)) : child
-                    for child in children]
+        children = [
+            isexpr(child, Int, Integer) ? :(RuleNode($child)) : child
+                for child in children
+        ]
         return :([$(children...)])
     end
 
@@ -303,7 +310,7 @@ Hole[Bool[1, 1, 0, 0]]
 ```
 """
 macro rulenode(ex::Union{Integer, Expr})
-    _shorthand2rulenode(ex)
+    return _shorthand2rulenode(ex)
 end
 
 """
@@ -325,12 +332,18 @@ RuleNode(ind::Int, _val::Any) = RuleNode(ind, _val, AbstractRuleNode[])
 Base.:(==)(::RuleNode, ::AbstractHole) = false
 Base.:(==)(::AbstractHole, ::RuleNode) = false
 function Base.:(==)(A::RuleNode, B::RuleNode)
-    (A.ind == B.ind) &&
+    return (A.ind == B.ind) &&
         length(A.children) == length(B.children) && #required because zip doesn't check lengths
         all(isequal(a, b) for (a, b) in zip(A.children, B.children))
 end
-# We do not know how the holes will be expanded yet, so we cannot assume equality even if the domains are equal.
-Base.:(==)(A::AbstractHole, B::AbstractHole) = false
+function Base.:(==)(a::UniformHole, b::UniformHole)
+    return a.domain == b.domain && length(a.children) == length(b.children) &&
+        all(isequal(a, b) for (a, b) in zip(a.children, b.children))
+end
+function Base.:(==)(a::H, b::H) where {H <: AbstractHole}
+    return a.domain == b.domain
+end
+
 
 Base.copy(r::RuleNode) = RuleNode(r.ind, r._val, r.children)
 Base.copy(h::Hole) = Hole(copy(h.domain))
@@ -350,18 +363,18 @@ end
 
 function Base.show(io::IO, node::RuleNode; separator = ",")
     print(io, node.ind)
-    if !isempty(children(node))
+    return if !isempty(children(node))
         Base.show_enclosed_list(io, "{", children(node), separator, "}", 0)
     end
 end
 
 function Base.show(io::IO, node::AbstractHole; _...)
-    print(io, "Hole[$(node.domain)]")
+    return print(io, "Hole[$(node.domain)]")
 end
 
 function Base.show(io::IO, node::UniformHole; separator = ",")
     print(io, "UniformHole[$(node.domain)]")
-    if !isempty(node.children)
+    return if !isempty(node.children)
         Base.show_enclosed_list(io, "{", children(node), separator, "}", 0)
     end
 end
@@ -390,8 +403,10 @@ performed in both [`RuleNode`](@ref)s until nodes with a different index
 are found.
 """
 Base.isless(
-    rn₁::AbstractRuleNode, rn₂::AbstractRuleNode)::Bool = _rulenode_compare(
-    rn₁, rn₂) == -1
+    rn₁::AbstractRuleNode, rn₂::AbstractRuleNode
+)::Bool = _rulenode_compare(
+    rn₁, rn₂
+) == -1
 
 function _rulenode_compare(rn₁::AbstractRuleNode, rn₂::AbstractRuleNode)::Int
     # Helper function for Base.isless
@@ -455,8 +470,10 @@ Returns every rule in the ruleset that is also used in the [`AbstractRuleNode`](
 !!! warning
 	The `ignoreNode` must be a subtree of `node` for it to have an effect.
 """
-function rulesoftype(node::RuleNode, ruleset::Set{Int},
-        ignoreNode::Union{Nothing, AbstractRuleNode} = nothing)::Set{Int}
+function rulesoftype(
+        node::RuleNode, ruleset::Set{Int},
+        ignoreNode::Union{Nothing, AbstractRuleNode} = nothing
+    )::Set{Int}
     retval = Set{Int}()
 
     if !isnothing(ignoreNode) && node == ignoreNode
@@ -477,9 +494,11 @@ function rulesoftype(node::RuleNode, ruleset::Set{Int},
         return retval
     end
 end
-function rulesoftype(node::RuleNode, rule_index::Int,
-        ignoreNode::Union{Nothing, AbstractRuleNode} = nothing)
-    rulesoftype(node, Set{Int}(rule_index), ignoreNode)
+function rulesoftype(
+        node::RuleNode, rule_index::Int,
+        ignoreNode::Union{Nothing, AbstractRuleNode} = nothing
+    )
+    return rulesoftype(node, Set{Int}(rule_index), ignoreNode)
 end
 
 rulesoftype(::Hole, ::Vararg{Any}) = Set{Int}()
@@ -497,9 +516,10 @@ function rulesoftype(
         grammar::AbstractGrammar,
         ruletype::Symbol,
         ignoreNode::Union{Nothing, RuleNode} = nothing
-)
-    rulesoftype(
-        node, Set(grammar[ruletype]), ignoreNode)
+    )
+    return rulesoftype(
+        node, Set(grammar[ruletype]), ignoreNode
+    )
 end
 
 """
@@ -508,8 +528,11 @@ end
 Returns true if the rulenode contains the index.
 """
 function contains_index(rulenode::AbstractRuleNode, index::Int)
-    !isempty(rulesoftype(
-        rulenode, index))
+    return !isempty(
+        rulesoftype(
+            rulenode, index
+        )
+    )
 end
 
 """
@@ -519,7 +542,7 @@ Replace a node in `expr`, specified by `path`, with `new_expr`.
 Path is a sequence of child indices, starting from the root node.
 """
 function swap_node(expr::AbstractRuleNode, new_expr::AbstractRuleNode, path::Vector{Int})
-    if length(path) == 1
+    return if length(path) == 1
         expr.children[path[begin]] = new_expr
     else
         swap_node(expr.children[path[begin]], new_expr, path[2:end])
@@ -532,7 +555,7 @@ end
 Replace child `i` of a node, a part of larger `expr`, with `new_expr`.
 """
 function swap_node(expr::RuleNode, node::RuleNode, child_index::Int, new_expr::RuleNode)
-    if expr == node
+    return if expr == node
         node.children[child_index] = new_expr
     else
         for child in expr.children
@@ -548,7 +571,7 @@ Extract the derivation sequence from a path (sequence of child indices) and an [
 If the path is deeper than the deepest node, it returns what it has.
 """
 function get_rulesequence(node::RuleNode, path::Vector{Int})
-    if node.ind == 0 # sign for empty node 
+    if node.ind == 0 # sign for empty node
         return Vector{Int}()
     elseif isempty(node.children) # no childnen, nowehere to follow the path; still return the index
         return [node.ind]
@@ -557,13 +580,17 @@ function get_rulesequence(node::RuleNode, path::Vector{Int})
     elseif isassigned(path, 2)
         # at least two items are left in the path
         # need to access the child with get because it can happen that the child is not yet built
-        return append!([node.ind],
-            get_rulesequence(get(node.children, path[begin], RuleNode(0)), path[2:end]))
+        return append!(
+            [node.ind],
+            get_rulesequence(get(node.children, path[begin], RuleNode(0)), path[2:end])
+        )
     else
         # if only one item left in the path
         # need to access the child with get because it can happen that the child is not yet built
-        return append!([node.ind],
-            get_rulesequence(get(node.children, path[begin], RuleNode(0)), Vector{Int}()))
+        return append!(
+            [node.ind],
+            get_rulesequence(get(node.children, path[begin], RuleNode(0)), Vector{Int}())
+        )
     end
 end
 
@@ -636,7 +663,8 @@ end
 Returns the path from the `root` to the `targetnode`. Returns nothing if no path exists.
 """
 function get_path(
-        root::AbstractRuleNode, targetnode::AbstractRuleNode)::Union{Vector{Int}, Nothing}
+        root::AbstractRuleNode, targetnode::AbstractRuleNode
+    )::Union{Vector{Int}, Nothing}
     if root === targetnode
         return Vector{Int}()
     end
@@ -655,11 +683,12 @@ end
 Recursively counts the number of holes in an [`AbstractRuleNode`](@ref)
 """
 function number_of_holes(rn::RuleNode)
-    reduce(
-        +, [number_of_holes(c) for c in rn.children], init = 0)
+    return reduce(
+        +, [number_of_holes(c) for c in rn.children], init = 0
+    )
 end
 function number_of_holes(rn::UniformHole)
-    1 + reduce(+, [number_of_holes(c) for c in rn.children], init = 0)
+    return 1 + reduce(+, [number_of_holes(c) for c in rn.children], init = 0)
 end
 number_of_holes(rn::Hole) = 1
 
@@ -677,8 +706,10 @@ contains_hole(hole::AbstractHole) = true
 Checks if an [`AbstractRuleNode`](@ref) tree contains a [`Hole`](@ref).
 """
 function contains_nonuniform_hole(rn::AbstractRuleNode)
-    any(contains_nonuniform_hole(c)
-    for c in rn.children)
+    return any(
+        contains_nonuniform_hole(c)
+            for c in rn.children
+    )
 end
 contains_nonuniform_hole(hole::Hole) = true
 
@@ -762,15 +793,3 @@ function have_same_shape(node1, node2)
     end
     return true
 end
-
-function issame(a::RuleNode, b::RuleNode)
-    (a.ind == b.ind) && length(a.children) == length(b.children) &&
-        all(issame(a, b) for (a, b) in zip(a.children, b.children))
-end
-
-function issame(a::UniformHole, b::UniformHole)
-    a.domain == b.domain && length(a.children) == length(b.children) &&
-        all(issame(a, b) for (a, b) in zip(a.children, b.children))
-end
-
-issame(a::Hole, b::Hole) = a.domain == b.domain

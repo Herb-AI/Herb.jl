@@ -24,6 +24,7 @@ function Base.show(io::IO, grammar::AbstractGrammar)
     for i in eachindex(grammar.rules)
         println(io, i, ": ", grammar.types[i], " = ", grammar.rules[i])
     end
+    return
 end
 
 Base.getindex(grammar::AbstractGrammar, typ::Symbol) = grammar.bytype[typ]

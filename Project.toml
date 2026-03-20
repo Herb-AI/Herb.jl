@@ -1,7 +1,7 @@
 name = "HerbCore"
 uuid = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
 authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Nicolae Filat <N.Filat@student.tudelft.nl>", "Tilman Hinnerichs <t.r.hinnerichs@tudelft.nl>", "Sebastijan Dumancic <s.dumancic@tudelft.nl>"]
-version = "1.0.0"
+version = "1.1.0"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"

@@ -1,4 +1,5 @@
-@testset verbose=true "T <: AbstractRuleNode" begin
+@testitem "T <: AbstractRuleNode" begin
+    using AbstractTrees: children, nodevalue, treeheight
     @testset "AbstractTrees Interface" begin
         @test nodevalue(RuleNode(1)) == 1
         @test isempty(children(RuleNode(1)))
@@ -14,12 +15,12 @@
             node = RuleNode(1, [RuleNode(2), RuleNode(3)])
             @test node == node
             @test RuleNode(1, [RuleNode(2), RuleNode(3)]) ==
-                  RuleNode(1, [RuleNode(2), RuleNode(3)])
+                RuleNode(1, [RuleNode(2), RuleNode(3)])
             @test RuleNode(1, [RuleNode(2), node]) == RuleNode(1, [RuleNode(2), node])
 
             @test RuleNode(1) !== RuleNode(2)
             @test RuleNode(1, [RuleNode(2), RuleNode(3)]) !==
-                  RuleNode(2, [RuleNode(2), RuleNode(3)])
+                RuleNode(2, [RuleNode(2), RuleNode(3)])
         end
 
         @testset "Hash tests" begin
@@ -45,8 +46,8 @@
             @test RuleNode(2) > RuleNode(1)
             @test RuleNode(1, [RuleNode(2)]) < RuleNode(1, [RuleNode(3)])
             @test RuleNode(1, [RuleNode(2)]) < RuleNode(2, [RuleNode(1)])
-            @test_throws ArgumentError RuleNode(1)<Hole(BitVector((1, 1)))
-            @test_throws ArgumentError Hole(BitVector((1, 1)))<RuleNode(1)
+            @test_throws ArgumentError RuleNode(1) < Hole(BitVector((1, 1)))
+            @test_throws ArgumentError Hole(BitVector((1, 1))) < RuleNode(1)
         end
 
         @testset "Node depth from a tree" begin
@@ -126,7 +127,7 @@
             @test get_node_at_location(rulenode, [2]).ind == 4
             @testset "Hole" begin
                 hole = Hole(BitVector([1, 1]))
-                @test get_node_at_location(hole, Vector{Int}()).domain == hole.domain #because hole != hole 
+                @test get_node_at_location(hole, Vector{Int}()).domain == hole.domain #because hole != hole
                 @test_throws Exception get_node_at_location(hole, [1])
             end
         end
@@ -136,13 +137,17 @@
             n2 = RuleNode(2)
             n3 = UniformHole(BitVector((1, 1, 1)), [RuleNode(1), n2])
             n4 = RuleNode(1)
-            root = RuleNode(4, [
-                RuleNode(4, [
-                    n1,
-                    RuleNode(1)
-                ]),
-                n3
-            ])
+            root = RuleNode(
+                4, [
+                    RuleNode(
+                        4, [
+                            n1,
+                            RuleNode(1),
+                        ]
+                    ),
+                    n3,
+                ]
+            )
             @test get_path(root, n1) == [1, 1]
             @test get_path(root, n2) == [2, 2]
             @test get_path(root, n3) == [2]
@@ -155,7 +160,7 @@
             @test length(UniformHole(domain, [RuleNode(2)])) == 2
             @test length(RuleNode(1, [RuleNode(2, [Hole(domain), RuleNode(4)])])) == 4
             @test length(UniformHole(domain, [RuleNode(2, [RuleNode(4), RuleNode(4)])])) ==
-                  4
+                4
         end
 
         @testset "Depth tests with holes" begin
@@ -174,11 +179,13 @@
             @test number_of_holes(UniformHole(domain, [Hole(domain), RuleNode(1)])) == 2
             @test number_of_holes(RuleNode(2, [Hole(domain), RuleNode(1)])) == 1
             @test number_of_holes(
-                UniformHole(domain,
-                [
-                    Hole(domain),
-                    UniformHole(domain, [Hole(domain), RuleNode(1)])
-                ]),
+                UniformHole(
+                    domain,
+                    [
+                        Hole(domain),
+                        UniformHole(domain, [Hole(domain), RuleNode(1)]),
+                    ]
+                ),
             ) == 4
         end
 
@@ -226,10 +233,12 @@
             @test have_same_shape(RuleNode(4, [RuleNode(1)]), RuleNode(1)) == false
 
             node1 = @rulenode 3{1, 1}
-            node2 = RuleNode(9, [
-                RuleNode(2),
-                Hole(domain)
-            ])
+            node2 = RuleNode(
+                9, [
+                    RuleNode(2),
+                    Hole(domain),
+                ]
+            )
             @test have_same_shape(node1, node2)
 
             node1 = @rulenode 3{1, 1}
@@ -240,8 +249,11 @@
         @testset "hasdynamicvalue" begin
             @test hasdynamicvalue(RuleNode(1, "DynamicValue")) == true
             @test hasdynamicvalue(RuleNode(1)) == false
-            @test hasdynamicvalue(UniformHole(
-                BitVector((1, 0)), [RuleNode(1, "DynamicValue")])) == false
+            @test hasdynamicvalue(
+                UniformHole(
+                    BitVector((1, 0)), [RuleNode(1, "DynamicValue")]
+                )
+            ) == false
             @test hasdynamicvalue(UniformHole(BitVector((1, 0)), [RuleNode(1)])) == false
             @test hasdynamicvalue(Hole(BitVector((1, 0)))) == false
         end
@@ -286,7 +298,7 @@
             			=#
             node = @rulenode 1{2, 3{5, 6}, 4{7, 8}}
             @test rulesonleft(node, Vector{Int}()) ==
-                  Set{Int}([1, 2, 3, 4, 5, 6, 7, 8])
+                Set{Int}([1, 2, 3, 4, 5, 6, 7, 8])
             @test rulesonleft(node, [2, 1]) == Set{Int}([1, 2, 3])
             @test rulesonleft(node, [2, 2]) == Set{Int}([1, 2, 3, 5])
         end
@@ -312,19 +324,28 @@
     @testset "UniformHole" begin
         @testset "show" begin
             # UniformHole[Bool[0, 0, 1]]{14,2{4{9}},2{4{6}}}
-            node = UniformHole([0, 0, 1],
+            node = UniformHole(
+                [0, 0, 1],
                 [
                     RuleNode(14),
-                    RuleNode(2, [
-                        RuleNode(4, [
-                        RuleNode(9)
-                    ])
-                    ]),
-                    RuleNode(2, [
-                        RuleNode(4, [
-                        RuleNode(6)
-                    ])
-                    ])
+                    RuleNode(
+                        2, [
+                            RuleNode(
+                                4, [
+                                    RuleNode(9),
+                                ]
+                            ),
+                        ]
+                    ),
+                    RuleNode(
+                        2, [
+                            RuleNode(
+                                4, [
+                                    RuleNode(6),
+                                ]
+                            ),
+                        ]
+                    ),
                 ]
             )
             io = IOBuffer()
@@ -336,32 +357,41 @@
     @testset "Hole" begin
         @testset "show" begin
             # 12{14,2{4{Hole[...]}},2{4{6}}}
-            node = RuleNode(12,
+            node = RuleNode(
+                12,
                 [
                     RuleNode(14),
-                    RuleNode(2, [
-                        RuleNode(4, [
-                        Hole(ones(14))
-                    ])
-                    ]),
-                    RuleNode(2, [
-                        RuleNode(4, [
-                        RuleNode(6)
-                    ])
-                    ])
+                    RuleNode(
+                        2, [
+                            RuleNode(
+                                4, [
+                                    Hole(ones(14)),
+                                ]
+                            ),
+                        ]
+                    ),
+                    RuleNode(
+                        2, [
+                            RuleNode(
+                                4, [
+                                    RuleNode(6),
+                                ]
+                            ),
+                        ]
+                    ),
                 ]
             )
             io = IOBuffer()
             Base.show(io, node)
             @test String(take!(io)) ==
-                  "12{14,2{4{Hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]}},2{4{6}}}"
+                "12{14,2{4{Hole[Bool[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]}},2{4{6}}}"
         end
         @testset "Hole not Equal Hole" begin
             hole1 = Hole([1, 1, 0, 1])
             hole2 = Hole([1, 1, 0, 1])
             hole3 = hole1
-            @test hole1 != hole2
-            @test hole3 != hole1
+            @test hole1 == hole2
+            @test hole3 == hole1
         end
     end
 
@@ -399,7 +429,8 @@
             @test node.domain == BitVector([1, 1, 0, 0])
 
             node = @rulenode UniformHole[1, 1, 0, 0]{
-                UniformHole[0, 0, 1, 1], UniformHole[0, 0, 1, 1]}
+                UniformHole[0, 0, 1, 1], UniformHole[0, 0, 1, 1],
+            }
 
             @test node.domain == BitVector([1, 1, 0, 0])
             for c in children(node)
@@ -434,7 +465,7 @@
 
             node = @rulenode Hole[Bool[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]]
             @test node.domain ==
-                  BitVector([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0])
+                BitVector([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0])
             @test isempty(children(node))
         end
 
@@ -444,8 +475,8 @@
         end
     end
 
-    @testset "update rule indices" verbose=true begin
-        @testset "RuleNode" verbose=true begin
+    @testset "update rule indices" verbose = true begin
+        @testset "RuleNode" verbose = true begin
             @testset "RuleNode" begin
                 node = @rulenode 1{4{5, 6{3, 2, 1}}}
                 expected_node = @rulenode 1{4{5, 6{3, 2, 1}}}
@@ -465,7 +496,7 @@
                 @test_throws ErrorException update_rule_indices!(node, n_rules, mapping)
             end
         end
-        @testset "AbstractHole" verbose=true begin
+        @testset "AbstractHole" verbose = true begin
             mapping = Dict(1 => 5, 2 => 6, 3 => 1)
             @testset "UniformHole" begin
                 n_rules = 6
@@ -483,7 +514,8 @@
                 n_rules = 2
                 @test_throws ErrorException update_rule_indices!(uniform_hole, n_rules)
                 @test_throws ErrorException update_rule_indices!(
-                    uniform_hole, n_rules, mapping)
+                    uniform_hole, n_rules, mapping
+                )
             end
             @testset "Hole" begin
                 n_rules = 6
@@ -514,58 +546,73 @@
         @test is_domain_valid(hole, 4) == true
     end
 
-    @testset "issame" begin
+    @testset "isequal" begin
         # RuleNode
         node1 = @rulenode 1{4{5, 6}, 1{2, 3}}
         node2 = @rulenode 1{4{5, 6}, 1{2, 3}}
         node3 = @rulenode 1{4{5, 5}, 1{2, 3}}
-        @test issame(node1, node2) == true
-        @test issame(node1, node3) == false
+        @test node1 == node2
+        @test node1 != node3
         # Hole
         hole1 = Hole([1, 1, 0, 1])
         hole2 = Hole([1, 1, 0, 1])
         hole3 = Hole([1, 0, 0, 1])
-        @test issame(hole1, hole2) == true
-        @test issame(hole2, hole3) == false
+        @test hole1 == hole2
+        @test hole2 != hole3
 
         # UniformHole
-        uhole1 = UniformHole([0, 0, 1],
+        uhole1 = UniformHole(
+            [0, 0, 1],
             [
                 RuleNode(14),
-                RuleNode(2, [
-                    RuleNode(4, [
-                    RuleNode(6)
-                ])
-                ])
+                RuleNode(
+                    2, [
+                        RuleNode(
+                            4, [
+                                RuleNode(6),
+                            ]
+                        ),
+                    ]
+                ),
             ]
         )
-        uhole2 = UniformHole([0, 0, 1],
+        uhole2 = UniformHole(
+            [0, 0, 1],
             [
                 RuleNode(14),
-                RuleNode(2, [
-                    RuleNode(4, [
-                    RuleNode(6)
-                ])
-                ])
+                RuleNode(
+                    2, [
+                        RuleNode(
+                            4, [
+                                RuleNode(6),
+                            ]
+                        ),
+                    ]
+                ),
             ]
         )
-        uhole3 = UniformHole([0, 0, 1],
+        uhole3 = UniformHole(
+            [0, 0, 1],
             [
                 RuleNode(14),
-                RuleNode(2, [
-                    RuleNode(4, [
-                    RuleNode(66)
-                ])
-                ])
+                RuleNode(
+                    2, [
+                        RuleNode(
+                            4, [
+                                RuleNode(66),
+                            ]
+                        ),
+                    ]
+                ),
             ]
         )
         uhole4 = UniformHole([0, 0, 1], [RuleNode(14)])
         uhole5 = UniformHole([1, 0, 1], [RuleNode(14)])
-        @test issame(uhole1, uhole2) == true
-        @test issame(uhole1, uhole3) == false
-        @test issame(uhole4, uhole5) == false
+        @test uhole1 == uhole2
+        @test uhole1 != uhole3
+        @test uhole4 != uhole5
         # compare different types
-        @test issame(node1, uhole2) == false
-        @test issame(hole3, uhole5) == false
+        @test node1 != uhole2
+        @test hole3 != uhole5
     end
 end

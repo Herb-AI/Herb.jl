@@ -1,4 +1,4 @@
-@testset "Grammar" begin
+@testitem "Grammar" begin
     struct ExGrammar <: AbstractGrammar
         rules::Vector{Any}
         types::Vector{Symbol}
