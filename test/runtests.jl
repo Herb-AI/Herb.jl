@@ -8,7 +8,7 @@ using JET
         Aqua.test_all(Garden)
     end
     @testset "Code linting (JET.jl)" begin
-        JET.test_package(Garden; target_defined_modules = true)
+        JET.test_package(Garden; target_modules = (Garden,))
     end
     for (root, dirs, files) in walkdir(@__DIR__)
         for file in filter(contains(r"test_"), files)

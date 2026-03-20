@@ -4,10 +4,10 @@ using Herb.HerbSpecification: IOExample, Problem
 using Herb.HerbCore: RuleNode, Hole, @rulenode
 using Garden: FrAngel
 using .FrAngel: frangel, mine_fragments, select_shallowest_fragments,
-                select_smallest_fragments, modify_grammar_frangel!, decide_frangel,
-                NoProgramFoundError
+    select_smallest_fragments, modify_grammar_frangel!, decide_frangel,
+    NoProgramFoundError
 
-@testset verbose=true "FrAngel" begin
+@testset verbose = true "FrAngel" begin
     @testset "Integration tests" begin
         # Define extra grammar as FrAngel will change it.
         grammar = @cfgrammar begin
@@ -34,7 +34,8 @@ using .FrAngel: frangel, mine_fragments, select_shallowest_fragments,
 
         # A program yielding 0 is impossible to derive from the grammar.
         @test_throws NoProgramFoundError frangel(
-            BFSIterator, grammar, :Start, imp_problem; max_depth = 4)
+            BFSIterator, grammar, :Start, imp_problem; max_depth = 4
+        )
     end
 
     grammar = @cfgrammar begin
@@ -53,9 +54,11 @@ using .FrAngel: frangel, mine_fragments, select_shallowest_fragments,
         @test (@rulenode 2{3, 4}) in fragments
 
         complete = @rulenode 2{3, 4}
-        rn_hole = RuleNode(2, [
-            complete, Hole([0, 0, 1, 1])
-        ])
+        rn_hole = RuleNode(
+            2, [
+                complete, Hole([0, 0, 1, 1]),
+            ]
+        )
         fragments_hole = mine_fragments(grammar, rn_hole)
         @test !(rn_hole in fragments_hole)
         @test complete in fragments_hole
