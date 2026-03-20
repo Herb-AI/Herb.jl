@@ -1,19 +1,16 @@
 using Test
 
-using RuntimeGeneratedFunctions
+import RuntimeGeneratedFunctions
 RuntimeGeneratedFunctions.init(@__MODULE__)
 
-using Herb.HerbCore
-using Herb.HerbGrammar: @cfgrammar, init_probabilities!
-using Herb.HerbInterpret
-using Herb.HerbSearch: CostBasedBottomUpIterator, get_costs
-using Herb.HerbSpecification: IOExample, Problem
-using Garden: optimal_program, suboptimal_program
-using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
+import Garden.Probe: get_promising_programs_with_fitness, modify_grammar_probe!, probe
+import Herb.HerbSearch: get_costs
+import Herb: @csgrammar, CostBasedBottomUpIterator, HerbCore, IOExample, Problem,
+    init_probabilities!, make_interpreter, optimal_program, suboptimal_program
 
 @testset "Probe" begin
     @testset verbose = true "Integration tests" begin
-        grammar = @cfgrammar begin
+        grammar = @csgrammar begin
             Start = Int
             Int = Int + Int
             Int = |(1:2)
@@ -22,7 +19,7 @@ using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
 
         problem = Problem([IOExample(Dict{Symbol, Any}(:x => x), x + 1) for x in 1:5])
 
-        interp = HerbInterpret.make_interpreter(
+        interp = make_interpreter(
             grammar;
             input_symbols = [:x],
             target_module = @__MODULE__,
@@ -45,7 +42,7 @@ using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
     end
 
     @testset "No exact solution returns nothing" begin
-        grammar = @cfgrammar begin
+        grammar = @csgrammar begin
             Start = Int
             Int = Int + Int
             Int = |(1:5)
@@ -54,7 +51,7 @@ using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
 
         impossible_problem = Problem([IOExample(Dict{Symbol, Any}(:x => x), 0) for x in 1:5])
 
-        interp = HerbInterpret.make_interpreter(
+        interp = make_interpreter(
             grammar;
             input_symbols = [:x],
             target_module = @__MODULE__,
@@ -76,7 +73,7 @@ using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
     end
 
     @testset "get_promising_programs_with_fitness" begin
-        grammar = @cfgrammar begin
+        grammar = @csgrammar begin
             Start = Int
             Int = Int + Int
             Int = |(1:5)
@@ -93,14 +90,16 @@ using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
             ]
         )
 
-        interp = HerbInterpret.make_interpreter(
+        interp = make_interpreter(
             grammar;
             input_symbols = [:x],
             target_module = @__MODULE__,
             cache_module = @__MODULE__
         )
 
-        iterator = CostBasedBottomUpIterator(grammar, :Start; current_costs = get_costs(grammar), max_depth = 3)
+        iterator = CostBasedBottomUpIterator(
+            grammar, :Start; current_costs = get_costs(grammar), max_depth = 3
+        )
 
         promising_programs, result_flag,
             num_programs = get_promising_programs_with_fitness(
@@ -112,13 +111,13 @@ using .Probe: probe, get_promising_programs_with_fitness, modify_grammar_probe!
         )
 
         @test num_programs > 0
-        @test result_flag in (optimal_program, suboptimal_program)
+        @test result_flag == optimal_program || result_flag == suboptimal_program
         @test !isempty(promising_programs)
         @test all(0 < fitness <= 1 for (_, fitness) in promising_programs)
     end
 
     @testset "modify_grammar_probe!" begin
-        grammar = @cfgrammar begin
+        grammar = @csgrammar begin
             Start = Int
             Int = Int + Int
             Int = |(1:5)

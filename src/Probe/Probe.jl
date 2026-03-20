@@ -1,15 +1,12 @@
 module Probe
 
-using DocStringExtensions
-using Garden: SynthResult, optimal_program, suboptimal_program
-using Herb.HerbCore: AbstractRuleNode, AbstractGrammar, rulesoftype
-using Herb.HerbGrammar: normalize!, init_probabilities!, ContextSensitiveGrammar,
-    rulenode2expr, grammar2symboltable
-using Herb.HerbSpecification: AbstractSpecification, Problem
-using Herb.HerbInterpret: SymbolTable
-using Herb.HerbConstraints: freeze_state, get_grammar
-using Herb.HerbSearch: CostBasedBottomUpIterator, evaluate, ProgramIterator,
-    log_probability, get_costs
+import DocStringExtensions: TYPEDSIGNATURES
+import Herb.HerbSearch: evaluate, get_costs
+import Herb: AbstractGrammar, AbstractRuleNode, AbstractSpecification,
+    ContextSensitiveGrammar, CostBasedBottomUpIterator, Problem, ProgramIterator,
+    freeze_state, get_grammar, grammar2symboltable, init_probabilities!,
+    log_probability,
+    normalize!, optimal_program, rulenode2expr, rulesoftype, suboptimal_program
 
 """
     $(TYPEDSIGNATURES)
@@ -128,7 +125,7 @@ function decide_probe(
             try
                 y = interp(program, ex.in)
                 ok = eq(y, ex.out)
-            catch err
+            catch
                 ok = false
             end
         else
