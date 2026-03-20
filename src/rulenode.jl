@@ -340,10 +340,9 @@ function Base.:(==)(a::UniformHole, b::UniformHole)
     return a.domain == b.domain && length(a.children) == length(b.children) &&
         all(isequal(a, b) for (a, b) in zip(a.children, b.children))
 end
-function Base.:(==)(a::H, b::H) where {H <: AbstractHole}
+function Base.:(==)(a::Hole, b::Hole)
     return a.domain == b.domain
 end
-
 
 Base.copy(r::RuleNode) = RuleNode(r.ind, r._val, r.children)
 Base.copy(h::Hole) = Hole(copy(h.domain))
