@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.21
+# v0.20.23
 
 using Markdown
 using InteractiveUtils
@@ -263,10 +263,7 @@ We implement both interfaces:
 # ╔═╡ 3d4cd754-6e08-435d-9f5e-9e293f425c56
 md"""
 Additionally, to avoid duplicate constraints, a constraint is only added to the grammar if it doesn't already exist. If the constraint is a complex struct, make sure `==` is well defined for it.
-"""
 
-# ╔═╡ 5611665e-3269-4140-aa42-dbdaaf6dc967
-md"""
 We consider two `ForbidConsecutive` constraints to be the same if their `rule`s are equal. We can explicitly define the equality as follows (though in this case, the default comparison would have worked the same):
 """
 
@@ -420,7 +417,7 @@ end
 
 # ╔═╡ ce9ae2a2-f3e3-4693-9e6d-60e91128de34
 md"""
-With all the components implemented, we can do a constrained enumeration using our custom constraint. Firt, we clear the grammar and add some of our new `ForbidConsecutive` constraints.
+With all the components implemented, we can do a constrained enumeration using our custom constraint. First, we clear the grammar and add some of our new `ForbidConsecutive` constraints.
 """
 
 # ╔═╡ 89c165c6-3e04-4887-924f-364b25b21bcd
@@ -431,11 +428,12 @@ begin
     addconstraint!(grammar, ForbidConsecutive(plus))
     addconstraint!(grammar, ForbidConsecutive(times))
     addconstraint!(grammar, ForbidConsecutive(plus))
+	println("There are $(length(grammar.constraints)) constraints in the grammar now.")
 end
 
 # ╔═╡ 2d2440a6-aeba-42dc-92b2-4325b51b4262
 md"""
-The last constraint we try to add is ignored - it already exists.
+Note that the last constraint we try to add is ignored as it already exists.
 
 Finally we enumerate the programs that satisfy the constraints.
 """
@@ -479,13 +477,12 @@ end
 # ╠═50c86953-0326-4122-8b01-5fa5e68785ff
 # ╠═17d818d2-d6f5-4eb3-8be1-5af78cb099e9
 # ╠═3d4cd754-6e08-435d-9f5e-9e293f425c56
-# ╠═5611665e-3269-4140-aa42-dbdaaf6dc967
-# ╟─ae811b8c-672b-428c-9c14-a2595c15f0b4
+# ╠═ae811b8c-672b-428c-9c14-a2595c15f0b4
 # ╟─bacc917b-2706-412d-9b85-deb4b6685323
 # ╠═fef62621-716a-4f8a-85b4-d92e48b30bc6
 # ╟─e40e09fc-c697-4c83-90eb-2b758254128e
 # ╠═4e0989a8-7e63-45eb-80c9-a3a2f97c357c
-# ╟─ce9ae2a2-f3e3-4693-9e6d-60e91128de34
+# ╠═ce9ae2a2-f3e3-4693-9e6d-60e91128de34
 # ╠═89c165c6-3e04-4887-924f-364b25b21bcd
-# ╟─2d2440a6-aeba-42dc-92b2-4325b51b4262
+# ╠═2d2440a6-aeba-42dc-92b2-4325b51b4262
 # ╠═8bc33f0c-8c72-4a19-bb93-ddc49ad2247a
