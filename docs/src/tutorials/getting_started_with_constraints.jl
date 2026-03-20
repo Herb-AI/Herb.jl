@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.13
+# v0.20.21
 
 using Markdown
 using InteractiveUtils
@@ -244,11 +244,10 @@ Each time a new AST node is added to a tree, the `on_new_node` function is calle
 
 # ╔═╡ a2f8378f-b798-418b-84e5-4754c990f1b2
 md"""
-To be able to add our custom constraint to the grammar, we need to implement two more functions that are required for all grammar constraints:
+To be able to add our custom constraint to the grammar, we need to implement the following functions that is required for all grammar constraints:
 - `HerbCore.is_domain_valid()`
-- `HerbCore.issame()`
 
-Let's look at `is_domain_valid` first. For a `ForbidConsecutive` constraint the domain is valid if its `rule` is a valid rule index, i.e. it does not exceed the number of rules in the given grammar.
+For a `ForbidConsecutive` constraint the domain is valid if its `rule` is a valid rule index, i.e. it does not exceed the number of rules in the given grammar.
 
 The docs for tell us that there is two interfaces for `is_domain` and we will implement both.
 """
@@ -263,15 +262,12 @@ We implement both interfaces:
 
 # ╔═╡ 3d4cd754-6e08-435d-9f5e-9e293f425c56
 md"""
-`issame` is used by `addconstraint!` to avoid duplicate constraints, i.e. a constraint is only added to the grammar if it doesn't already exist. If not implemented for a specific type, `issame` defaults to `false`. 
+Additionally, to avoid duplicate constraints, a constraint is only added to the grammar if it doesn't already exist. If the constraint is a complex struct, make sure `==` is well defined for it.
 """
-
-# ╔═╡ 5065a0a1-78f6-4713-8f1e-cc1c1ff8c521
-@doc HerbCore.issame
 
 # ╔═╡ 5611665e-3269-4140-aa42-dbdaaf6dc967
 md"""
-We consider two `ForbidConsecutive` constraints to be the same if their `rule`s are equal. 
+We consider two `ForbidConsecutive` constraints to be the same if their `rule`s are equal. We can explicitly define the equality as follows (though in this case, the default comparison would have worked the same):
 """
 
 # ╔═╡ bacc917b-2706-412d-9b85-deb4b6685323
@@ -396,7 +392,7 @@ function HerbCore.is_domain_valid(c::ForbidConsecutive, grammar::AbstractGrammar
 end
 
 # ╔═╡ ae811b8c-672b-428c-9c14-a2595c15f0b4
-function HerbCore.issame(c1::ForbidConsecutive, c2::ForbidConsecutive)
+function HerbCore.Base.:(==)(c1::ForbidConsecutive, c2::ForbidConsecutive)
     c1.rule == c2.rule
 end
 
@@ -477,15 +473,14 @@ end
 # ╟─2bea7a99-c46a-4200-9ba8-1227a5806f2f
 # ╟─f4c15b60-5d45-4b75-9100-a7be2969d7ca
 # ╠═b00b039b-63ee-40d0-8f4b-d25539e596d5
-# ╟─a2f8378f-b798-418b-84e5-4754c990f1b2
+# ╠═a2f8378f-b798-418b-84e5-4754c990f1b2
 # ╠═713e4732-79c9-47cd-bac8-9295d4cc327e
 # ╟─a1e75d1b-3caa-4f80-b044-88e33d7de809
 # ╠═50c86953-0326-4122-8b01-5fa5e68785ff
 # ╠═17d818d2-d6f5-4eb3-8be1-5af78cb099e9
-# ╟─3d4cd754-6e08-435d-9f5e-9e293f425c56
-# ╠═5065a0a1-78f6-4713-8f1e-cc1c1ff8c521
-# ╟─5611665e-3269-4140-aa42-dbdaaf6dc967
-# ╠═ae811b8c-672b-428c-9c14-a2595c15f0b4
+# ╠═3d4cd754-6e08-435d-9f5e-9e293f425c56
+# ╠═5611665e-3269-4140-aa42-dbdaaf6dc967
+# ╟─ae811b8c-672b-428c-9c14-a2595c15f0b4
 # ╟─bacc917b-2706-412d-9b85-deb4b6685323
 # ╠═fef62621-716a-4f8a-85b4-d92e48b30bc6
 # ╟─e40e09fc-c697-4c83-90eb-2b758254128e
