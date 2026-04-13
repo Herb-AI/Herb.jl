@@ -1,7 +1,7 @@
 [![Build Status](https://github.com/Herb-AI/Herb.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/Herb-AI/Herb.jl/actions/workflows/CI.yml?query=branch%3Amaster)
 [![Nightly](https://github.com/Herb-AI/Herb.jl/workflows/Nightly/badge.svg)](https://github.com/Herb-AI/Herb.jl/actions/workflows/nightly.yml)
 [![Dev-Docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://Herb-AI.github.io/Herb.jl/dev)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15746953.svg)](https://doi.org/10.5281/zenodo.15746953)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15746952.svg)](https://doi.org/10.5281/zenodo.15746952)
 
 # Herb.jl
 *A library for defining and efficiently solving program synthesis tasks in Julia.*
