@@ -25,7 +25,7 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "c55692a8a3e37de1df5822f27ec2d12dd3ccb1839d88c15768c07bc71598bd95"
+    input_sha = "9dffad0d8debfeb348dddbe47cd2130c060e0a589a70b9648a9fda035544a901"
     julia_version = "1.12.6"
 -->
 
@@ -328,18 +328,22 @@ end</code></pre>
 
 <div class="markdown"><p>Note that the last constraint we try to add is ignored as it already exists.</p><p>Finally we enumerate the programs that satisfy the constraints.</p></div>
 
-<pre class='language-julia'><code class='language-julia'>begin
-    iter = BFSIterator(grammar, :Int, max_size=6)
-    constrained_exprs = []
-
-    for program ∈ iter
-        expr = rulenode2expr(program, grammar)
-        push!(constrained_exprs, expr)
-        println(expr)
-    end
-end
-</code></pre>
-
+<pre class='language-julia'><code class='language-julia'>constrained_exprs = rulenode2expr.(BFSIterator(grammar, :Int, max_size=6), (grammar,))</code></pre>
+<pre class="code-output documenter-example-output" id="var-constrained_exprs">292-element Vector{Any}:
+ 1
+  :x
+  :(-1)
+  :(-x)
+  :(1 + 1)
+  :(1 + x)
+  :(x + 1)
+ ⋮
+  :(-(1 * (x + 1)))
+  :(-(1 * (x + x)))
+  :(-(x * (1 + 1)))
+  :(-(x * (1 + x)))
+  :(-(x * (x + 1)))
+  :(-(x * (x + x)))</pre>
 
 
 <div class="markdown"><p>Comparing to an unconstrained grammar, we can see whether the custom constraint is working as intended.</p></div>
@@ -394,4 +398,4 @@ mermaid.initialize({
     startOnLoad: true,
     theme: "neutral"
 });
-</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../TopDown/">« Top Down Iterator</a><a class="docs-footer-nextpage" href="../working_with_interpreters/">Working with custom interpreters »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 13 April 2026 12:03">Monday 13 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../TopDown/">« Top Down Iterator</a><a class="docs-footer-nextpage" href="../working_with_interpreters/">Working with custom interpreters »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 13 April 2026 12:23">Monday 13 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

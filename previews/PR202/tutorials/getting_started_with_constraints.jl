@@ -450,17 +450,7 @@ Finally we enumerate the programs that satisfy the constraints.
 """
 
 # ╔═╡ 8bc33f0c-8c72-4a19-bb93-ddc49ad2247a
-begin
-    iter = BFSIterator(grammar, :Int, max_size=6)
-	constrained_exprs = []
-
-    for program ∈ iter
-		expr = rulenode2expr(program, grammar)
-		push!(constrained_exprs, expr)
-        println(expr)
-    end
-end
-
+constrained_exprs = rulenode2expr.(BFSIterator(grammar, :Int, max_size=6), (grammar,))
 
 # ╔═╡ ac73e1a2-8799-4190-825e-c0812b9d496a
 md"""
