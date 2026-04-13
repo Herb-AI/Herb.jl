@@ -242,23 +242,62 @@ Each time a new AST node is added to a tree, the `on_new_node` function is calle
 (Don't worry about the `HerbConstraints.` prefixes. Normally, constraints are defined within the HerbConstraints repository, so there is no need to specify the namespace)
 """
 
+# ╔═╡ b00b039b-63ee-40d0-8f4b-d25539e596d5
+begin
+    """
+    Forbids the consecutive application of the specified rule.
+    For example, CustomConstraint(4) forbids the tree 4(1, 4(1, 1)) as it applies rule 4 twice in a row.
+    """
+    struct ForbidConsecutive <: AbstractGrammarConstraint
+        rule::Int
+    end
+
+    """
+    Post a local constraint on each new node that appears in the tree
+    """
+    function HerbConstraints.on_new_node(solver::Solver, constraint::ForbidConsecutive, path::Vector{Int})
+        HerbConstraints.post!(solver, LocalForbidConsecutive(path, constraint.rule))
+    end
+end
+
 # ╔═╡ a2f8378f-b798-418b-84e5-4754c990f1b2
 md"""
-To be able to add our custom constraint to the grammar, we need to implement the following functions that is required for all grammar constraints:
-- `HerbCore.is_domain_valid()`
+To be able to add our custom constraint to the grammar, we need to implement the following functions that are required for all grammar constraints:
 
-For a `ForbidConsecutive` constraint the domain is valid if its `rule` is a valid rule index, i.e. it does not exceed the number of rules in the given grammar.
+- `HerbCore.is_domain_valid(::AbstractConstraint, ::Int)`
+- `HerbCore.is_domain_valid(::AbstractConstraint, ::AbstractGrammar)`
+- `HerbGrammar.is_constraint_valid(::AbstractConstraint, ::AbstractGrammar)`
 
-The docs for tell us that there is two interfaces for `is_domain` and we will implement both.
+For a `ForbidConsecutive` constraint the constraint is valid if its `rule` is a valid rule index, i.e. it does not exceed the number of rules in the given grammar. In this case, both `is_domain_valid` and `is_constraint_valid` have the same behavior, but in case your custom constraint involves a pattern over a tree, then their behavior might differ.
+
+We can take a look at the docstrings to see what we need to implement.
 """
 
 # ╔═╡ 713e4732-79c9-47cd-bac8-9295d4cc327e
+@doc HerbGrammar.is_constraint_valid
+
+# ╔═╡ 64e970d5-1e59-469b-b46b-1c7e9ef6b94a
 @doc HerbCore.is_domain_valid
 
-# ╔═╡ a1e75d1b-3caa-4f80-b044-88e33d7de809
+# ╔═╡ 240ea34c-fa32-4ee5-9c8b-df9b5b0123c4
 md"""
-We implement both interfaces:
+We implement the functions for our new constraint like so:
 """
+
+# ╔═╡ 89ce7de0-6fa7-4f21-b853-5fa26bace38c
+function HerbCore.is_domain_valid(c::ForbidConsecutive, n_rules)
+    c.rule <= n_rules
+end
+
+# ╔═╡ a889db29-dd74-46bb-aa1d-93e388ccc251
+function HerbCore.is_domain_valid(c::ForbidConsecutive, grammar::AbstractGrammar)
+    HerbCore.is_domain_valid(c, length(grammar.rules))
+end
+
+# ╔═╡ 17d818d2-d6f5-4eb3-8be1-5af78cb099e9
+function HerbGrammar.is_constraint_valid(c::ForbidConsecutive, grammar::AbstractGrammar; allow_empty_children=false)
+    HerbCore.is_domain_valid(c, length(grammar.rules))
+end
 
 # ╔═╡ 3d4cd754-6e08-435d-9f5e-9e293f425c56
 md"""
@@ -266,6 +305,11 @@ Additionally, to avoid duplicate constraints, a constraint is only added to the 
 
 We consider two `ForbidConsecutive` constraints to be the same if their `rule`s are equal. We can explicitly define the equality as follows (though in this case, the default comparison would have worked the same):
 """
+
+# ╔═╡ ae811b8c-672b-428c-9c14-a2595c15f0b4
+function HerbCore.Base.:(==)(c1::ForbidConsecutive, c2::ForbidConsecutive)
+    c1.rule == c2.rule
+end
 
 # ╔═╡ bacc917b-2706-412d-9b85-deb4b6685323
 md"""
@@ -360,39 +404,6 @@ begin
     end
 end
 
-# ╔═╡ b00b039b-63ee-40d0-8f4b-d25539e596d5
-begin
-    """
-    Forbids the consecutive application of the specified rule.
-    For example, CustomConstraint(4) forbids the tree 4(1, 4(1, 1)) as it applies rule 4 twice in a row.
-    """
-    struct ForbidConsecutive <: AbstractGrammarConstraint
-        rule::Int
-    end
-
-    """
-    Post a local constraint on each new node that appears in the tree
-    """
-    function HerbConstraints.on_new_node(solver::Solver, constraint::ForbidConsecutive, path::Vector{Int})
-        HerbConstraints.post!(solver, LocalForbidConsecutive(path, constraint.rule))
-    end
-end
-
-# ╔═╡ 50c86953-0326-4122-8b01-5fa5e68785ff
-function HerbCore.is_domain_valid(c::ForbidConsecutive, n_rules::Integer)
-    c.rule <= n_rules
-end
-
-# ╔═╡ 17d818d2-d6f5-4eb3-8be1-5af78cb099e9
-function HerbCore.is_domain_valid(c::ForbidConsecutive, grammar::AbstractGrammar)
-    HerbCore.is_domain_valid(c, length(grammar.rules))
-end
-
-# ╔═╡ ae811b8c-672b-428c-9c14-a2595c15f0b4
-function HerbCore.Base.:(==)(c1::ForbidConsecutive, c2::ForbidConsecutive)
-    c1.rule == c2.rule
-end
-
 # ╔═╡ e40e09fc-c697-4c83-90eb-2b758254128e
 md"""
 Posting a local constraint will trigger the initial propagation. To re-propagate, the constraint needs to be rescheduled for propagation.
@@ -439,14 +450,32 @@ Finally we enumerate the programs that satisfy the constraints.
 """
 
 # ╔═╡ 8bc33f0c-8c72-4a19-bb93-ddc49ad2247a
-begin
-    iter = BFSIterator(grammar, :Int, max_size=6)
+constrained_exprs = rulenode2expr.(BFSIterator(grammar, :Int, max_size=6), (grammar,))
 
-    for program ∈ iter
-        println(rulenode2expr(program, grammar))
-    end
+# ╔═╡ ac73e1a2-8799-4190-825e-c0812b9d496a
+md"""
+Comparing to an unconstrained grammar, we can see whether the custom constraint is working as intended.
+"""
+
+# ╔═╡ f443fd1c-0dfd-4a15-bba7-49741234701a
+grammar_unconstrained = @csgrammar begin
+    Int = 1
+    Int = x
+    Int = -Int
+    Int = Int + Int
+    Int = Int * Int
 end
 
+# ╔═╡ 0b013b58-1fbc-4765-be3e-ed211875260c
+unconstrained_exprs = rulenode2expr.(BFSIterator(grammar_unconstrained, :Int, max_size=6), (grammar_unconstrained,))
+
+# ╔═╡ 49e38dd1-137a-4b46-b28e-19f73cb7c67b
+setdiff(unconstrained_exprs, constrained_exprs)
+
+# ╔═╡ ca22c374-a8b1-4b7f-bf12-21947e1621c3
+md"""
+We can see that all the programs that are constrained away are those that repeat one of the operations specified in the `ForbidConsecutive` constraints.
+"""
 
 # ╔═╡ Cell order:
 # ╟─c5509a19-43bc-44d3-baa9-9af83717b6e6
@@ -473,10 +502,12 @@ end
 # ╠═b00b039b-63ee-40d0-8f4b-d25539e596d5
 # ╠═a2f8378f-b798-418b-84e5-4754c990f1b2
 # ╠═713e4732-79c9-47cd-bac8-9295d4cc327e
-# ╟─a1e75d1b-3caa-4f80-b044-88e33d7de809
-# ╠═50c86953-0326-4122-8b01-5fa5e68785ff
+# ╠═64e970d5-1e59-469b-b46b-1c7e9ef6b94a
+# ╟─240ea34c-fa32-4ee5-9c8b-df9b5b0123c4
+# ╠═89ce7de0-6fa7-4f21-b853-5fa26bace38c
+# ╠═a889db29-dd74-46bb-aa1d-93e388ccc251
 # ╠═17d818d2-d6f5-4eb3-8be1-5af78cb099e9
-# ╠═3d4cd754-6e08-435d-9f5e-9e293f425c56
+# ╟─3d4cd754-6e08-435d-9f5e-9e293f425c56
 # ╠═ae811b8c-672b-428c-9c14-a2595c15f0b4
 # ╟─bacc917b-2706-412d-9b85-deb4b6685323
 # ╠═fef62621-716a-4f8a-85b4-d92e48b30bc6
@@ -484,5 +515,10 @@ end
 # ╠═4e0989a8-7e63-45eb-80c9-a3a2f97c357c
 # ╠═ce9ae2a2-f3e3-4693-9e6d-60e91128de34
 # ╠═89c165c6-3e04-4887-924f-364b25b21bcd
-# ╠═2d2440a6-aeba-42dc-92b2-4325b51b4262
+# ╟─2d2440a6-aeba-42dc-92b2-4325b51b4262
 # ╠═8bc33f0c-8c72-4a19-bb93-ddc49ad2247a
+# ╠═ac73e1a2-8799-4190-825e-c0812b9d496a
+# ╟─f443fd1c-0dfd-4a15-bba7-49741234701a
+# ╠═0b013b58-1fbc-4765-be3e-ed211875260c
+# ╠═49e38dd1-137a-4b46-b28e-19f73cb7c67b
+# ╠═ca22c374-a8b1-4b7f-bf12-21947e1621c3
