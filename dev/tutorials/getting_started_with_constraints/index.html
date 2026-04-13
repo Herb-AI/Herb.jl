@@ -25,8 +25,8 @@
 <!--
     # This information is used for caching.
     [PlutoStaticHTML.State]
-    input_sha = "7f6d2c79d4e994a25b08d4ee57295d2ef1e865c282ddf1847c84c5dbceddbe9a"
-    julia_version = "1.12.5"
+    input_sha = "185cedf80b1b9550abfc0e37a6777069bc5a4879349191671e435af85055d819"
+    julia_version = "1.12.6"
 -->
 
 <div class="markdown"><h1 id="Getting-started-with-HerbConstraints">Getting started with HerbConstraints</h1><p>When enumerating programs using a grammar, we will encounter many redundant programs. For example, <code>x</code>, <code>-(-x)</code> and <code>1 * x</code> are syntactically different programs, but they have the same semantics. Grammar constraints aim to speed up synthesis by eliminating such redundant programs and thereby reducing the size of the program space.</p></div>
@@ -202,16 +202,19 @@ end</code></pre>
 
 
 
-<div class="markdown"><p>To be able to add our custom constraint to the grammar, we need to implement two more functions that are required for all grammar constraints:</p><ul><li><p><code>HerbCore.is_domain_valid()</code></p></li><li><p><code>HerbCore.issame()</code></p></li></ul><p>Let's look at <code>is_domain_valid</code> first. For a <code>ForbidConsecutive</code> constraint the domain is valid if its <code>rule</code> is a valid rule index, i.e. it does not exceed the number of rules in the given grammar.</p><p>The docs for tell us that there is two interfaces for <code>is_domain</code> and we will implement both.</p></div>
+<div class="markdown"><p>To be able to add our custom constraint to the grammar, we need to implement the following functions that are required for all grammar constraints:</p><ul><li><p><code>HerbCore.is_domain_valid(::AbstractConstraint, ::Int)</code></p></li><li><p><code>HerbCore.is_domain_valid(::AbstractConstraint, ::AbstractGrammar)</code></p></li><li><p><code>HerbGrammar.is_constraint_valid(::AbstractConstraint, ::AbstractGrammar)</code></p></li></ul><p>For a <code>ForbidConsecutive</code> constraint the constraint is valid if its <code>rule</code> is a valid rule index, i.e. it does not exceed the number of rules in the given grammar. In this case, both <code>is_domain_valid</code> and <code>is_constraint_valid</code> have the same behavior, but in case your custom constraint involves a pattern over a tree, then their behavior might differ.</p><p>We can take a look at the docstrings to see what we need to implement.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>@doc HerbGrammar.is_constraint_valid</code></pre>
+<div class="markdown"><pre><code class="language-julia">is_constraint_valid(c::AbstractConstraint, grammar::AbstractGrammar; allow_empty_children)</code></pre><p>Checks if the structure of constraint <code>c</code> is sound with the given grammar. E.g. if <code>c</code> is <code>Forbidden(tree)</code>, this funciton will check if <code>tree</code> is possible to construct with the given grammar.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>@doc HerbCore.is_domain_valid</code></pre>
 <div class="markdown"><pre><code class="language-julia">is_domain_valid(x, n_rules::Integer)
 is_domain_valid(x, grammar::AbstractGrammar)</code></pre><p>Check if the domain for the given object <code>x</code> (ex: <a href="@ref"><code>RuleNode</code></a>, <a href="@ref"><code>Hole</code></a> or <a href="@ref"><code>AbstractConstraint</code></a>) is valid given the provided grammar or number of rules.</p><p>If <a href="@ref"><code>isfilled</code></a><code>(x)</code> and <code>x</code> has children, it checks if all children are valid.</p></div>
 
 
-<div class="markdown"><p>We implement both interfaces:</p></div>
+<div class="markdown"><p>We implement the functions for our new constraint like so:</p></div>
 
-<pre class='language-julia'><code class='language-julia'>function HerbCore.is_domain_valid(c::ForbidConsecutive, n_rules::Integer)
+<pre class='language-julia'><code class='language-julia'>function HerbCore.is_domain_valid(c::ForbidConsecutive, n_rules)
     c.rule &lt;= n_rules
 end</code></pre>
 
@@ -221,16 +224,15 @@ end</code></pre>
 end</code></pre>
 
 
-
-<div class="markdown"><p><code>issame</code> is used by <code>addconstraint!</code> to avoid duplicate constraints, i.e. a constraint is only added to the grammar if it doesn't already exist. If not implemented for a specific type, <code>issame</code> defaults to <code>false</code>. </p></div>
-
-<pre class='language-julia'><code class='language-julia'>@doc HerbCore.issame</code></pre>
-<div class="markdown"><pre><code class="language-julia">issame(a, b)</code></pre><p>Returns whether the two given objects <code>a</code> and <code>b</code> (ex: <a href="@ref"><code>RuleNode</code></a>, <a href="@ref"><code>Hole</code></a> or <a href="@ref"><code>AbstractConstraint</code></a>) are the same.</p></div>
+<pre class='language-julia'><code class='language-julia'>function HerbGrammar.is_constraint_valid(c::ForbidConsecutive, grammar::AbstractGrammar; allow_empty_children=false)
+    HerbCore.is_domain_valid(c, length(grammar.rules))
+end</code></pre>
 
 
-<div class="markdown"><p>We consider two <code>ForbidConsecutive</code> constraints to be the same if their <code>rule</code>s are equal. </p></div>
 
-<pre class='language-julia'><code class='language-julia'>function HerbCore.issame(c1::ForbidConsecutive, c2::ForbidConsecutive)
+<div class="markdown"><p>Additionally, to avoid duplicate constraints, a constraint is only added to the grammar if it doesn't already exist. If the constraint is a complex struct, make sure <code>==</code> is well defined for it.</p><p>We consider two <code>ForbidConsecutive</code> constraints to be the same if their <code>rule</code>s are equal. We can explicitly define the equality as follows (though in this case, the default comparison would have worked the same):</p></div>
+
+<pre class='language-julia'><code class='language-julia'>function HerbCore.Base.:(==)(c1::ForbidConsecutive, c2::ForbidConsecutive)
     c1.rule == c2.rule
 end</code></pre>
 
@@ -310,7 +312,7 @@ end
 
 
 
-<div class="markdown"><p>With all the components implemented, we can do a constrained enumeration using our custom constraint. Firt, we clear the grammar and add some of our new <code>ForbidConsecutive</code> constraints.</p></div>
+<div class="markdown"><p>With all the components implemented, we can do a constrained enumeration using our custom constraint. First, we clear the grammar and add some of our new <code>ForbidConsecutive</code> constraints.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>begin
     clearconstraints!(grammar)
@@ -319,25 +321,81 @@ end
     addconstraint!(grammar, ForbidConsecutive(plus))
     addconstraint!(grammar, ForbidConsecutive(times))
     addconstraint!(grammar, ForbidConsecutive(plus))
+    println("There are $(length(grammar.constraints)) constraints in the grammar now.")
 end</code></pre>
 
 
 
-<div class="markdown"><p>The last constraint we try to add is ignored - it already exists.</p><p>Finally we enumerate the programs that satisfy the constraints.</p></div>
+<div class="markdown"><p>Note that the last constraint we try to add is ignored as it already exists.</p><p>Finally we enumerate the programs that satisfy the constraints.</p></div>
 
-<pre class='language-julia'><code class='language-julia'>begin
-    iter = BFSIterator(grammar, :Int, max_size=6)
+<pre class='language-julia'><code class='language-julia'>constrained_exprs = rulenode2expr.(BFSIterator(grammar, :Int, max_size=6), (grammar,))</code></pre>
+<pre class="code-output documenter-example-output" id="var-constrained_exprs">292-element Vector{Any}:
+ 1
+  :x
+  :(-1)
+  :(-x)
+  :(1 + 1)
+  :(1 + x)
+  :(x + 1)
+ ⋮
+  :(-(1 * (x + 1)))
+  :(-(1 * (x + x)))
+  :(-(x * (1 + 1)))
+  :(-(x * (1 + x)))
+  :(-(x * (x + 1)))
+  :(-(x * (x + x)))</pre>
 
-    for program ∈ iter
-        println(rulenode2expr(program, grammar))
-    end
-end
-</code></pre>
 
+<div class="markdown"><p>Comparing to an unconstrained grammar, we can see whether the custom constraint is working as intended.</p></div>
+
+
+<pre class="code-output documenter-example-output" id="var-grammar_unconstrained">1: Int = 1
+2: Int = x
+3: Int = -Int
+4: Int = Int + Int
+5: Int = Int * Int
+</pre>
+
+<pre class='language-julia'><code class='language-julia'>unconstrained_exprs = rulenode2expr.(BFSIterator(grammar_unconstrained, :Int, max_size=6), (grammar_unconstrained,))</code></pre>
+<pre class="code-output documenter-example-output" id="var-unconstrained_exprs">556-element Vector{Any}:
+ 1
+  :x
+  :(-1)
+  :(-x)
+  :(1 + 1)
+  :(1 + x)
+  :(x + 1)
+ ⋮
+  :(-(-x) * -1)
+  :(-(1 * -(-1)))
+  :(-(-x) * -x)
+  :(-(1 * -(-x)))
+  :(-(x * -(-1)))
+  :(-(x * -(-x)))</pre>
+
+<pre class='language-julia'><code class='language-julia'>setdiff(unconstrained_exprs, constrained_exprs)</code></pre>
+<pre class="code-output documenter-example-output" id="var-hash850786">264-element Vector{Any}:
+ :(-(-1))
+ :(-(-x))
+ :(-(-(-1)))
+ :(-(-(-x)))
+ :((1 + 1) + 1)
+ :((1 + 1) + x)
+ :((1 + x) + 1)
+ ⋮
+ :(-(-x) * -1)
+ :(-(1 * -(-1)))
+ :(-(-x) * -x)
+ :(-(1 * -(-x)))
+ :(-(x * -(-1)))
+ :(-(x * -(-x)))</pre>
+
+
+<div class="markdown"><p>We can see that all the programs that are constrained away are those that repeat one of the operations specified in the <code>ForbidConsecutive</code> constraints.</p></div>
 
 <!-- PlutoStaticHTML.End --><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 mermaid.initialize({
     startOnLoad: true,
     theme: "neutral"
 });
-</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../TopDown/">« Top Down Iterator</a><a class="docs-footer-nextpage" href="../working_with_interpreters/">Working with custom interpreters »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Wednesday 4 March 2026 11:25">Wednesday 4 March 2026</span>. Using Julia version 1.12.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../TopDown/">« Top Down Iterator</a><a class="docs-footer-nextpage" href="../working_with_interpreters/">Working with custom interpreters »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 13 April 2026 13:14">Monday 13 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
