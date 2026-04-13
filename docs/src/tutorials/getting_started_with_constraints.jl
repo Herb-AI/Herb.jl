@@ -242,11 +242,29 @@ Each time a new AST node is added to a tree, the `on_new_node` function is calle
 (Don't worry about the `HerbConstraints.` prefixes. Normally, constraints are defined within the HerbConstraints repository, so there is no need to specify the namespace)
 """
 
+# ╔═╡ b00b039b-63ee-40d0-8f4b-d25539e596d5
+begin
+    """
+    Forbids the consecutive application of the specified rule.
+    For example, CustomConstraint(4) forbids the tree 4(1, 4(1, 1)) as it applies rule 4 twice in a row.
+    """
+    struct ForbidConsecutive <: AbstractGrammarConstraint
+        rule::Int
+    end
+
+    """
+    Post a local constraint on each new node that appears in the tree
+    """
+    function HerbConstraints.on_new_node(solver::Solver, constraint::ForbidConsecutive, path::Vector{Int})
+        HerbConstraints.post!(solver, LocalForbidConsecutive(path, constraint.rule))
+    end
+end
+
 # ╔═╡ a2f8378f-b798-418b-84e5-4754c990f1b2
 md"""
 To be able to add our custom constraint to the grammar, we need to implement the following functions that are required for all grammar constraints:
 
-- `HerbCore.is_domain_valid(::AbstractConstraint, ::AbstractGrammar)`
+- `HerbCore.is_domain_valid(::AbstractConstraint, ::Int)`
 - `HerbCore.is_domain_valid(::AbstractConstraint, ::AbstractGrammar)`
 - `HerbGrammar.is_constraint_valid(::AbstractConstraint, ::AbstractGrammar)`
 
@@ -266,12 +284,32 @@ md"""
 We implement the functions for our new constraint like so:
 """
 
+# ╔═╡ 89ce7de0-6fa7-4f21-b853-5fa26bace38c
+function HerbCore.is_domain_valid(c::ForbidConsecutive, n_rules)
+    c.rule <= n_rules
+end
+
+# ╔═╡ a889db29-dd74-46bb-aa1d-93e388ccc251
+function HerbCore.is_domain_valid(c::ForbidConsecutive, grammar::AbstractGrammar)
+    HerbCore.is_domain_valid(c, length(grammar.rules))
+end
+
+# ╔═╡ 17d818d2-d6f5-4eb3-8be1-5af78cb099e9
+function HerbGrammar.is_constraint_valid(c::ForbidConsecutive, grammar::AbstractGrammar; allow_empty_children=false)
+    HerbCore.is_domain_valid(c, length(grammar.rules))
+end
+
 # ╔═╡ 3d4cd754-6e08-435d-9f5e-9e293f425c56
 md"""
 Additionally, to avoid duplicate constraints, a constraint is only added to the grammar if it doesn't already exist. If the constraint is a complex struct, make sure `==` is well defined for it.
 
 We consider two `ForbidConsecutive` constraints to be the same if their `rule`s are equal. We can explicitly define the equality as follows (though in this case, the default comparison would have worked the same):
 """
+
+# ╔═╡ ae811b8c-672b-428c-9c14-a2595c15f0b4
+function HerbCore.Base.:(==)(c1::ForbidConsecutive, c2::ForbidConsecutive)
+    c1.rule == c2.rule
+end
 
 # ╔═╡ bacc917b-2706-412d-9b85-deb4b6685323
 md"""
@@ -364,44 +402,6 @@ begin
         #the constraint is satisfied and can be deactivated
         HerbConstraints.deactivate!(solver, constraint)
     end
-end
-
-# ╔═╡ b00b039b-63ee-40d0-8f4b-d25539e596d5
-begin
-    """
-    Forbids the consecutive application of the specified rule.
-    For example, CustomConstraint(4) forbids the tree 4(1, 4(1, 1)) as it applies rule 4 twice in a row.
-    """
-    struct ForbidConsecutive <: AbstractGrammarConstraint
-        rule::Int
-    end
-
-    """
-    Post a local constraint on each new node that appears in the tree
-    """
-    function HerbConstraints.on_new_node(solver::Solver, constraint::ForbidConsecutive, path::Vector{Int})
-        HerbConstraints.post!(solver, LocalForbidConsecutive(path, constraint.rule))
-    end
-end
-
-# ╔═╡ 89ce7de0-6fa7-4f21-b853-5fa26bace38c
-function HerbCore.is_domain_valid(c::ForbidConsecutive, n_rules)
-    c.rule <= n_rules
-end
-
-# ╔═╡ a889db29-dd74-46bb-aa1d-93e388ccc251
-function HerbCore.is_domain_valid(c::ForbidConsecutive, grammar::AbstractGrammar)
-    HerbCore.is_domain_valid(c, length(grammar.rules))
-end
-
-# ╔═╡ 17d818d2-d6f5-4eb3-8be1-5af78cb099e9
-function HerbGrammar.is_constraint_valid(c::ForbidConsecutive, grammar::AbstractGrammar; allow_empty_children=false)
-    HerbCore.is_domain_valid(c, length(grammar.rules))
-end
-
-# ╔═╡ ae811b8c-672b-428c-9c14-a2595c15f0b4
-function HerbCore.Base.:(==)(c1::ForbidConsecutive, c2::ForbidConsecutive)
-    c1.rule == c2.rule
 end
 
 # ╔═╡ e40e09fc-c697-4c83-90eb-2b758254128e
