@@ -1,0 +1,6 @@
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+Cthulhu = "f68482b8-f384-11e8-15f7-abe071a5a75f"
+Herb = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
+HerbSearch = "3008d8e8-f9aa-438a-92ed-26e9c7b4829f"
+ProfileView = "c46f51b8-102a-5cf2-8d2c-8597cb0e0da7"

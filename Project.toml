@@ -7,6 +7,8 @@ authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Tilman Hinnerichs <t.r.hinn
 projects = [
     "test",
     "docs",
+    "benchmarks",
+    "benchmarks/profile",
     "herbs/HerbConstraints",
     "herbs/HerbCore",
     "herbs/HerbGrammar",
