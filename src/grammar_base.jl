@@ -206,18 +206,26 @@ end
 
 
 """
-    add_rule!(g::AbstractGrammar, p::Real, e::Expr)
+    add_rule!(g::AbstractGrammar, p::Real, e::Expr; normalize=true)
 
-Adds a probabilistic derivation rule.
+Add a probabilistic derivation rule.
+
+!!! note
+    By default, normalizes the grammar `g`'s probabilities after adding the rule(s).
+    When constructing a grammar iteratively, it may be useful to skip normalization
+    until all rules and their probabilities have been added, calling
+    [`normalize!`](@ref) at the end.
 """
-function add_rule!(g::AbstractGrammar, p::Real, e::Expr)
+function add_rule!(g::AbstractGrammar, p::Real, e::Expr; normalize=true)
     isprobabilistic(g) || throw(ArgumentError("adding a probabilistic rule to a non-probabilistic grammar"))
     len₀ = length(g.rules)
     add_rule!(g, e)
     len₁ = length(g.rules)
     nnew = len₁ - len₀
     append!(g.log_probabilities, repeat([log(p / nnew)], nnew))
-    normalize!(g)
+    if normalize
+        normalize!(g)
+    end
 end
 
 """

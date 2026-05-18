@@ -1,7 +1,7 @@
 name = "HerbGrammar"
 uuid = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
 authors = ["Sebastijan Dumancic <s.dumancic@tudelft.nl>", "Jaap de Jong <J.deJong-18@student.tudelft.nl>", "Nicolae Filat <N.Filat@student.tudelft.nl>", "Piotr Cichoń <gitlab@gitlab.ewi.tudelft.nl>"]
-version = "1.1.3"
+version = "1.2.0"
 
 [workspace]
 projects = ["test"]
