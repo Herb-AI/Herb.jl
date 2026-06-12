@@ -15,6 +15,11 @@ include("grammars.jl")
 
 include("list_functions.jl")
 
+
+function set_base_grammar!(grammar_with_spec::AbstractGrammar)
+    global base_grammar_deepcoder = grammar_with_spec
+end
+
 function make_deepcoder_interpreter(g)
     return make_interpreter(g; target_module=DeepCoder_2016, cache_module=DeepCoder_2016)
 end
