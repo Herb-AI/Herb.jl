@@ -16,5 +16,5 @@ jobs:
   format:
     name: Format Julia code
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: fredrikekre/runic-action@v1
