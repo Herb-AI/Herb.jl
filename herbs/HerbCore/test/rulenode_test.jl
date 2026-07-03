@@ -8,6 +8,20 @@
         @test treeheight(RuleNode(1, [RuleNode(2), RuleNode(2)])) == 1
     end
 
+    @testset "getindex" begin
+        rn = @rulenode 1{2,3{4,5}}
+        @test rn[1] == @rulenode(2)
+        @test rn[2] == @rulenode(3{4,5})
+        @test rn[1:2] == [@rulenode(2), @rulenode(3{4,5})]
+    end
+
+    @testset "view" begin
+        rn = @rulenode 1{2,3{4,5}}
+        @test view(rn, 1)[] == @rulenode(2)
+        @test view(rn, 2)[] == @rulenode(3{4,5})
+        @test view(rn, 1:2) == [@rulenode(2), @rulenode(3{4,5})]
+    end
+
     @testset "RuleNode tests" begin
         @testset "Equality tests" begin
             @test RuleNode(1) == RuleNode(1)
@@ -129,6 +143,15 @@
                 hole = Hole(BitVector([1, 1]))
                 @test get_node_at_location(hole, Vector{Int}()).domain == hole.domain #because hole != hole
                 @test_throws Exception get_node_at_location(hole, [1])
+            end
+            @testset "Hole in RuleNode" begin
+                rn = RuleNode(1, [Hole([1, 1])])
+                retrieved = get_node_at_location(rn, [1])
+                @test retrieved == Hole([1, 1])
+            end
+            @testset "Deeper example" begin
+                rn = @rulenode 1{2,3{4,5{6,7}}}
+                @test get_node_at_location(rn, [2, 2, 2]) == RuleNode(7)
             end
         end
 
