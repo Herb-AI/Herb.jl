@@ -1,0 +1,16 @@
+name = "HerbGrammar"
+uuid = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
+authors = ["Sebastijan Dumancic <s.dumancic@tudelft.nl>", "Jaap de Jong <J.deJong-18@student.tudelft.nl>", "Nicolae Filat <N.Filat@student.tudelft.nl>", "Piotr Cichoń <gitlab@gitlab.ewi.tudelft.nl>"]
+version = "1.2.0"
+
+[workspace]
+projects = ["test"]
+
+[deps]
+HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
+Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+
+[compat]
+HerbCore = "1"
+Serialization = "^1.8,^1.10,^1.11"
+julia = "1.10"
