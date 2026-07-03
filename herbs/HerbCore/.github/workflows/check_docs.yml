@@ -1,0 +1,50 @@
+name: Check Docs
+
+on:
+  push:
+    branches:
+      - master
+    tags: '*'
+  pull_request:
+
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Julia
+      uses: julia-actions/setup-julia@v1
+      with:
+        version: '1' # Use the latest stable Julia version
+    - name: Install dependencies
+      run: |
+        julia --project=docs -e '
+          using Pkg;
+          Pkg.develop(PackageSpec(path=pwd()));
+          Pkg.instantiate();
+          Pkg.add("Documenter");
+        '
+    - name: Try building documentation and run doctests
+      run: |
+        julia --project=docs -e '
+          using Documenter, HerbCore;
+          DocMeta.setdocmeta!(HerbCore, :DocTestSetup, :(using HerbCore); recursive=true)
+          content = """
+            ```@autodocs
+            Modules = [HerbCore]
+            ```
+          """
+          cd("docs")
+          mkpath("src/")
+          open("src/index.md", "w") do file
+            write(file, content)
+          end
+          makedocs(
+            sitename="HerbCore.jl",
+            modules=[HerbCore],
+            format=Documenter.HTML(),
+            doctest=true,
+            warnonly=[:missing_docs],
+            pages=["index.md"]
+          );
+        '

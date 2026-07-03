@@ -1,0 +1,15 @@
+name = "HerbCore"
+uuid = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
+authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Nicolae Filat <N.Filat@student.tudelft.nl>", "Tilman Hinnerichs <t.r.hinnerichs@tudelft.nl>", "Sebastijan Dumancic <s.dumancic@tudelft.nl>"]
+version = "1.1.0"
+
+[deps]
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+StyledStrings = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+
+[compat]
+AbstractTrees = "0.4.5"
+julia = "1.10"
+MacroTools = "0.5.15"
+StyledStrings = "1"
