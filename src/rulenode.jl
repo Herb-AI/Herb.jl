@@ -43,6 +43,9 @@ mutable struct RuleNode <: AbstractRuleNode
     children::Vector{AbstractRuleNode}
 end
 
+Base.getindex(rn::AbstractRuleNode, inds...) = getindex(get_children(rn), inds...)
+Base.view(rn::AbstractRuleNode, inds...) = view(get_children(rn), inds...)
+
 """
 	update_rule_indices!(node::RuleNode, n_rules::Integer)
 
@@ -129,6 +132,7 @@ mutable struct UniformHole <: AbstractUniformHole
 end
 
 UniformHole(domain) = UniformHole(domain, AbstractRuleNode[])
+Base.getindex(uh::UniformHole, inds...) = getindex(get_children(uh), inds...)
 
 # Check if `hole`'s domain length matches `n_rules`.
 function is_domain_valid(hole::AbstractHole, n_rules::Integer)
@@ -636,12 +640,13 @@ rulesonleft(h::AbstractHole, loc::Vector{Int}) = Set{Int}(findall(h.domain))
 
 Retrieves a [`RuleNode`](@ref) at the given location by reference.
 """
-function get_node_at_location(root::AbstractRuleNode, location::Vector{Int})
-    if location == []
-        return root
-    else
-        return get_node_at_location(root.children[location[1]], location[2:end])
+function get_node_at_location(root::AbstractRuleNode, location::AbstractVector{<:Integer})
+    res = root
+    for i in location
+        res = res[i]
     end
+
+    return res
 end
 
 """
@@ -649,7 +654,7 @@ end
 
 Retrieves the current hole, if location is this very hole. Throws error otherwise.
 """
-function get_node_at_location(root::Hole, location::Vector{Int})
+function get_node_at_location(root::Hole, location::AbstractVector{<:Integer})
     if location == []
         return root
     end
