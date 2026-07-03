@@ -1,0 +1,14 @@
+name = "Garden"
+uuid = "22d0bc84-1826-4aaf-b584-c2a6a91114a2"
+version = "0.1.1"
+
+[deps]
+DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+Herb = "c09c6b7f-4f63-49de-90d9-97a3563c0f4a"
+RuntimeGeneratedFunctions = "7e49a35a-f44a-4d26-94aa-eba1b4ca6b47"
+
+[compat]
+DocStringExtensions = "0.9.3"
+Herb = "1"
+RuntimeGeneratedFunctions = "0.5.17"
+julia = "1.10"
