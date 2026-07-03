@@ -1,0 +1,17 @@
+name = "HerbInterpret"
+uuid = "5bbddadd-02c5-4713-84b8-97364418cca7"
+version = "1.0.1"
+authors = ["Tilman Hinnerichs <t.r.hinnerichs@tudelft.nl>", "Jaap de Jong <jaapdejong15@gmail.com>", "Sebastijan Dumancic <s.dumancic@tudelft.nl>", "Reuben Gardos Reid <R.J.GardosReid@tudelft.nl>"]
+
+[deps]
+HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
+HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
+HerbSpecification = "6d54aada-062f-46d8-85cf-a1ceaf058a06"
+RuntimeGeneratedFunctions = "7e49a35a-f44a-4d26-94aa-eba1b4ca6b47"
+
+[compat]
+HerbCore = "1"
+HerbGrammar = "1"
+HerbSpecification = "1"
+RuntimeGeneratedFunctions = "0.5.16"
+julia = "1.10"
