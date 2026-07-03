@@ -5,6 +5,7 @@ authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Tilman Hinnerichs <t.r.hinn
 
 [workspace]
 projects = [
+    "benchmark",
     "docs",
     "herbs/Garden",
     "herbs/HerbBenchmarks",
