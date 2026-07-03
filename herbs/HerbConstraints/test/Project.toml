@@ -1,0 +1,13 @@
+[deps]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Clingo_jll = "e1d4ad0e-dc8b-5d2d-8155-e9a55b531f08"
+HerbCore = "2b23ba43-8213-43cb-b5ea-38c12b45bd45"
+HerbGrammar = "4ef9e186-2fe5-4b24-8de7-9f7291f24af7"
+JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
+ReTestItems = "817f1d60-ba6b-4fd5-9520-3cf149f6a823"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
+TestSetExtensions = "98d24dd4-01ad-11ea-1b02-c9a08f80db04"
+
+[compat]
+TestSetExtensions = "3"
