@@ -5,10 +5,12 @@ authors = ["Jaap de Jong <jaapdejong15@gmail.com>", "Tilman Hinnerichs <t.r.hinn
 
 [workspace]
 projects = [
+    "benchmark",
     "test",
     "docs",
     "herbs/HerbConstraints",
     "herbs/HerbCore",
+    "herbs/HerbNodes",
     "herbs/HerbGrammar",
     "herbs/HerbInterpret",
     "herbs/HerbSearch",
