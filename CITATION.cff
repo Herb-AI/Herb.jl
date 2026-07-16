@@ -57,8 +57,28 @@ identifiers:
   - type: swh
     value: 'swh:1:dir:e77a8fcc376baf6db3f78eeb0011a1a5d68ace93'
     description: Latest version of Herb.jl
+  - type: url
+    value: 'https://arxiv.org/abs/2510.09726'
+    description: Herb.jl Introduction Paper
 repository-code: 'https://github.com/Herb-AI/Herb.jl'
 url: 'https://herb-ai.github.io/'
+abstract: >-
+  Program synthesis -- the automatic generation of code
+  given a specification -- is one of the most fundamental
+  tasks in artificial intelligence (AI) and the dream of
+  many programmers. Numerous synthesizers have been
+  developed for program synthesis, offering different
+  approaches to the exponentially growing program space.
+  Although such state-of-the-art tools exist, reusing and
+  adapting them remains tedious and time-consuming. We
+  propose Herb.jl, a unifying program synthesis library
+  written in Julia, to address these issues. Since current
+  methods share similar building blocks, we aim to break
+  down the underlying algorithms into extendable, reusable
+  subcomponents. To demonstrate the benefits of using
+  Herb.jl, we show how to implement a simple problem and
+  grammar, and how to solve it with just a few lines of
+  code. 
 keywords:
   - Program Synthesis
   - Collaborative Science
