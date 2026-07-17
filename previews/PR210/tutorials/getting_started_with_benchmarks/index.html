@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Evaluating on Benchmarks · Herb.jl</title><meta name="title" content="Evaluating on Benchmarks · Herb.jl"/><meta property="og:title" content="Evaluating on Benchmarks · Herb.jl"/><meta property="twitter:title" content="Evaluating on Benchmarks · Herb.jl"/><meta name="description" content="Documentation for Herb.jl."/><meta property="og:description" content="Documentation for Herb.jl."/><meta property="twitter:description" content="Documentation for Herb.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img class="docs-light-only" src="../../assets/logo.svg" alt="Herb.jl logo"/><img class="docs-dark-only" src="../../assets/logo-dark.svg" alt="Herb.jl logo"/></a><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><span class="tocitem">Basics</span><ul><li><a class="tocitem" href="../../">Herb.jl</a></li><li><a class="tocitem" href="../../install/">Installation Guide</a></li><li><a class="tocitem" href="../basic_getting_started/">Getting Started</a></li><li><a class="tocitem" href="../../concepts/">Herb Architecture and Core Concepts</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../getting_started_with_herb/">A more verbose getting started with Herb.jl</a></li><li><a class="tocitem" href="../defining_grammars/">Defining Grammars in Herb.jl</a></li><li><a class="tocitem" href="../advanced_search/">Advanced Search Procedures</a></li><li><a class="tocitem" href="../TopDown/">Top Down Iterator</a></li><li><a class="tocitem" href="../getting_started_with_constraints/">Getting started with Constraints</a></li><li><a class="tocitem" href="../working_with_interpreters/">Working with custom interpreters</a></li><li class="is-active"><a class="tocitem" href>Evaluating on Benchmarks</a></li><li><a class="tocitem" href="../abstract_syntax_trees/">Abstract Syntax Trees</a></li></ul></li><li><span class="tocitem">Sub-Modules</span><ul><li><a class="tocitem" href="../../HerbCore/">HerbCore.jl</a></li><li><a class="tocitem" href="../../HerbGrammar/">HerbGrammar.jl</a></li><li><a class="tocitem" href="../../HerbSpecification/">HerbSpecification.jl</a></li><li><a class="tocitem" href="../../HerbInterpret/">HerbInterpret.jl</a></li><li><a class="tocitem" href="../../HerbConstraints/">HerbConstraints.jl</a></li><li><a class="tocitem" href="../../HerbSearch/">HerbSearch.jl</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Evaluating on Benchmarks</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Evaluating on Benchmarks</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl/blob/main/docs/src/tutorials/getting_started_with_benchmarks.jl" title="View source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><style>
+    #documenter-page table {
+        display: table !important;
+        margin: 2rem auto !important;
+        border-top: 2pt solid rgba(0,0,0,0.2);
+        border-bottom: 2pt solid rgba(0,0,0,0.2);
+    }
+
+    #documenter-page pre, #documenter-page div {
+        margin-top: 1.4rem !important;
+        margin-bottom: 1.4rem !important;
+    }
+
+    .code-output {
+        padding: 0.7rem 0.5rem !important;
+    }
+
+    .admonition-body {
+        padding: 0em 1.25em !important;
+    }
+</style>
+
+<!-- PlutoStaticHTML.Begin -->
+<!--
+    # This information is used for caching.
+    [PlutoStaticHTML.State]
+    input_sha = "81165914198a0d92419fb12f62bfb5f8e3941720c3be7dfc963b1d25de696b9e"
+    julia_version = "1.12.6"
+-->
+
+<div class="markdown"><h1 id="Getting-started-with-HerbBenchmarks">Getting started with HerbBenchmarks</h1><p>In the domain of program synthesis, multiple benchmarks are used to evaluate the performance of new techniques. To make running them accessible and quick with Herb, we have set up <a href="https://github.com/Herb-AI/HerbBenchmarks.jl">HerbBenchmarks.jl</a>. </p></div>
+
+
+<div class="markdown"><h3 id="Setup">Setup</h3><p>As always, we need to activate the environment we want to use. For the purpose of this demonstration, we explicitly add HerbBenchmarks, but this only needs to be run once in the environment, not every use. Note that since it is not in the registry, we need to add it using the GitHub URL.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    import Pkg
+    Pkg.activate(Base.current_project())
+    Pkg.add(url="https://github.com/Herb-AI/HerbBenchmarks.jl.git")
+    Pkg.instantiate()
+end</code></pre>
+
+
+
+<div class="markdown"><p>In addition to HerbBenchmarks, we will import Herb so we can demonstrate its use on the benchmarks.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>using HerbBenchmarks, Herb</code></pre>
+
+
+
+<div class="markdown"><h3 id="Choosing-a-Benchmark">Choosing a Benchmark</h3><p>To see what benchmarks are available, you can look at the <a href="https://github.com/Herb-AI/HerbBenchmarks.jl">HerbBenchmarks.jl</a> repository, in the <code>src/data</code> folder. There, each repository represents a benchmark. For each benchmark, we have the following files:</p><ul><li><p><code>README.dm</code>: A short description.</p></li><li><p><code>citation.bib</code>: A BibTex file with the source.</p></li><li><p><code>data.jl</code> file(s): Lists the problems, each a set of input-output examples.</p></li><li><p><code>grammar(s).jl</code>: Including a common grammar for all problems, or a grammar for each problem.</p></li><li><p><code>&lt;type&gt;_primitives/functions.jl</code>: Containing the implementation of the functions used in the grammar. </p></li><li><p><code>&lt;bench_name&gt;.jl</code>: Defining the module with all the functionalities we need to run the benchmark.</p></li></ul><p>In this tutorial, we will focus on the <code>SyGuS/PBE_SLIA_Track_2019</code> benchmark (Note that SyGuS has multiple tracks, each operating as an independent benchmark). You can start by taking a quick look at each of the files above to get a sense of what we have at our disposal. </p><p>Now, we can import the benchmark we choose. Note that importing only the benchmark we want, without <code>using HerbBenchmarks</code>, will not work, since we also need the shared functionalities defined in HerbBenchmarks itself.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>import HerbBenchmarks.PBE_SLIA_Track_2019 as SLIA</code></pre>
+
+
+
+<div class="markdown"><h3 id="Accessing-the-Benchmark">Accessing the Benchmark</h3><p>Usually, we would want to iterate over all the problems and their corresponding grammars. Lucky for us, there is a function just for that!</p></div>
+
+<pre class='language-julia'><code class='language-julia'>PG_pairs = get_all_problem_grammar_pairs(SLIA)</code></pre>
+<pre class="code-output documenter-example-output" id="var-PG_pairs">205-element Vector{ProblemGrammarPair}:
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "11440431", Problem{Vector{IOExample{Any, String}}}("problem_11440431", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Mining US"), "Mining"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Soybean Farming CAN"), "Soybean Farming"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Soybean Farming"), "Soybean Farming"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Oil Extraction US"), "Oil Extraction"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Fishing"), "Fishing")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = 
+4: ntString =  
+5: ntString = US
+6: ntString = CAN
+7: ntString = concat_cvc(ntString, ntString)
+8: ntString = replace_cvc(ntString, ntString, ntString)
+9: ntString = at_cvc(ntString, ntInt)
+10: ntString = int_to_str_cvc(ntInt)
+11: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+12: ntString = substr_cvc(ntString, ntInt, ntInt)
+13: ntInt = 1
+14: ntInt = 0
+15: ntInt = -1
+16: ntInt = ntInt + ntInt
+17: ntInt = ntInt - ntInt
+18: ntInt = len_cvc(ntString)
+19: ntInt = str_to_int_cvc(ntString)
+20: ntInt = if ntBool
+    ntInt
+else
+    ntInt
+end
+21: ntInt = indexof_cvc(ntString, ntString, ntInt)
+22: ntBool = true
+23: ntBool = false
+24: ntBool = ntInt == ntInt
+25: ntBool = prefixof_cvc(ntString, ntString)
+26: ntBool = suffixof_cvc(ntString, ntString)
+27: ntBool = contains_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "11604909", Problem{Vector{IOExample{Any, String}}}("problem_11604909", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "AIX 5.1"), "5.1"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "VMware ESX Server 3.5.0 build-110268"), "3.5"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Linux Linux 2.6 Linux"), "2.6"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Red Hat Enterprise AS 4 &lt;2.6-78.0.13.ELl_arg_esmp&gt;"), "2.6"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Microsoft <R> Windows <R> 2000 Advanced Server 1.0"), "1.0"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Microsoft Windows XP Win2008R2 6.1.7601"), "6.1")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = 
+4: ntString =  
+5: ntString = .
+6: ntString = concat_cvc(ntString, ntString)
+7: ntString = replace_cvc(ntString, ntString, ntString)
+8: ntString = at_cvc(ntString, ntInt)
+9: ntString = int_to_str_cvc(ntInt)
+10: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+11: ntString = substr_cvc(ntString, ntInt, ntInt)
+12: ntInt = 1
+13: ntInt = 0
+14: ntInt = -1
+15: ntInt = ntInt + ntInt
+16: ntInt = ntInt - ntInt
+17: ntInt = len_cvc(ntString)
+18: ntInt = str_to_int_cvc(ntString)
+19: ntInt = if ntBool
+    ntInt
+else
+    ntInt
+end
+20: ntInt = indexof_cvc(ntString, ntString, ntInt)
+21: ntBool = true
+22: ntBool = false
+23: ntBool = ntInt == ntInt
+24: ntBool = prefixof_cvc(ntString, ntString)
+25: ntBool = suffixof_cvc(ntString, ntString)
+26: ntBool = contains_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "12948338", Problem{Vector{IOExample{Any, Int64}}}("problem_12948338", IOExample{Any, Int64}[IOExample{Any, Int64}(Dict{Symbol, Any}(:_arg_1 =&gt; "An example string with _username in it RT _AwesomeUser says _username is awesome", :_arg_2 =&gt; "username"), 2), IOExample{Any, Int64}(Dict{Symbol, Any}(:_arg_1 =&gt; "An example string with _username in it RT _AwesomeUser says _username is awesome", :_arg_2 =&gt; "AwesomeUser"), 1), IOExample{Any, Int64}(Dict{Symbol, Any}(:_arg_1 =&gt; "An _example string with _example in it is awesome _example", :_arg_2 =&gt; "example"), 3)]), 1: Start = ntInt
+2: ntString = _arg_1
+3: ntString = _arg_2
+4: ntString = 
+5: ntString =  
+6: ntString = _
+7: ntString = concat_cvc(ntString, ntString)
+8: ntString = replace_cvc(ntString, ntString, ntString)
+9: ntString = at_cvc(ntString, ntInt)
+10: ntString = int_to_str_cvc(ntInt)
+11: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+12: ntString = substr_cvc(ntString, ntInt, ntInt)
+13: ntInt = 1
+14: ntInt = 0
+15: ntInt = -1
+16: ntInt = 2
+17: ntInt = 3
+18: ntInt = ntInt + ntInt
+19: ntInt = ntInt - ntInt
+20: ntInt = len_cvc(ntString)
+21: ntInt = str_to_int_cvc(ntString)
+22: ntInt = if ntBool
+    ntInt
+else
+    ntInt
+end
+23: ntInt = indexof_cvc(ntString, ntString, ntInt)
+24: ntBool = true
+25: ntBool = false
+26: ntBool = ntInt == ntInt
+27: ntBool = prefixof_cvc(ntString, ntString)
+28: ntBool = suffixof_cvc(ntString, ntString)
+29: ntBool = contains_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "17212077", Problem{Vector{IOExample{Any, String}}}("problem_17212077", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "01/15/2013"), "01/2013"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "03/07/2011"), "03/2011"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "05/09/2009"), "05/2009")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = 
+4: ntString =  
+5: ntString = /
+6: ntString = concat_cvc(ntString, ntString)
+7: ntString = replace_cvc(ntString, ntString, ntString)
+8: ntString = at_cvc(ntString, ntInt)
+9: ntString = int_to_str_cvc(ntInt)
+10: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+11: ntString = substr_cvc(ntString, ntInt, ntInt)
+12: ntInt = 1
+13: ntInt = 0
+14: ntInt = -1
+15: ntInt = ntInt + ntInt
+16: ntInt = ntInt - ntInt
+17: ntInt = len_cvc(ntString)
+18: ntInt = str_to_int_cvc(ntString)
+19: ntInt = if ntBool
+    ntInt
+else
+    ntInt
+end
+20: ntInt = indexof_cvc(ntString, ntString, ntInt)
+21: ntBool = true
+22: ntBool = false
+23: ntBool = ntInt == ntInt
+24: ntBool = prefixof_cvc(ntString, ntString)
+25: ntBool = suffixof_cvc(ntString, ntString)
+26: ntBool = contains_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "19274448", Problem{Vector{IOExample{Any, Bool}}}("problem_19274448", IOExample{Any, Bool}[IOExample{Any, Bool}(Dict{Symbol, Any}(:_arg_1 =&gt; "dhfjd9999999dfda"), true), IOExample{Any, Bool}(Dict{Symbol, Any}(:_arg_1 =&gt; "ddsss999dfdfsfd"), false)]), 1: Start = ntBool
+2: ntString = _arg_1
+3: ntString = 
+4: ntString =  
+5: ntString = 9999999
+6: ntString = concat_cvc(ntString, ntString)
+7: ntString = replace_cvc(ntString, ntString, ntString)
+8: ntString = at_cvc(ntString, ntInt)
+9: ntString = int_to_str_cvc(ntInt)
+10: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+11: ntString = substr_cvc(ntString, ntInt, ntInt)
+12: ntInt = 1
+13: ntInt = 0
+14: ntInt = -1
+15: ntInt = ntInt + ntInt
+16: ntInt = ntInt - ntInt
+17: ntInt = len_cvc(ntString)
+18: ntInt = str_to_int_cvc(ntString)
+19: ntInt = if ntBool
+    ntInt
+else
+    ntInt
+end
+20: ntInt = indexof_cvc(ntString, ntString, ntInt)
+21: ntBool = true
+22: ntBool = false
+23: ntBool = ntInt == ntInt
+24: ntBool = prefixof_cvc(ntString, ntString)
+25: ntBool = suffixof_cvc(ntString, ntString)
+26: ntBool = contains_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "19558979", Problem{Vector{IOExample{Any, String}}}("problem_19558979", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "spreadsheet", :_arg_2 =&gt; 1), "s"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "spreadsheet", :_arg_2 =&gt; 2), "p"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "spreadsheet", :_arg_2 =&gt; 3), "r"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "spreadsheet", :_arg_2 =&gt; 4), "e"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "spreadsheet", :_arg_2 =&gt; 5), "a")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = 
+4: ntString =  
+5: ntString = concat_cvc(ntString, ntString)
+6: ntString = replace_cvc(ntString, ntString, ntString)
+7: ntString = at_cvc(ntString, ntInt)
+8: ntString = int_to_str_cvc(ntInt)
+9: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+10: ntString = substr_cvc(ntString, ntInt, ntInt)
+11: ntInt = _arg_2
+12: ntInt = 1
+13: ntInt = 0
+14: ntInt = -1
+15: ntInt = 2
+16: ntInt = 3
+17: ntInt = 4
+18: ntInt = 5
+19: ntInt = ntInt + ntInt
+20: ntInt = ntInt - ntInt
+21: ntInt = len_cvc(ntString)
+22: ntInt = str_to_int_cvc(ntString)
+23: ntInt = if ntBool
+    ntInt
+else
+    ntInt
+end
+24: ntInt = indexof_cvc(ntString, ntString, ntInt)
+25: ntBool = true
+26: ntBool = false
+27: ntBool = ntInt == ntInt
+28: ntBool = prefixof_cvc(ntString, ntString)
+29: ntBool = suffixof_cvc(ntString, ntString)
+30: ntBool = contains_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "2171308", Problem{Vector{IOExample{Any, String}}}("problem_2171308", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "John Doe"), "J Doe"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Mayur Naik"), "M Naik"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Nimit Singh"), "N Singh")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = 
+4: ntString =  
+5: ntString = concat_cvc(ntString, ntString)
+6: ntString = replace_cvc(ntString, ntString, ntString)
+7: ntString = at_cvc(ntString, ntInt)
+8: ntString = int_to_str_cvc(ntInt)
+9: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+10: ntString = substr_cvc(ntString, ntInt, ntInt)
+11: ntInt = 1
+12: ntInt = 0
+13: ntInt = -1
+14: ntInt = ntInt + ntInt
+15: ntInt = ntInt - ntInt
+16: ntInt = len_cvc(ntString)
+17: ntInt = str_to_int_cvc(ntString)
+18: ntInt = if ntBool
+    ntInt
+else
+    ntInt
+end
+19: ntInt = indexof_cvc(ntString, ntString, ntInt)
+20: ntBool = true
+21: ntBool = false
+22: ntBool = ntInt == ntInt
+23: ntBool = prefixof_cvc(ntString, ntString)
+24: ntBool = suffixof_cvc(ntString, ntString)
+25: ntBool = contains_cvc(ntString, ntString)
+)
+ ⋮
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "univ_5_long_repeat", Problem{Vector{IOExample{Any, String}}}("problem_univ_5_long_repeat", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UC Berkeley", :_arg_2 =&gt; "Berkeley, CA"), "Berkeley, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Pennsylvania", :_arg_2 =&gt; "Phialdelphia, PA, USA"), "Phialdelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UCLA", :_arg_2 =&gt; "Los Angeles, CA"), "UCLA, Los Angeles, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Cornell University", :_arg_2 =&gt; "Ithaca, New York, USA"), "Ithaca, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Penn", :_arg_2 =&gt; "Philadelphia, PA, USA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Michigan", :_arg_2 =&gt; "Ann Arbor, MI, USA"), "Ann Arbor, MI, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UC Berkeley", :_arg_2 =&gt; "Berkeley, CA"), "Berkeley, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "MIT", :_arg_2 =&gt; "Cambridge, MA"), "Cambridge, MA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Pennsylvania", :_arg_2 =&gt; "Phialdelphia, PA, USA"), "Phialdelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UCLA", :_arg_2 =&gt; "Los Angeles, CA"), "Los Angeles, CA, USA")  …  IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UIUC", :_arg_2 =&gt; "Urbana, IL"), "Urbana, IL, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Temple University", :_arg_2 =&gt; "Philadelphia, PA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Harvard University", :_arg_2 =&gt; "Cambridge, MA, USA"), "Cambridge, MA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Connecticut", :_arg_2 =&gt; "Storrs, CT, USA"), "Storrs, CT, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Drexel University", :_arg_2 =&gt; "Philadelphia, PA"), "DPhiladelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "NYU", :_arg_2 =&gt; "New York, New York, USA"), "New York, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UIUC", :_arg_2 =&gt; "Urbana, IL"), "Urbana, IL, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "New Haven University", :_arg_2 =&gt; "New Haven, CT, USA"), "New Haven, CT, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of California, Santa Barbara", :_arg_2 =&gt; "Santa Barbara, CA, USA"), "Santa Barbara, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Connecticut", :_arg_2 =&gt; "Storrs, CT, USA"), "Storrs, CT, USA")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = _arg_2
+4: ntString = New York
+5: ntString =  
+6: ntString = ,
+7: ntString = A
+8: ntString = B
+9: ntString = C
+10: ntString = D
+11: ntString = E
+12: ntString = F
+13: ntString = G
+14: ntString = H
+15: ntString = I
+16: ntString = J
+17: ntString = K
+18: ntString = L
+19: ntString = M
+20: ntString = N
+21: ntString = O
+22: ntString = P
+23: ntString = Q
+24: ntString = R
+25: ntString = S
+26: ntString = T
+27: ntString = U
+28: ntString = V
+29: ntString = W
+30: ntString = X
+31: ntString = Y
+32: ntString = Z
+33: ntString = concat_cvc(ntString, ntString)
+34: ntString = replace_cvc(ntString, ntString, ntString)
+35: ntString = at_cvc(ntString, ntInt)
+36: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+37: ntString = substr_cvc(ntString, ntInt, ntInt)
+38: ntInt = 0
+39: ntInt = 1
+40: ntInt = 2
+41: ntInt = ntInt + ntInt
+42: ntInt = ntInt - ntInt
+43: ntInt = len_cvc(ntString)
+44: ntInt = indexof_cvc(ntString, ntString, ntInt)
+45: ntBool = true
+46: ntBool = false
+47: ntBool = prefixof_cvc(ntString, ntString)
+48: ntBool = suffixof_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "univ_5_short", Problem{Vector{IOExample{Any, String}}}("problem_univ_5_short", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Pennsylvania", :_arg_2 =&gt; "Phialdelphia, PA, USA"), "Phialdelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UCLA", :_arg_2 =&gt; "Los Angeles, CA"), "Los Angeles, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Cornell University", :_arg_2 =&gt; "Ithaca, New York, USA"), "Ithaca, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Penn", :_arg_2 =&gt; "Philadelphia, PA, USA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Maryland College Park", :_arg_2 =&gt; "College Park, MD"), "College Park, MD, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Michigan", :_arg_2 =&gt; "Ann Arbor, MI, USA"), "Ann Arbor, MI, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Columbia University", :_arg_2 =&gt; "New York, NY, USA"), "New York, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "NYU", :_arg_2 =&gt; "New York, New York, USA"), "New York, NY, USA")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = _arg_2
+4: ntString = New York
+5: ntString =  
+6: ntString = ,
+7: ntString = A
+8: ntString = B
+9: ntString = C
+10: ntString = D
+11: ntString = E
+12: ntString = F
+13: ntString = G
+14: ntString = H
+15: ntString = I
+16: ntString = J
+17: ntString = K
+18: ntString = L
+19: ntString = M
+20: ntString = N
+21: ntString = O
+22: ntString = P
+23: ntString = Q
+24: ntString = R
+25: ntString = S
+26: ntString = T
+27: ntString = U
+28: ntString = V
+29: ntString = W
+30: ntString = X
+31: ntString = Y
+32: ntString = Z
+33: ntString = concat_cvc(ntString, ntString)
+34: ntString = replace_cvc(ntString, ntString, ntString)
+35: ntString = at_cvc(ntString, ntInt)
+36: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+37: ntString = substr_cvc(ntString, ntInt, ntInt)
+38: ntInt = 0
+39: ntInt = 1
+40: ntInt = 2
+41: ntInt = ntInt + ntInt
+42: ntInt = ntInt - ntInt
+43: ntInt = len_cvc(ntString)
+44: ntInt = indexof_cvc(ntString, ntString, ntInt)
+45: ntBool = true
+46: ntBool = false
+47: ntBool = prefixof_cvc(ntString, ntString)
+48: ntBool = suffixof_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "univ_6", Problem{Vector{IOExample{Any, String}}}("problem_univ_6", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Pennsylvania", :_arg_2 =&gt; "Phialdelphia, PA, USA"), "Phialdelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UCLA", :_arg_2 =&gt; "Los Angeles, CA"), "Los Angeles, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Cornell University", :_arg_2 =&gt; "Ithaca, New York, USA"), "Ithaca, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Penn", :_arg_2 =&gt; "Philadelphia, PA, USA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Maryland College Park", :_arg_2 =&gt; "College Park, MD"), "College Park, MD, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Michigan", :_arg_2 =&gt; "Ann Arbor, MI, USA"), "Ann Arbor, MI, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Columbia University", :_arg_2 =&gt; "New York, NY, USA"), "New York, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "NYU", :_arg_2 =&gt; "New York, New York, USA"), "New York, NY, USA")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = _arg_2
+4: ntString = New York
+5: ntString =  
+6: ntString = ,
+7: ntString = USA
+8: ntString = AK
+9: ntString = AZ
+10: ntString = AR
+11: ntString = CA
+12: ntString = CO
+13: ntString = CT
+14: ntString = DE
+15: ntString = FL
+16: ntString = GA
+17: ntString = HI
+18: ntString = ID
+19: ntString = IL
+20: ntString = IN
+21: ntString = IA
+22: ntString = KS
+23: ntString = KY
+24: ntString = LA
+25: ntString = ME
+26: ntString = MD
+27: ntString = MA
+28: ntString = MI
+29: ntString = MN
+30: ntString = MS
+31: ntString = MO
+32: ntString = MT
+33: ntString = NE
+34: ntString = NV
+35: ntString = NH
+36: ntString = NJ
+37: ntString = NM
+38: ntString = NY
+39: ntString = NC
+40: ntString = ND
+41: ntString = OH
+42: ntString = OK
+43: ntString = OR
+44: ntString = PA
+45: ntString = RI
+46: ntString = SC
+47: ntString = SD
+48: ntString = TN
+49: ntString = TX
+50: ntString = UT
+51: ntString = VT
+52: ntString = VA
+53: ntString = WA
+54: ntString = WV
+55: ntString = WI
+56: ntString = concat_cvc(ntString, ntString)
+57: ntString = replace_cvc(ntString, ntString, ntString)
+58: ntString = at_cvc(ntString, ntInt)
+59: ntString = int_to_str_cvc(ntInt)
+60: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+61: ntString = substr_cvc(ntString, ntInt, ntInt)
+62: ntInt = 0
+63: ntInt = 1
+64: ntInt = 2
+65: ntInt = ntInt + ntInt
+66: ntInt = ntInt - ntInt
+67: ntInt = len_cvc(ntString)
+68: ntInt = str_to_int_cvc(ntString)
+69: ntInt = indexof_cvc(ntString, ntString, ntInt)
+70: ntBool = true
+71: ntBool = false
+72: ntBool = prefixof_cvc(ntString, ntString)
+73: ntBool = suffixof_cvc(ntString, ntString)
+74: ntBool = contains_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "univ_6_long", Problem{Vector{IOExample{Any, String}}}("problem_univ_6_long", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Pennsylvania", :_arg_2 =&gt; "Phialdelphia, PA, USA"), "Phialdelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UCLA", :_arg_2 =&gt; "Los Angeles, CA"), "Los Angeles, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Cornell University", :_arg_2 =&gt; "Ithaca, New York, USA"), "Ithaca, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Penn", :_arg_2 =&gt; "Philadelphia, PA, USA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Maryland College Park", :_arg_2 =&gt; "College Park, MD"), "College Park, MD, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Michigan", :_arg_2 =&gt; "Ann Arbor, MI, USA"), "Ann Arbor, MI, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UC Berkeley", :_arg_2 =&gt; "Berkeley, CA"), "Berkeley, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "MIT", :_arg_2 =&gt; "Cambridge, MA"), "Cambridge, MA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Rice University", :_arg_2 =&gt; "Houston, TX"), "Houston, TX, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Yale University", :_arg_2 =&gt; "New Haven, CT, USA"), "New Haven, CT, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Columbia University", :_arg_2 =&gt; "New York, NY, USA"), "New York, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "NYU", :_arg_2 =&gt; "New York, New York, USA"), "New York, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UC Berkeley", :_arg_2 =&gt; "Berkeley, CA"), "Berkeley, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UIUC", :_arg_2 =&gt; "Urbana, IL"), "Urbana, IL, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Temple University", :_arg_2 =&gt; "Philadelphia, PA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Harvard University", :_arg_2 =&gt; "Cambridge, MA, USA"), "Cambridge, MA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Connecticut", :_arg_2 =&gt; "Storrs, CT, USA"), "Storrs, CT, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Drexel University", :_arg_2 =&gt; "Philadelphia, PA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "New Haven University", :_arg_2 =&gt; "New Haven, CT, USA"), "New Haven, CT, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of California, Santa Barbara", :_arg_2 =&gt; "Santa Barbara, CA, USA"), "Santa Barbara, CA, USA")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = _arg_2
+4: ntString = New York
+5: ntString =  
+6: ntString = ,
+7: ntString = AK
+8: ntString = AZ
+9: ntString = AR
+10: ntString = CA
+11: ntString = CO
+12: ntString = CT
+13: ntString = DE
+14: ntString = FL
+15: ntString = GA
+16: ntString = HI
+17: ntString = ID
+18: ntString = IL
+19: ntString = IN
+20: ntString = IA
+21: ntString = KS
+22: ntString = KY
+23: ntString = LA
+24: ntString = ME
+25: ntString = MD
+26: ntString = MA
+27: ntString = MI
+28: ntString = MN
+29: ntString = MS
+30: ntString = MO
+31: ntString = MT
+32: ntString = NE
+33: ntString = NV
+34: ntString = NH
+35: ntString = NJ
+36: ntString = NM
+37: ntString = NY
+38: ntString = NC
+39: ntString = ND
+40: ntString = OH
+41: ntString = OK
+42: ntString = OR
+43: ntString = PA
+44: ntString = RI
+45: ntString = SC
+46: ntString = SD
+47: ntString = TN
+48: ntString = TX
+49: ntString = UT
+50: ntString = VT
+51: ntString = VA
+52: ntString = WA
+53: ntString = WV
+54: ntString = WI
+55: ntString = USA
+56: ntString = concat_cvc(ntString, ntString)
+57: ntString = replace_cvc(ntString, ntString, ntString)
+58: ntString = at_cvc(ntString, ntInt)
+59: ntString = int_to_str_cvc(ntInt)
+60: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+61: ntString = substr_cvc(ntString, ntInt, ntInt)
+62: ntInt = 0
+63: ntInt = 1
+64: ntInt = 2
+65: ntInt = ntInt + ntInt
+66: ntInt = ntInt - ntInt
+67: ntInt = len_cvc(ntString)
+68: ntInt = str_to_int_cvc(ntString)
+69: ntInt = indexof_cvc(ntString, ntString, ntInt)
+70: ntBool = true
+71: ntBool = false
+72: ntBool = prefixof_cvc(ntString, ntString)
+73: ntBool = suffixof_cvc(ntString, ntString)
+74: ntBool = contains_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "univ_6_long_repeat", Problem{Vector{IOExample{Any, String}}}("problem_univ_6_long_repeat", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UC Berkeley", :_arg_2 =&gt; "Berkeley, CA"), "Berkeley, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Pennsylvania", :_arg_2 =&gt; "Phialdelphia, PA, USA"), "Phialdelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UCLA", :_arg_2 =&gt; "Los Angeles, CA"), "UCLA, Los Angeles, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Cornell University", :_arg_2 =&gt; "Ithaca, New York, USA"), "Ithaca, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Penn", :_arg_2 =&gt; "Philadelphia, PA, USA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Michigan", :_arg_2 =&gt; "Ann Arbor, MI, USA"), "Ann Arbor, MI, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UC Berkeley", :_arg_2 =&gt; "Berkeley, CA"), "Berkeley, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "MIT", :_arg_2 =&gt; "Cambridge, MA"), "Cambridge, MA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Pennsylvania", :_arg_2 =&gt; "Phialdelphia, PA, USA"), "Phialdelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UCLA", :_arg_2 =&gt; "Los Angeles, CA"), "Los Angeles, CA, USA")  …  IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UIUC", :_arg_2 =&gt; "Urbana, IL"), "Urbana, IL, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Temple University", :_arg_2 =&gt; "Philadelphia, PA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Harvard University", :_arg_2 =&gt; "Cambridge, MA, USA"), "Cambridge, MA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Connecticut", :_arg_2 =&gt; "Storrs, CT, USA"), "Storrs, CT, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Drexel University", :_arg_2 =&gt; "Philadelphia, PA"), "DPhiladelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "NYU", :_arg_2 =&gt; "New York, New York, USA"), "New York, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UIUC", :_arg_2 =&gt; "Urbana, IL"), "Urbana, IL, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "New Haven University", :_arg_2 =&gt; "New Haven, CT, USA"), "New Haven, CT, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of California, Santa Barbara", :_arg_2 =&gt; "Santa Barbara, CA, USA"), "Santa Barbara, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Connecticut", :_arg_2 =&gt; "Storrs, CT, USA"), "Storrs, CT, USA")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = _arg_2
+4: ntString = New York
+5: ntString =  
+6: ntString = ,
+7: ntString = AK
+8: ntString = AZ
+9: ntString = AR
+10: ntString = CA
+11: ntString = CO
+12: ntString = CT
+13: ntString = DE
+14: ntString = FL
+15: ntString = GA
+16: ntString = HI
+17: ntString = ID
+18: ntString = IL
+19: ntString = IN
+20: ntString = IA
+21: ntString = KS
+22: ntString = KY
+23: ntString = LA
+24: ntString = ME
+25: ntString = MD
+26: ntString = MA
+27: ntString = MI
+28: ntString = MN
+29: ntString = MS
+30: ntString = MO
+31: ntString = MT
+32: ntString = NE
+33: ntString = NV
+34: ntString = NH
+35: ntString = NJ
+36: ntString = NM
+37: ntString = NY
+38: ntString = NC
+39: ntString = ND
+40: ntString = OH
+41: ntString = OK
+42: ntString = OR
+43: ntString = PA
+44: ntString = RI
+45: ntString = SC
+46: ntString = SD
+47: ntString = TN
+48: ntString = TX
+49: ntString = UT
+50: ntString = VT
+51: ntString = VA
+52: ntString = WA
+53: ntString = WV
+54: ntString = WI
+55: ntString = USA
+56: ntString = concat_cvc(ntString, ntString)
+57: ntString = replace_cvc(ntString, ntString, ntString)
+58: ntString = at_cvc(ntString, ntInt)
+59: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+60: ntString = substr_cvc(ntString, ntInt, ntInt)
+61: ntInt = 0
+62: ntInt = 1
+63: ntInt = 2
+64: ntInt = ntInt + ntInt
+65: ntInt = ntInt - ntInt
+66: ntInt = len_cvc(ntString)
+67: ntInt = indexof_cvc(ntString, ntString, ntInt)
+68: ntBool = true
+69: ntBool = false
+70: ntBool = prefixof_cvc(ntString, ntString)
+71: ntBool = suffixof_cvc(ntString, ntString)
+)
+ ProblemGrammarPair(HerbBenchmarks.PBE_SLIA_Track_2019, "univ_6_short", Problem{Vector{IOExample{Any, String}}}("problem_univ_6_short", IOExample{Any, String}[IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Pennsylvania", :_arg_2 =&gt; "Phialdelphia, PA, USA"), "Phialdelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "UCLA", :_arg_2 =&gt; "Los Angeles, CA"), "Los Angeles, CA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Cornell University", :_arg_2 =&gt; "Ithaca, New York, USA"), "Ithaca, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Penn", :_arg_2 =&gt; "Philadelphia, PA, USA"), "Philadelphia, PA, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Maryland College Park", :_arg_2 =&gt; "College Park, MD"), "College Park, MD, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "University of Michigan", :_arg_2 =&gt; "Ann Arbor, MI, USA"), "Ann Arbor, MI, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "Columbia University", :_arg_2 =&gt; "New York, NY, USA"), "New York, NY, USA"), IOExample{Any, String}(Dict{Symbol, Any}(:_arg_1 =&gt; "NYU", :_arg_2 =&gt; "New York, New York, USA"), "New York, NY, USA")]), 1: Start = ntString
+2: ntString = _arg_1
+3: ntString = _arg_2
+4: ntString = New York
+5: ntString =  
+6: ntString = ,
+7: ntString = USA
+8: ntString = PA
+9: ntString = CT
+10: ntString = CA
+11: ntString = MD
+12: ntString = NY
+13: ntString = concat_cvc(ntString, ntString)
+14: ntString = replace_cvc(ntString, ntString, ntString)
+15: ntString = at_cvc(ntString, ntInt)
+16: ntString = if ntBool
+    ntString
+else
+    ntString
+end
+17: ntString = substr_cvc(ntString, ntInt, ntInt)
+18: ntInt = 0
+19: ntInt = 1
+20: ntInt = 2
+21: ntInt = ntInt + ntInt
+22: ntInt = ntInt - ntInt
+23: ntInt = len_cvc(ntString)
+24: ntInt = indexof_cvc(ntString, ntString, ntInt)
+25: ntBool = true
+26: ntBool = false
+27: ntBool = prefixof_cvc(ntString, ntString)
+28: ntBool = suffixof_cvc(ntString, ntString)
+)</R></R></pre>
+
+
+<div class="markdown"><p>Each pair has an identifier, a problem, and a grammar. We can look at the first 3 problems to see what we have. Each problem has a name and a spec. The spec is a list of examples, each with an input dictionary and an output value.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    function print_problem(problem)
+        println("Problem: $(problem.name)")
+        for i in eachindex(problem.spec)
+            println("$i\tInputs: \n\t\t$(join(["$k =&gt; $v" for (k,v) in problem.spec[i].in], "\n\t\t"))")
+            println("\tOutput:\n\t\t$(problem.spec[i].out)")
+        end
+        println("\n")
+    end
+    for pair in PG_pairs[1:3]
+        println("Identifier: $(pair.identifier)\n")
+        print_problem(pair.problem)
+    end
+end</code></pre>
+
+
+
+<div class="markdown"><p>We can also fetch a specific pair by the identifier. We will also look at the grammar this time (Rules 3 and 4 are the empty string and a space, respectively). Can you guess what the solution to this problem is?</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    pair = get_problem_grammar_pair(SLIA, "19558979")
+    println("Identifier: $(pair.identifier)\n")
+    print_problem(pair.problem)
+    println("Grammar:\n$(pair.grammar)")
+end</code></pre>
+
+
+
+<div class="markdown"><h3 id="Solving-the-benchmark">Solving the benchmark</h3><p>Now that we know how to access the problems and grammars, we can try to solve them with a simple BFS, and see the result. We will demonstrate how to solve the problem we have just fetched. Note that all problems will have the <code>:Start</code> type conversion rule, to state the actual output type we want for this problem. Additionally, we need to pass the benchmark module that defines the grammar functions to the <code>synth</code> function, so that it can evaluate candidate solutions.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin 
+    grammar = pair.grammar
+    problem = pair.problem
+    iterator = BFSIterator(grammar, :Start, max_depth=3)
+    solution, flag = synth(problem, iterator; mod=SLIA)
+    println(flag)
+    program = rulenode2expr(solution, grammar)
+    println(program)
+end</code></pre>
+
+
+
+<div class="markdown"><p>We found an <code>optimal_program</code>! And we can see that, as you might have expected, it is a simple <code>at</code> function. Now you can write yourself a loop over all the pairs, and solve each one.</p></div>
+
+
+<div class="markdown"><h3 id="Running-the-Solution">Running the Solution</h3><p>Now that we have a solution to a problem, we might want to run the solution program on some (new) inputs. To do that, we have interpreters.</p></div>
+
+<pre class='language-julia'><code class='language-julia'>begin
+    interpret = SLIA.make_SLIA_interpreter(grammar)
+    ex = problem.spec[1].in
+    println("For the specified example:\n\t$(ex)\nThe output is:  \n\t$(interpret(solution, ex))")
+    new_input = Dict{Symbol, Any}(:_arg_1 =&gt; "test_new_input", :_arg_2 =&gt; 7)
+    println("For the new example:\n\t$(new_input)\nThe output is:  \n\t$(interpret(solution, new_input))")
+end
+</code></pre>
+
+
+
+<div class="markdown"><h3 id="Summery">Summery</h3><p>We saw how to review the available benchmarks, access their problems, solve each, and interpret the solution on new inputs. Now you can pick your own benchmark and write a script that iterates over all the problems and compares your new synthesis ideas!</p></div>
+
+<!-- PlutoStaticHTML.End --><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+    startOnLoad: true,
+    theme: "neutral"
+});
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_interpreters/">« Working with custom interpreters</a><a class="docs-footer-nextpage" href="../abstract_syntax_trees/">Abstract Syntax Trees »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 17 July 2026 13:01">Friday 17 July 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
