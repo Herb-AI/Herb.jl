@@ -36,6 +36,7 @@ makedocs(
             "Top Down Iterator" => "tutorials/TopDown.md",
             "Getting started with Constraints" => "tutorials/getting_started_with_constraints.md",
             "Working with custom interpreters" => "tutorials/working_with_interpreters.md",
+            "Evaluating on Benchmarks" => "tutorials/getting_started_with_benchmarks.md",
             "Abstract Syntax Trees" => "tutorials/abstract_syntax_trees.md",
         ],
         "Sub-Modules" => [
