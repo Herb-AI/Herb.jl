@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Defining Grammars in Herb.jl · Herb.jl</title><meta name="title" content="Defining Grammars in Herb.jl · Herb.jl"/><meta property="og:title" content="Defining Grammars in Herb.jl · Herb.jl"/><meta property="twitter:title" content="Defining Grammars in Herb.jl · Herb.jl"/><meta name="description" content="Documentation for Herb.jl."/><meta property="og:description" content="Documentation for Herb.jl."/><meta property="twitter:description" content="Documentation for Herb.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img class="docs-light-only" src="../../assets/logo.svg" alt="Herb.jl logo"/><img class="docs-dark-only" src="../../assets/logo-dark.svg" alt="Herb.jl logo"/></a><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><span class="tocitem">Basics</span><ul><li><a class="tocitem" href="../../">Herb.jl</a></li><li><a class="tocitem" href="../../install/">Installation Guide</a></li><li><a class="tocitem" href="../basic_getting_started/">Getting Started</a></li><li><a class="tocitem" href="../../concepts/">Herb Architecture and Core Concepts</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../getting_started_with_herb/">A more verbose getting started with Herb.jl</a></li><li class="is-active"><a class="tocitem" href>Defining Grammars in Herb.jl</a></li><li><a class="tocitem" href="../advanced_search/">Advanced Search Procedures</a></li><li><a class="tocitem" href="../TopDown/">Top Down Iterator</a></li><li><a class="tocitem" href="../getting_started_with_constraints/">Getting started with Constraints</a></li><li><a class="tocitem" href="../working_with_interpreters/">Working with custom interpreters</a></li><li><a class="tocitem" href="../abstract_syntax_trees/">Abstract Syntax Trees</a></li></ul></li><li><span class="tocitem">Sub-Modules</span><ul><li><a class="tocitem" href="../../HerbCore/">HerbCore.jl</a></li><li><a class="tocitem" href="../../HerbGrammar/">HerbGrammar.jl</a></li><li><a class="tocitem" href="../../HerbSpecification/">HerbSpecification.jl</a></li><li><a class="tocitem" href="../../HerbInterpret/">HerbInterpret.jl</a></li><li><a class="tocitem" href="../../HerbConstraints/">HerbConstraints.jl</a></li><li><a class="tocitem" href="../../HerbSearch/">HerbSearch.jl</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Defining Grammars in Herb.jl</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Defining Grammars in Herb.jl</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl/blob/master/docs/src/tutorials/defining_grammars.jl" title="View source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><style>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Defining Grammars in Herb.jl · Herb.jl</title><meta name="title" content="Defining Grammars in Herb.jl · Herb.jl"/><meta property="og:title" content="Defining Grammars in Herb.jl · Herb.jl"/><meta property="twitter:title" content="Defining Grammars in Herb.jl · Herb.jl"/><meta name="description" content="Documentation for Herb.jl."/><meta property="og:description" content="Documentation for Herb.jl."/><meta property="twitter:description" content="Documentation for Herb.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.63.2/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img class="docs-light-only" src="../../assets/logo.svg" alt="Herb.jl logo"/><img class="docs-dark-only" src="../../assets/logo-dark.svg" alt="Herb.jl logo"/></a><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><span class="tocitem">Basics</span><ul><li><a class="tocitem" href="../../">Herb.jl</a></li><li><a class="tocitem" href="../../install/">Installation Guide</a></li><li><a class="tocitem" href="../basic_getting_started/">Getting Started</a></li><li><a class="tocitem" href="../../concepts/">Herb Architecture and Core Concepts</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../getting_started_with_herb/">A more verbose getting started with Herb.jl</a></li><li class="is-active"><a class="tocitem" href>Defining Grammars in Herb.jl</a></li><li><a class="tocitem" href="../advanced_search/">Advanced Search Procedures</a></li><li><a class="tocitem" href="../TopDown/">Top Down Iterator</a></li><li><a class="tocitem" href="../getting_started_with_constraints/">Getting started with Constraints</a></li><li><a class="tocitem" href="../working_with_interpreters/">Working with custom interpreters</a></li><li><a class="tocitem" href="../abstract_syntax_trees/">Abstract Syntax Trees</a></li></ul></li><li><span class="tocitem">Sub-Modules</span><ul><li><a class="tocitem" href="../../HerbCore/">HerbCore.jl</a></li><li><a class="tocitem" href="../../HerbGrammar/">HerbGrammar.jl</a></li><li><a class="tocitem" href="../../HerbSpecification/">HerbSpecification.jl</a></li><li><a class="tocitem" href="../../HerbInterpret/">HerbInterpret.jl</a></li><li><a class="tocitem" href="../../HerbConstraints/">HerbConstraints.jl</a></li><li><a class="tocitem" href="../../HerbSearch/">HerbSearch.jl</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Defining Grammars in Herb.jl</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Defining Grammars in Herb.jl</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Herb-AI/Herb.jl/blob/master/docs/src/tutorials/defining_grammars.jl" title="View source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><style>
     #documenter-page table {
         display: table !important;
         margin: 2rem auto !important;
@@ -26,7 +26,7 @@
     # This information is used for caching.
     [PlutoStaticHTML.State]
     input_sha = "92f2efa50fb2079f9fa0c3b0fb251429d7ab7e475499d84df99ed89e6f902bbc"
-    julia_version = "1.12.6"
+    julia_version = "1.13.0"
 -->
 
 <div class="markdown"><h1 id="Defining-Grammars-in-Herb.jl-using-HerbGrammar">Defining Grammars in Herb.jl using HerbGrammar</h1><p>The program space in Herb.jl is defined using a grammar.  This notebook demonstrates how such a grammar can be created.  There are multiple kinds of grammars, but they can all be defined in a very similar way.</p></div>
@@ -217,40 +217,40 @@ end</code></pre>
 <div class="markdown"><h3 id="isterminal">isterminal</h3><p><code>isterminal</code> returns <code>true</code> if a rule is terminal, i.e. it cannot be expanded. For example, rule 1 is terminal, but rule 11 is not, since it contains the non-terminal symbol <code>:Int</code>. </p></div>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.isterminal(g₇, 1)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash594982">true</pre>
+<pre class="code-output documenter-example-output" id="var-hash166776">true</pre>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.isterminal(g₇, 11)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash518469">false</pre>
+<pre class="code-output documenter-example-output" id="var-hash106451">false</pre>
 
 
 <div class="markdown"><h3 id="return_type">return_type</h3><p>This function is rather obvious; it returns the non-terminal symbol that corresponds to a certain rule. The return type for all rules in our grammar is <code>:Int</code>.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.return_type(g₇, 11)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash167108">:Int</pre>
+<pre class="code-output documenter-example-output" id="var-hash845871">:Int</pre>
 
 
 <div class="markdown"><h3 id="child_types">child_types</h3><p><code>child_types</code> returns the types of the nonterminal children of a rule in a vector. If you just want to know how many children a rule has, and not necessarily which types they have, you can use <code>nchildren</code></p></div>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.child_types(g₇, 11)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash141241">2-element Vector{Symbol}:
+<pre class="code-output documenter-example-output" id="var-hash158231">2-element Vector{Symbol}:
  :Int
  :Int</pre>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.nchildren(g₇, 11)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash151878">2</pre>
+<pre class="code-output documenter-example-output" id="var-hash172194">2</pre>
 
 
 <div class="markdown"><h3 id="nonterminals">nonterminals</h3><p>The <code>nonterminals</code> function can be used to obtain a list of all nonterminals in the grammar.</p></div>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.nonterminals(g₇)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash115023">1-element Vector{Symbol}:
+<pre class="code-output documenter-example-output" id="var-hash146749">1-element Vector{Symbol}:
  :Int</pre>
 
 
 <div class="markdown"><h3 id="Adding-rules">Adding rules</h3><p>It is also possible to add rules to a grammar during execution. This can be done using the <code>add_rule!</code> function. The exclamation mark is a Julia convention and is appended to name if a function modifies its arguments (in our example the grammar).</p><p>A rule can be provided in the same syntax as is used in the grammar definition. The rule should be of the <code>Expr</code> type, which is a built-in type for representing expressions.  An easy way of creating <code>Expr</code> values in Julia is to encapsulate it in brackets and use a colon as prefix:</p></div>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.add_rule!(g₇, :(Int = Int - Int))</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash700556">1: Int = 0
+<pre class="code-output documenter-example-output" id="var-hash115981">1: Int = 0
 2: Int = 1
 3: Int = 2
 4: Int = 3
@@ -270,7 +270,7 @@ end</code></pre>
 <div class="markdown"><h3 id="Removing-rules">Removing rules</h3><p>It is also possible to remove rules in Herb.jl, however, this is a bit more involved.  As said before, rules have an index associated with them.  The internal representation of programs that are defined by the grammar makes use of those indices for efficiency. Blindly removing a rule would shift the indices of other rules, and this could mean that existing programs get a different meaning or become invalid. </p><p>Therefore, there are two functions for removing rules:</p><ul><li><p><code>remove_rule!</code> removes a rule from the grammar, but fills its place with a placeholder. Therefore, the indices stay the same, and only programs that use the removed rule become invalid.</p></li><li><p><code>cleanup_removed_rules!</code> removes all placeholders and shifts the indices of the other rules.</p></li></ul></div>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.remove_rule!(g₇, 11)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash501182">1: Int = 0
+<pre class="code-output documenter-example-output" id="var-hash361394">1: Int = 0
 2: Int = 1
 3: Int = 2
 4: Int = 3
@@ -287,7 +287,7 @@ end</code></pre>
 </pre>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.cleanup_removed_rules!(g₇)</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash168833">1: Int = 0
+<pre class="code-output documenter-example-output" id="var-hash125077">1: Int = 0
 2: Int = 1
 3: Int = 2
 4: Int = 3
@@ -330,7 +330,7 @@ end</code></pre>
 <div class="markdown"><p>Constraints can be added using the <code>addconstraint!</code> function, which takes a context-sensitive grammar and a constraint and adds the constraint to the grammar.</p><p>For example, we can add a `<code>constraint to enforce that the input symbol</code>x` (rule 13) appears at least once in the program, to avoid programs that are just a constant.  </p></div>
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.addconstraint!(g₈, Contains(13))</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash105069">1-element Vector{AbstractConstraint}:
+<pre class="code-output documenter-example-output" id="var-hash165689">1-element Vector{AbstractConstraint}:
  Contains(13)</pre>
 
 
@@ -365,7 +365,7 @@ end</code></pre>
 
 
 <pre class='language-julia'><code class='language-julia'>HerbGrammar.read_csg("demo.txt")</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash174505">1: Int = 0
+<pre class="code-output documenter-example-output" id="var-hash738882">1: Int = 0
 2: Int = 1
 3: Int = 2
 4: Int = 3
@@ -387,7 +387,7 @@ end</code></pre>
 
 
 <pre class='language-julia'><code class='language-julia'>g₈, g₈.constraints</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash136301">(1: Int = 0
+<pre class="code-output documenter-example-output" id="var-hash752830">(1: Int = 0
 2: Int = 1
 3: Int = 2
 4: Int = 3
@@ -419,7 +419,7 @@ end</code></pre>
 </pre>
 
 <pre class='language-julia'><code class='language-julia'>g₁₀, g₁₀.constraints</code></pre>
-<pre class="code-output documenter-example-output" id="var-hash688383">(1: Int = 0
+<pre class="code-output documenter-example-output" id="var-hash471220">(1: Int = 0
 2: Int = 1
 3: Int = 2
 4: Int = 3
@@ -439,4 +439,4 @@ mermaid.initialize({
     startOnLoad: true,
     theme: "neutral"
 });
-</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../getting_started_with_herb/">« A more verbose getting started with Herb.jl</a><a class="docs-footer-nextpage" href="../advanced_search/">Advanced Search Procedures »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Tuesday 11 August 2026 18:15">Tuesday 11 August 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</script></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../getting_started_with_herb/">« A more verbose getting started with Herb.jl</a><a class="docs-footer-nextpage" href="../advanced_search/">Advanced Search Procedures »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Monday 14 September 2026 15:01">Monday 14 September 2026</span>. Using Julia version 1.13.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
